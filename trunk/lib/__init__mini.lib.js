@@ -264,6 +264,25 @@ function __contextImp(){
 		this.alz[sInterface] = interfaceImp;
 		this[sInterface] = interfaceImp;
 	};
+	//创建一个方法并返回
+	function createMethod(name){
+		return function(){
+			return callMethod(this, name, arguments);
+		};
+	}
+	//使用用特定的参数调用一个指定名称的方法
+	function callMethod(obj, name, args){
+		if(obj._exts !== obj._clazz[__proto]._exts){
+			window.alert("callMethod error");
+		}
+		var exts = obj._exts;
+		for(var i = 0, len = exts.length; i < len; i++){  //按顺序执行方法的扩展（构造、析构）
+			if(name in exts[i]){
+				exts[i][name].apply(obj, args);
+			}
+		}
+		exts = null;
+	}
 	/**
 	 * 为类提供一个扩展机制
 	 * @param className {String} 被扩展的类的名字
@@ -283,28 +302,23 @@ function __contextImp(){
 		//}
 		var p = clazz[__proto];
 		var exts = p._exts;  //_exts[name]
-		if(exts.length == 0){  //如果还没有被扩展过
-			exts.push({  //保存扩展之前原始的构造函数和析构函数
-				"init"   : p._init,
-				"dispose": p.dispose
-			});
-			//重定义构造函数和析构函数，保证能够执行扩展的代码
-			p._init = function(){
-				if(this._exts !== this._clazz[__proto]._exts) alert("");
-				var exts = this._exts;
-				for(var i = 0, len = exts.length; i < len; i++){  //按顺序执行构造扩展
-					exts[i].init.call(this, arguments);
-				}
-				exts = null;
+		if(exts.length == 0){  //如果还没有被扩展过，保存扩展之前原始的关键方法
+			var methods = {
+				"_init"  : 1,  //构造函数
+				"init"   : 1,  //初始化函数
+				"dispose": 1   //析构函数
 			};
-			p.dispose = function(){
-				if(this._exts !== this._clazz[__proto]._exts) alert("");
-				var exts = this._exts;
-				for(var i = 0, len = exts.length; i < len; i++){  //按顺序执行析构扩展
-					exts[i].dispose.apply(this, arguments);
+			//重定义关键方法，保证能够顺利执行扩展的代码
+			var ext = {};
+			for(var key in methods){
+				var k = methods[key];
+				if(k in p){
+					ext[k] = p[k];
+					p[k] = createMethod(k);
 				}
-				exts = null;
-			};
+			}
+			exts.push(ext);
+			ext = null;
 		}
 		var o = new extImp();  //创建扩展的一个实例（只需创建一个）
 		exts.push(o);  //注册扩展
@@ -315,7 +329,7 @@ function __contextImp(){
 		//如果是扩展的WebAppRuntime类，保证全局唯一对象runtime能够被扩展
 		//[TO-DO]onContentLoad之后再执行WebAppRuntime的类扩展
 		if(className == "WebAppRuntime"){
-			o.init.call(this.runtime);
+			if(o._init) o._init.call(this.runtime);
 		}
 		o = null;
 		exts = null;
@@ -1475,10 +1489,8 @@ _class("LibLoader", "", function(_super){
 _package("alz.core");
 
 _extension("WebAppRuntime", function(){  //注册 WebAppRuntime 扩展
-	this.init = function(){
-	};
-	this.dispose = function(){
-	};
+	//this._init = function(){};
+	//this.dispose = function(){};
 	this.addMethods = function(destination, source){
 		for(var property in source){
 			destination[property] = source[property];
