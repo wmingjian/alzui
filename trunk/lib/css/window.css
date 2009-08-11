@@ -1,8 +1,5 @@
 @charset "utf-8";
 
-HTML,
-BODY{position:relative;overflow:hidden;width:100%;height:100%;margin:0px;padding:0px;border:0px;background-color:background;}
-
 .wui-Window-winxp {position:absolute;overflow:hidden;left:20px;top:20px;width:40%;height:40%;}
 .wui-Window-winxp .head {position:absolute;overflow:hidden;width:300px;height:24px;z-index:2;/*background-color:gray;*/}
 .wui-Window-winxp .head img         {float:left;position:relative;top:4px;width:16px;height:16px;margin-left:2px;vertical-align:middle;margin-right:4px;}

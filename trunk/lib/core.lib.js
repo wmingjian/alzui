@@ -1,5 +1,5 @@
 /*
- * alzui-mini JavaScript Framework, v0.0.1
+ * alzui-mini JavaScript Framework, v0.0.2
  * Copyright (c) 2009 wmingjian@gmail.com. All rights reserved.
  *
  * Licensed under the GNU General Public License v2.
@@ -8,7 +8,7 @@
 (function(){with(runtime.createContext("core")){
 
 //_import("AObject,ui.Component");
-//_export("DOMUtil,AjaxEngine,EventTarget,Application");
+//_export("DOMUtil,DOMUtil2,AjaxEngine,EventTarget,AppManager,Application");
 
 /*#file begin=alz.core.DOMUtil.js*/
 _package("alz.core");
@@ -508,6 +508,326 @@ _class("DOMUtil", "", function(_super){
 			}
 		}
 		style = null;
+	};
+});
+/*#file end*/
+/*#file begin=alz.core.LayoutElement.js*/
+_package("alz.core");
+
+_class("LayoutElement", "", function(_super){
+	this._init = function(el, dom){
+		_super._init.call(this);
+		this._dom = dom;
+		this._self = null;
+		this.init(el);
+	};
+	this.init = function(obj){
+		obj.__ptr__ = this;
+		this._self = obj;
+		//初始化应用到的属性，从DOM对象中解析出实际的值，只读方式使用
+		var properties = [
+			"width",
+			"height",
+			"marginBottom",
+			"marginLeft",
+			"marginRight",
+			"marginTop",
+			"borderBottomWidth",
+			"borderLeftWidth",
+			"borderRightWidth",
+			"borderTopWidth",
+			"paddingBottom",
+			"paddingLeft",
+			"paddingRight",
+			"paddingTop"
+		];
+		for(var i = 0, len = properties.length; i < len; i++){
+			var key = properties[i];
+			if(!("_" + key in this)){
+				this["_" + key] = this._dom.getStyleProperty(obj, key);
+			}
+		}
+	};
+	this.dispose = function(){
+		this._self.__ptr__ = null;
+		this._self = null;
+		this._dom = null;
+		_super.dispose.apply(this);
+	};
+	this.setLeft = function(x){
+		this._self.style.left = x + "px";
+	};
+	this.setTop = function(y){
+		this._self.style.top = y + "px";
+	};
+	this.getWidth = function(){
+		return this._dom.getWidth(this._self);
+	};
+	this.setWidth = function(w){
+		this._dom.setWidth(this._self, w);
+	};
+	this.getHeight = function(){
+		var h = this._height;
+		if(h != this._dom.getHeight(this._self)){
+			runtime.log(this._self.className + ":" + h + "!=" + this._dom.getHeight(this._self));
+		}
+		return this._height;
+	};
+	this.setHeight = function(h){
+		this._dom.setHeight(this._self, h);
+	};
+	this.setInnerWidth = function(w, skip){
+		//绝对定位，marginRight没有作用
+		//this.setWidth(w/*- this._marginLeft - this._marginRight*/);
+		this._self.style.width = Math.max(0, w
+			- (skip ? 0 : (this._marginLeft + this._marginRight))
+			- this._borderLeftWidth - this._borderRightWidth
+			- this._paddingLeft - this._paddingRight
+		) + "px";
+	};
+	this.setInnerHeight = function(h){
+		//this.setHeight(h - this._marginTop - this._marginBottom);
+		this._self.style.height = Math.max(0, h
+			- this._marginTop - this._marginBottom
+			- this._borderTopWidth - this._borderBottomWidth
+			- this._paddingTop - this._paddingBottom
+		) + "px";
+	};
+	this.hasLayout = function(){
+		this._layout = this._self.getAttribute("_layout");
+		return this._layout;
+	};
+	this.layout = function(){
+		//this._self.style.overflow = "hidden";
+		_import("alz.layout." + this._layout);  //BorderLayout
+		var layout = new __context__[this._layout]();
+		layout.init(this._self);
+		layout.updateDock(
+			this._self.clientWidth - this._paddingLeft - this._paddingRight,
+			this._self.clientHeight - this._paddingTop - this._paddingBottom
+		);
+		layout.dispose();
+		layout = null;
+	};
+});
+/*#file end*/
+/*#file begin=alz.core.DomUtil2.js*/
+_package("alz.core");
+
+_class("DomUtil2", "", function(_super){
+	this._init = function(){
+		_super._init.call(this);
+		this._nodes = [];
+		this._domTemp = null;
+	}
+	this.dispose = function(){
+		this._domTemp = null;
+		//解除所有DOM元素和脚本对象的绑定关系
+		for(var i = 0, len = this._nodes.length; i < len; i++){
+			this._nodes[i].dispose();
+			this._nodes[i] = null;
+		}
+		this._nodes = [];
+		_super.dispose.apply(this);
+	};
+	this.createDomElement = function(html, parent){
+		if(!this._domTemp)
+			this._domTemp = window.document.createElement("div");
+		this._domTemp.innerHTML = html;
+		var obj = this._domTemp.removeChild(this._domTemp.childNodes[0]);
+		if(parent){
+			parent.appendChild(obj);
+			/*
+			//滞后加载图片
+			var imgs = obj.getElementsByTagName("img");
+			for(var i = 0, len = imgs.length; i < len; i++){
+				imgs[i].src = imgs[i].getAttribute("src0");
+			}
+			imgs = null;
+			*/
+		}
+		return obj;
+	};
+	/**
+	 * 统一 IE 和 Moz 系列浏览器的差异
+	 */
+	this.parseInt = function(tag, v){
+		switch(v){
+		case "medium":
+			return tag == "DIV" ? 0 : 2;
+		case "thin":
+			return tag == "DIV" ? 0 : 1;
+		case "thick":
+			return tag == "DIV" ? 0 : 1;
+		default:
+			var a = parseInt(v);
+			return isNaN(a) ? 0 : a;
+		}
+	};
+	this.getStyle = function(el){
+		var style, view = window.document.defaultView;
+		if(view && view.getComputedStyle)
+			style = view.getComputedStyle(el, null);
+		else if(el.currentStyle)
+			style = el.currentStyle;
+		else
+			throw "无法动态获取DOM的实际样式属性";
+		return style;
+	};
+	this.getPropertyValue = function(style, name){
+		//return runtime._host.env == "ie" ? style[name] : (style.getPropertyValue(name) || style.getPropertyCSSValue(name));
+		return style[name];
+	};
+	this.getStyleProperty = function(el, name){
+		var style = this.getStyle(el);
+		return this.parseInt(el.tagName, this.getPropertyValue(style, name) || el.style[name]);
+	};
+	this.setStyleProperty = function(el, name, value){
+		el.style[name] = value;
+	};
+	this.getObj = function(el){
+		var obj;
+		if(!("__ptr__" in el)){
+			obj = new LayoutElement(el, this);
+			this._nodes.push(obj);
+		}else{
+			obj = el.__ptr__;
+		}
+		return obj;
+	};
+	this.moveTo = function(el, x, y){
+		var obj = this.getObj(el);
+		if(!("_left" in obj)) obj._left = 0;
+		if(!("_top" in obj)) obj._top = 0;
+
+		obj._left = x;
+		this.setStyleProperty(el, "left", x + "px");
+
+		obj._top = y;
+		this.setStyleProperty(el, "top", y + "px");
+	};
+	this.setOpacity = function(el, v){
+		var obj = this.getObj(el);
+		if(!("_opacity" in obj)) obj._opacity = 0;
+		if(obj._opacity != v){
+			v = Math.max(0, Math.min(1, v));
+			obj._opacity = v;
+			switch(runtime._host.env){
+			case "ie":
+				v = Math.round(v * 100);
+				this.setStyleProperty(el, "filter", v == 100 ? "" : "Alpha(Opacity=" + v + ")");
+				break;
+			case "ff":
+			case "ns":
+				this.setStyleProperty(el, "MozOpacity", v == 1 ? "" : v);
+				break;
+			case "opera":
+			case "safari":
+			case "chrome":
+				this.setStyleProperty(el, "opacity", v == 1 ? "" : v);
+				break;
+			}
+		}
+		obj = null;
+	};
+	this._setWidth = function(el, v){
+		//if(runtime._host.compatMode != "BackCompat"){
+		//	//alert("+" + forIn(this.getStyle(el)).join("\n"));
+		//	v -= this.getStyleProperty(el, "borderLeftWidth") + this.getStyleProperty(el, "borderRightWidth");
+		//}
+		v = Math.max(0, v);
+		this.setStyleProperty(el, "width", v + "px");
+	};
+	this._setHeight = function(el, v){
+		//if(runtime._host.compatMode != "BackCompat"){
+		//	v -= this.getStyleProperty(el, "borderTopWidth") + this.getStyleProperty(el, "borderBottomWidth");
+		//}
+		v = Math.max(0, v);
+		this.setStyleProperty(el, "height", v + "px");
+	};
+	this.getWidth = function(el){
+		var obj = this.getObj(el);
+		//if(!("_width" in obj)){
+			if(runtime._host.compatMode != "BackCompat"){
+				obj._width = el.offsetWidth;  // - (runtime._host.env == "ie" ? 0 : this.getStyleProperty(el, "borderLeftWidth") + this.getStyleProperty(el, "borderRightWidth"))
+			}else{
+				obj._width = this.getStyleProperty(el, "borderLeftWidth")
+					+ el.offsetWidth  //this.getStyleProperty(el, "width")
+					+ this.getStyleProperty(el, "borderRightWidth");
+			}
+		//}
+		return obj._width;
+		//obj = null;
+	};
+	this.getHeight = function(el){
+		var obj = this.getObj(el);
+		//if(!("_height" in obj)){
+			if(runtime._host.compatMode != "BackCompat"){
+				obj._height = el.offsetHeight;
+			}else{
+				obj._height = this.getStyleProperty(el, "borderTopWidth")
+					+ el.offsetHeight  //this.getStyleProperty(el, "height")
+					+ this.getStyleProperty(el, "borderBottomWidth");
+			}
+		//}
+		return obj._height;
+		//obj = null;
+	};
+	this.setWidth = function(el, v){
+		var obj = this.getObj(el);
+		if(!("_width" in obj)) obj._width = 0;
+		v = Math.max(v/* - obj._marginLeft - obj._marginRight*/, 0);
+		//if(el.className == "pane-top") alert(obj._width + "!=" + v);
+		//if(obj._width != v){
+			obj._width = v;
+			var w = this.getInnerWidth(el, v);
+			this._setWidth(el, w);
+		//}
+		obj = null;
+	};
+	this.setHeight = function(el, v){
+		var obj = this.getObj(el);
+		if(!("_height" in obj)) obj._height = 0;
+		v = Math.max(v/* - obj._marginTop - obj._marginBottom*/, 0);
+		if(obj._height != v){
+			obj._height = v;
+			var w = this.getInnerHeight(el, v);
+			this._setHeight(el, w);
+		}
+		obj = null;
+	};
+	this.getInnerWidth = function(el, v){
+		var obj = this.getObj(el);
+		if(!v) v = obj._width;
+		var innerWidth = Math.max(0, runtime._host.compatMode == "BackCompat" ? v : v - obj._borderLeftWidth - obj._borderRightWidth - obj._paddingLeft - obj._paddingRight);
+		//var innerWidth = Math.max(0, runtime.getBoxModel() == 0 ? v : v - this._borderLeftWidth - this._borderRightWidth - this._paddingLeft - this._paddingRight);
+		obj = null;
+		if(isNaN(innerWidth)) runtime.log("DomUtil::getInnerWidth isNaN(innerWidth)");
+		return innerWidth;
+	};
+	this.getInnerHeight = function(el, v){
+		var obj = this.getObj(el);
+		if(!v) v = obj._height || el.offsetHeight;
+		var innerHeight = Math.max(0, runtime._host.compatMode == "BackCompat" ? v : v - obj._borderTopWidth - obj._borderBottomWidth - obj._paddingTop - obj._paddingBottom);
+		obj = null;
+		if(isNaN(innerHeight)) runtime.log("DomUtil::getInnerHeight isNaN(innerHeight)");
+		return innerHeight;
+	};
+	this.getOuterWidth = function(el, v){
+		var obj = this.getObj(el);
+		if(!v) v = this.getWidth(el);
+		var outerWidth = Math.max(0, runtime._host.compatMode == "BackCompat" ? v : v + obj._marginLeft + obj._marginRight);
+		obj = null;
+		if(isNaN(outerWidth)) window.alert("DomUtil::getOuterWidth isNaN(outerWidth)");
+		return outerWidth;
+	};
+	this.getOuterHeight = function(el, v){
+		var obj = this.getObj(el);
+		if(!v) v = this.getHeight(el);
+		var outerHeight = Math.max(0, runtime._host.compatMode == "BackCompat" ? v : v + obj._marginTop + obj._marginBottom);
+		obj = null;
+		if(isNaN(outerHeight)) window.alert("DomUtil::getOuterHeight isNaN(outerHeight)");
+		return outerHeight;
 	};
 });
 /*#file end*/
@@ -1418,11 +1738,13 @@ _class("Application", EventTarget, function(_super){
 _package("alz.core");
 
 _import("alz.core.DOMUtil");
+_import("alz.core.DOMUtil2");
 _import("alz.core.AjaxEngine");
 
 _extension("WebAppRuntime", function(){  //注册 WebAppRuntime 扩展
 	this._init = function(){  //加载之后的初始化工作
 		this.dom = new DOMUtil();
+		this.domutil = new DomUtil2();
 		this.ajax = this.getParentRuntime() ? this._parentRuntime.getAjax() : new AjaxEngine();
 		//this.ajax._userinfo = true;
 		//设置测试用例
@@ -1432,16 +1754,39 @@ _extension("WebAppRuntime", function(){  //注册 WebAppRuntime 扩展
 			this.ajax.setTestCase(win.runtime.ajax.getTestCase());
 		}
 		*/
+		if(this._debug){
+			window.document.onmousedown = function(ev){
+				ev = ev || window.event;
+				if(ev.ctrlKey){
+					var target = ev.target || ev.srcElement;
+					for(var el = target; el; el = el.parentNode){
+						if(el.__ptr__){
+							var arr = runtime.forIn(el.__ptr__);
+							arr.push("class=" + el.className);
+							arr.push("tagName=" + el.tagName);
+							window.alert(arr.join("\n"));
+							arr = null;
+							break;
+						}
+					}
+				}
+			};
+		}
 	};
 	this.dispose = function(){
-		if(this.dom){
-			this.dom.dispose();
-			this.dom = null;
+		if(this._debug){
+			window.document.onmousedown = null;
 		}
 		if(this.ajax){
 			if(!this._parentRuntime)
 				this.ajax.dispose();
 			this.ajax = null;
+		}
+		this.domutil.dispose();
+		this.domutil = null;
+		if(this.dom){
+			this.dom.dispose();
+			this.dom = null;
 		}
 	};
 	/**
@@ -1496,17 +1841,20 @@ _extension("WebAppRuntime", function(){  //注册 WebAppRuntime 扩展
 	 * @param html {String} 要解码的 HTML 代码字符串
 	 */
 	this.decodeHTML = function(html){
-		return html
-			//.replace(/&#37;/ig, '%')
-			.replace(/&nbsp;/ig, " ")
-			.replace(/&quot;/ig, "\"")
-			//.replace(/&apos;/ig, "\'")
-			.replace(/&gt;/ig, ">")
-			.replace(/&lt;/ig, "<")
-			.replace(/&#(\d{2}|\d{4});/ig, function($0, $1){
-				return String.fromCharCode($1);
-			})
-			.replace(/&amp;/ig, "&");
+		if(!html)
+			return "";
+		else
+			return html
+				//.replace(/&#37;/ig, '%')
+				.replace(/&nbsp;/ig, " ")
+				.replace(/&quot;/ig, "\"")
+				//.replace(/&apos;/ig, "\'")
+				.replace(/&gt;/ig, ">")
+				.replace(/&lt;/ig, "<")
+				.replace(/&#(\d{2}|\d{4});/ig, function($0, $1){
+					return String.fromCharCode($1);
+				})
+				.replace(/&amp;/ig, "&");
 	};
 	/**
 	 * 根据参数 progid 创建一个 ActiveXObject，成功返回对象，失败返回 null

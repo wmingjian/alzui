@@ -1,5 +1,5 @@
 /*
- * alzui-mini JavaScript Framework, v0.0.1
+ * alzui-mini JavaScript Framework, v0.0.2
  * Copyright (c) 2009 wmingjian@gmail.com. All rights reserved.
  *
  * Licensed under the GNU General Public License v2.
@@ -2352,7 +2352,10 @@ _extension("WebAppRuntime", function(){  //注册 WebAppRuntime 扩展
 		//调整所有应用的大小
 		for(var i = 0, len = this._apps.length; i < len; i++){
 			if(this._apps[i].onResize){
-				this._apps[i].onResize(rect.w, rect.h);
+				try{
+					this._apps[i].onResize(rect.w, rect.h);
+				}catch(ex){
+				}
 			}
 		}
 	};
@@ -2447,8 +2450,9 @@ _extension("WebAppRuntime", function(){  //注册 WebAppRuntime 扩展
 			var obj = this.getComponentById(id);  //可能的组件是 Popup,Dialog
 			obj.moveToCenter();
 			obj.showModal(true);
-		}
-		/*else obj.showModal(false);*/
+		}/*else{
+			obj.showModal(false);
+		}*/
 	};
 	this.getModalPanel = function(){
 		return this._workspace.getModalPanel();

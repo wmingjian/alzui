@@ -6,12 +6,12 @@
 <script type="text/javascript" src="../lib/__init__mini.lib.js" charset="utf-8"
 	pathcss="../lib/css/"
 	pathlib="../lib/"
-	css="window.css"
-	lib="core,ui"
+	css="alzui.css,window.css,wui-ListBox.css"
+	lib="core,ui,ui_action,test_win"
 	conf="{
 		debug:true,
 		runmode:0,
-		action:''
+		action:'index'
 	}"
 	></script>
 </head>
@@ -19,7 +19,15 @@
 <noscript>
 	<p>当前浏览器不支持脚本，无法正常浏览该系统</p>
 </noscript>
-<p>目前还没有任何内容，仅仅演示了加载框架代码的语法。</p>
-<p><a href="Window.html">Window组件演示</a></p>
+<div _align="client" _layout="BorderLayout">
+	<ul _align="left" class="wui-ListBox">
+		<li><a href="index.html">介绍</a></li>
+		<li><a href="Window.html">Window组件</a></li>
+		<li><a href="Table.html">Table组件</a></li>
+	</ul>
+	<div _align="client">
+		<p>目前还没有任何内容，仅仅演示了加载框架代码的语法。</p>
+	</div>
+</div>
 </body>
 </html>

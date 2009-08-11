@@ -1,5 +1,5 @@
 /*
- * alzui-mini JavaScript Framework, v0.0.1
+ * alzui-mini JavaScript Framework, v0.0.2
  * Copyright (c) 2009 wmingjian@gmail.com. All rights reserved.
  *
  * Licensed under the GNU General Public License v2.
@@ -8,7 +8,7 @@
 (function(__global){  // Using a closure to keep global namespace clean.
 
 /*#file begin=alz.init.js*/
-var __version = "0.0.1"; //当前版本信息，格式:"主版本号.副版本号.修订版本号"
+var __version = "0.0.2"; //当前版本信息，格式:"主版本号.副版本号.修订版本号"
 var __start = new Date().getTime();  //记录开始时间
 var __proto = "prototype";
 var __inDeclare = false;  //标识是否处于类声明过程中
@@ -422,7 +422,8 @@ _class("WebAppRuntime", "", function(_super){
 		this._startTime = __start;   //系统代码开始执行的时间戳
 		this._debug = false;         //系统是否处于调试状态
 		this._parentRuntime = null;  //父WebAppRuntime对象
-		this._hostenv = "";          //宿主环境
+		this._host = null;           //宿主环境
+		this._hostenv = "";
 		this._win = __global;
 		this._doc = this._win.document;
 
@@ -553,7 +554,7 @@ _class("WebAppRuntime", "", function(_super){
 		//for(var i = 1, len = this._exts.length; i < len; i++){
 		//	this._exts[i].init.call(this);
 		//}
-		this._libManager.initLoadLib(this);
+		this._libManager.initLoadLib();
 		this._newWorkspace = bNewWorkspace;
 		//this._workspace = new Screen();
 		//this._workspace[this._newWorkspace ? "create" : "bind"](this.getBody());
@@ -566,7 +567,7 @@ _class("WebAppRuntime", "", function(_super){
 		//[TODO]库代码的加载时机应该更早才对，至少要在 onContentLoaded 之前，最好是在初始化脚本加载并初始化完毕的时候
 		var libs = this._config["lib"];  //.replace(/^core,ui,/, "");  //忽略core,ui库代码
 		this._libLoader = new LibLoader();
-		this._libLoader.init(libs, this._config["codeprovider"], this, "onLibLoad");
+		this._libLoader.init(libs.split(","), this._config["codeprovider"], this, "onLibLoad");
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
@@ -595,35 +596,59 @@ _class("WebAppRuntime", "", function(_super){
 		this._domScript = null;
 		this._doc = null;
 		this._win = null;
+		this._host = null;
 		this._parentRuntime = null;
 		_super.dispose.apply(this);
 	};
 	/**
 	 * 利用正则匹配 window.navigator.userAgent 来获取浏览器的类型
 	 * @param nav {Navigator}
+	 * Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; en) Opera 8.00
+	 * Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9b4pre) Gecko/2008022005 Minefield/3.0b4pre (.NET CLR 3.5.30729)
 	 */
 	this.getHostenv = function(nav){
-		//window.prompt("", nav.userAgent);
+		//window.alert(this.forIn(nav).join("\n"));
+		//window.prompt("", nav.appVersion);  //nav.userAgent
 		var re = {
+		//"opera" : /Opera\/(\d+(?:\.\d+)+)/,      //Opera/9.10
+			"opera" : /Opera[\/\x20](\d+(?:\.\d+)+)/,  //Opera/9.10,Opera 8.00
 			"ie"    : /MSIE\x20(\d+(?:\.\d+)+)/,    //MSIE 6.0
 			"ff"    : /Firefox\/(\d+(?:\.\d+)+)/,   //Firefox/2.0.0.2
 			"ns"    : /Netscape\/(\d+(?:\.\d+)+)/,  //Netscape/7.0
-			"opera" : /Opera\/(\d+(?:\.\d+)+)/,      //Opera/9.10
 			"safari": /Version\/(\d+(?:\.\d+)+) Safari\/(\d+(?:\.\d+)+)/, //Version/3.0.3 Safari/522.15.5
-			"chrome": /Chrome\/(\d+(?:\.\d+)+) Safari\/(\d+(?:\.\d+)+)/  //Chrome/0.2.149.27 Safari/525.13
+			"chrome": /Chrome\/(\d+(?:\.\d+)+) Safari\/(\d+(?:\.\d+)+)/,  //Chrome/0.2.149.27 Safari/525.13
+			"mf"    : /Minefield\/(\d+(?:\.\d+)+)/  //Minefield/3.0b4pre
 		};
+		var host = {"os":"unix","env":"unknown","ver":"0","compatMode":""};
+		if(nav.platform == "Win32" || nav.platform == "Windows"){
+			//"Window NT 5.0" win2k
+			//"Window NT 5.1" winxp
+			host.os = "win";
+		}else if(nav.platform == "Mac68K" || nav.platform == "MacPPC" || nav.platform == "Macintosh"){
+			host.os = "mac";
+		}else if(nav.platform == "X11"){
+			host.os = "unix";
+		}
 		for(var k in re){
-			if(re[k].test(nav.userAgent)){
-				return k;
+			var arr = re[k].exec(nav.userAgent);
+			if(arr){  //re[k].test(nav.userAgent)
+				host.env = k == "mf" ? "ff": k;
+				host.ver = arr[1];
+				host.compatMode = host.env == "ie" && this._doc.compatMode == "BackCompat" ? "BackCompat" : "CSS1Compat";
+				break;
 			}
 		}
+		if(host.env == "unknown")
+			runtime.log("[BorderLayout::getHostenv]未知的宿主环境，userAgent:" + nav.userAgent);
+		return host;
 	};
 	/**
 	 * 检测浏览器类型
 	 */
 	this._checkBrowser = function(){
 		var nav = this._win.navigator;
-		this._hostenv = this.getHostenv(nav);
+		this._host = this.getHostenv(nav);
+		this._hostenv = this._host.env;
 		this.ie = this._hostenv == "ie";
 		this.ff = this._hostenv == "ff";
 		this.ns = this._hostenv == "ns";
@@ -867,7 +892,7 @@ _class("WebAppRuntime", "", function(_super){
 	this._extendSystemObject = function(){
 		//if(typeof HTMLElement != "undefined" && !window.opera){
 		if(this.moz){  //window.HTMLElement
-			_p = HTMLElement.prototype;
+			_p = HTMLElement[__proto];
 			_p.__defineGetter__("outerHTML", function(){
 				var str = "<" + this.tagName;
 				var a = this.attributes;
@@ -890,15 +915,15 @@ _class("WebAppRuntime", "", function(_super){
 				return !/^(area|base|basefont|col|frame|hr|img|br|input|isindex|link|meta|param)$/.test(this.tagName.toLowerCase());
 			});
 			//if(typeof Event!="undefined" && !window.opera){
-			_p = Event.prototype;
+			_p = Event[__proto];
 			//_p.__defineSetter__("returnValue", function(b){if(!b)this.preventDefault();return b;});
 			_p.__defineSetter__("cancelBubble",function(b){if(b)this.stopPropagation();return b;});
 			_p.__defineGetter__("offsetX", function(){return this.layerX;});
 			_p.__defineGetter__("offsetY", function(){return this.layerY;});
 			_p.__defineGetter__("srcElement", function(){var n = this.target;while(n.nodeType != 1) n = n.parentNode;return n;});
 			//}
-			XMLDocument.prototype.selectNodes =
-			Element.prototype.selectNodes = function(xpath){
+			XMLDocument[__proto].selectNodes =
+			Element[__proto].selectNodes = function(xpath){
 				var xpe = new XPathEvaluator();
 				var nsResolver = xpe.createNSResolver(this.ownerDocument == null
 					? this.documentElement
@@ -910,8 +935,8 @@ _class("WebAppRuntime", "", function(_super){
 					found.push(res);
 				return found;
 			};
-			XMLDocument.prototype.selectSingleNode =
-			Element.prototype.selectSingleNode = function(xpath){
+			XMLDocument[__proto].selectSingleNode =
+			Element[__proto].selectSingleNode = function(xpath){
 				var x = this.selectNodes(xpath);
 				if(!x || x.length < 1) return null;
 				return  x[0];
@@ -955,6 +980,7 @@ _class("WebAppRuntime", "", function(_super){
 			try{  //屏蔽页面onunload时可能产生的错误
 				this.dispose();
 			}catch(ex){
+				this.log("[WebAppRuntime::dispose]exception");
 			}
 			//if(application) application = null;
 			break;
@@ -1316,7 +1342,6 @@ _package("alz.core");
 _class("LibManager", "", function(_super){
 	this._init = function(){
 		_super._init.call(this);
-		this._rt = null;
 		this._hash = {};
 		this._libs = [];
 		this._libExt = ".lib.js";  //库文件默认的后缀名
@@ -1337,10 +1362,9 @@ _class("LibManager", "", function(_super){
 		}
 		this._libs = [];
 		for(var k in this._hash){
-			this._hash[k].dispose.apply(this._rt);
+			this._hash[k].dispose.apply(runtime);
 			delete this._hash[k];
 		}
-		this._rt = null;
 		_super.dispose.apply(this);
 	};
 	this.getLib = function(name){
@@ -1372,12 +1396,11 @@ _class("LibManager", "", function(_super){
 	/**
 	 * 执行和初始化文件一起加载并且尚未初始化的库代码
 	 */
-	this.initLoadLib = function(rt){
-		this._rt = rt;
+	this.initLoadLib = function(){
 		for(var i = 0, len = this._libs.length; i < len; i++){
 			var lib = this._libs[i];
 			if(!lib._inited){
-				lib.init.apply(this._rt);
+				lib.init.apply(runtime);
 				lib._inited = true;
 			}
 			lib = null;
@@ -1391,7 +1414,6 @@ _package("alz.core");
 _class("LibLoader", "", function(_super){
 	this._init = function(){
 		_super._init.call(this);
-		this._rt = null;
 		this._libs = [];
 		this._libExt = ".lib.js";  //库文件默认的后缀名
 		this._codeProvider = "";
@@ -1402,17 +1424,15 @@ _class("LibLoader", "", function(_super){
 	this.dispose = function(){
 		this._agent = null;
 		this._libs = [];
-		this._rt = null;
 		_super.dispose.apply(this);
 	};
 	/**
-	 * @param libList {String} 逗号分割的库名列表
+	 * @param libs {String} 逗号分割的库名列表
 	 * @param agent {WebAppRuntime}
 	 * @param funName {String}
 	 */
-	this.init = function(libList, codeProvider, agent, funName){  //加载库代码
-		this._rt = agent;
-		this._libs = libList == "" ? [] : libList.split(",");
+	this.init = function(libs, codeProvider, agent, funName){  //加载库代码
+		this._libs = libs;
 		this._codeProvider = codeProvider;
 		this._agent = agent;
 		this._funName = funName;
@@ -1420,7 +1440,7 @@ _class("LibLoader", "", function(_super){
 	};
 	this._start = function(){
 		var _this = this;
-		this._rt._win.setTimeout(function(){
+		runtime._win.setTimeout(function(){
 			_this._loadLib();
 		}, 10);
 	};
@@ -1437,9 +1457,9 @@ _class("LibLoader", "", function(_super){
 			src = this._codeProvider.replace(/\{libname\}/g, name.substr(0, 1) != "#" ? name : name.substr(1));
 		}else{
 			if(name.substr(0, 1) != "#")
-				src = this._rt.pathLib + name + this._libExt;  //内核扩展库
+				src = runtime.pathLib + name + this._libExt;  //内核扩展库
 			else
-				src = (this._rt._config["pathapp"] || this._rt.pathApp + "lib/") + name.substr(1) + this._libExt;  //与版本相关的库
+				src = (runtime._config["pathapp"] || runtime.pathApp + "lib/") + name.substr(1) + this._libExt;  //与版本相关的库
 		}
 		return src;
 	};
@@ -1457,31 +1477,35 @@ _class("LibLoader", "", function(_super){
 		*/
 		this.loadLibScript(this._libs[this._index]);
 	};
-	this.loadLibScript = function(libName, callback){
-		var obj = this._rt._doc.createElement("script");
+	this.loadLibScript = function(libName, agent, fun){
+		var obj = runtime._doc.createElement("script");
 		obj.type = "text/javascript";
 		obj.charset = "utf-8";
 		obj.src = this.getUrlByName(libName);
 		var _this = this;
-		obj[this._rt.ie ? "onreadystatechange" : "onload"] = function(){
+		obj[runtime.ie ? "onreadystatechange" : "onload"] = function(){
 			//脚本如果缓存状态为 complete，否则为 loaded
-			if(_this._rt.ie && this.readyState != "loaded" && this.readyState != "complete") return;
-			if(callback)
-				callback();
+			if(runtime.ie && this.readyState != "loaded" && this.readyState != "complete") return;
+			if(agent)
+				fun.call(agent, libName, runtime._libManager._hash[libName]);
 			else
 				_this._onLoad();
-			this[_this._rt.ie ? "onreadystatechange" : "onload"] = null;
+			this[runtime.ie ? "onreadystatechange" : "onload"] = null;
 		};
-		this._rt._domScript.parentNode.appendChild(obj, this._rt._domScript);
+		runtime._domScript.parentNode.appendChild(obj, runtime._domScript);
 		obj = null;
 	};
 	this._onLoad = function(){
-		this._agent[this._funName](this._libs[this._index].replace(/#/g, ""));
+		var name = this._libs[this._index].replace(/#/g, "");
+		var argv = [name, runtime._libManager._hash[name]];
+		var fun = typeof this._funName == "function" ? this._funName : this._agent[this._funName];
+		fun.apply(this._agent, argv);
 		this._index++;
 		if(this._index < this._libs.length)
 			this._start();
 		else  //加载完毕
-			this._agent[this._funName]();  //注意没有库名
+			fun.apply(this._agent);  //注意没有库名
+		fun = null;
 	};
 });
 /*#file end*/
@@ -1512,10 +1536,10 @@ _extension("WebAppRuntime", function(){  //注册 WebAppRuntime 扩展
 	 * 遍历一个对象，并返回格式化的字符串
 	 */
 	this.forIn = function(obj){
-		if(typeof(obj) == "string") return [obj];  //FF 兼容问题
+		if(typeof obj == "string") return [obj];  //FF 兼容问题
 		var a = [];
 		for(var k in obj){
-			a.push(k + "=" + (typeof(obj[k]) == "function" ? "[function]" : obj[k]));
+			a.push(k + "=" + (typeof obj[k] == "function" ? "[function]" : obj[k]));
 		}
 		return a;
 	};

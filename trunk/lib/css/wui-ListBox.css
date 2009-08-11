@@ -1,0 +1,5 @@
+@charset "utf-8";
+/* ListBox 组件 */
+.wui-ListBox{margin:0px;padding:0px;}
+.wui-ListBox li{list-style:none;height:16px;}
+.wui-ListBox li a{font:12px 宋体;line-height:16px;}
