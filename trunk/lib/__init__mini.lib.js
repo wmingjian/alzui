@@ -300,14 +300,14 @@ function __contextImp(){
 		//if(!(name in _exts)){
 		//	_exts[name] = [];
 		//}
+		var methods = {
+			"_init"  : 1,  //构造函数
+			"init"   : 1,  //初始化函数
+			"dispose": 1   //析构函数
+		};
 		var p = clazz[__proto];
 		var exts = p._exts;  //_exts[name]
 		if(exts.length == 0){  //如果还没有被扩展过，保存扩展之前原始的关键方法
-			var methods = {
-				"_init"  : 1,  //构造函数
-				"init"   : 1,  //初始化函数
-				"dispose": 1   //析构函数
-			};
 			//重定义关键方法，保证能够顺利执行扩展的代码
 			var ext = {};
 			for(var key in methods){
@@ -323,8 +323,8 @@ function __contextImp(){
 		var o = new extImp();  //创建扩展的一个实例（只需创建一个）
 		exts.push(o);  //注册扩展
 		for(var k in o){
-			if(k == "init" || k == "dispose") continue; //忽略构造或析构函数
-			p[k] = o[k];  //绑定到原型上
+			if(k in methods) continue; //忽略关键方法
+			p[k] = o[k];  //其他的方法直接绑定到原型上
 		}
 		//如果是扩展的WebAppRuntime类，保证全局唯一对象runtime能够被扩展
 		//[TO-DO]onContentLoad之后再执行WebAppRuntime的类扩展
