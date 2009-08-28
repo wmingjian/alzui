@@ -1,5 +1,5 @@
 /*
- * alzui-mini JavaScript Framework, v0.0.2
+ * alzui-mini JavaScript Framework, v0.0.3
  * Copyright (c) 2009 wmingjian@gmail.com. All rights reserved.
  *
  * Licensed under the GNU General Public License v2.
@@ -86,7 +86,7 @@ _class("DomUtil2", "", function(_super){
 	this.getObj = function(el){
 		var obj;
 		if(!("__ptr__" in el)){
-			obj = new LayoutElement(el, this);
+			obj = new BoxElement(el, this);
 			this._nodes.push(obj);
 		}else{
 			obj = el.__ptr__;
@@ -229,41 +229,7 @@ _class("DomUtil2", "", function(_super){
 	};
 });
 /*#file end*/
-/*#file begin=alz.mui.Component2.js*/
-_package("alz.mui");
-
-_class("Component", "", function(_super){
-
-	this.init = function(obj){
-		obj._ptr = this;
-		this._self = obj;
-	};
-	this.dispose = function(){
-		for(var k in this._ee){
-			//this._ee[k] = null;
-			delete this._ee[k];
-		}
-		this._self._ptr = null;
-		this._self = null;
-		this._parent = null;
-		_super.dispose.apply(this);
-	};
-	this.resize = function(w, h){
-		if(this._width == w && this._height == h) return true;
-		this._width = w;
-		this._height = h;
-		this._self.style.width = w + "px";
-		this._self.style.height = h + "px";
-	};
-	this.setCapture = function(v){
-		if(v){
-			_workspace._captureComponent = this;
-		}else{
-			_workspace._captureComponent = null;
-		}
-	};
-});
-/*#file end*/
+//_import("alz.mui.Component2");
 /*#file begin=alz.mui.Workspace2.js*/
 _package("alz.mui");
 
@@ -383,275 +349,7 @@ _class("SilverButton", Component, function(_super){
 /*#file begin=alz.layout.BorderLayout.js*/
 _package("alz.layout");
 
-var _debug = false;
-var _host = null;
-var _domutil = null;
-
-function init(){
-	_host = getHostenv(window.navigator);
-	_domutil = new DomUtil();
-	if(_debug){
-		window.document.onmousedown = function(ev){
-			ev = ev || window.event;
-			if(ev.ctrlKey){
-				var target = ev.target || ev.srcElement;
-				for(var el = target; el; el = el.parentNode){
-					if(el.__ptr__){
-						var arr = forIn(el.__ptr__);
-						arr.push("class=" + el.className);
-						arr.push("tagName=" + el.tagName);
-						window.alert(arr.join("\n"));
-						arr = null;
-						break;
-					}
-				}
-			}
-		};
-	}
-}
-/**
- * 遍历一个对象，并返回格式化的字符串
- */
-function forIn(obj){
-	if(typeof obj == "string") return [obj];  //FF 兼容问题
-	var a = [];
-	for(var k in obj){
-		a.push(k + "=" + (typeof obj[k] == "function" ? "[function]" : obj[k]));
-	}
-	return a;
-}
-function getHostenv(nav){
-	//window.prompt("", nav.userAgent);
-	//Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; en) Opera 8.00
-	//Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9b4pre) Gecko/2008022005 Minefield/3.0b4pre (.NET CLR 3.5.30729)
-	var re = {
-		"opera" : /Opera[\/\x20](\d+(?:\.\d+)+)/,  //Opera/9.10,Opera 8.00
-		"ie"    : /MSIE\x20(\d+(?:\.\d+)+)/,       //MSIE 6.0
-		"ff"    : /Firefox\/(\d+(?:\.\d+)+)/,   //Firefox/2.0.0.2
-		"ns"    : /Netscape\/(\d+(?:\.\d+)+)/,  //Netscape/7.0
-		"safari": /Version\/(\d+(?:\.\d+)+) Safari\/(\d+(?:\.\d+)+)/, //Version/3.0.3 Safari/522.15.5
-		"chrome": /Chrome\/(\d+(?:\.\d+)+) Safari\/(\d+(?:\.\d+)+)/,  //Chrome/0.2.149.27 Safari/525.13
-		"mf"    : /Minefield\/(\d+(?:\.\d+)+)/  //Minefield/3.0b4pre
-	};
-	var host = {"env":"unknown","ver":"0","compatMode":""};
-	for(var k in re){
-		var arr = re[k].exec(nav.userAgent);
-		if(arr){  //re[k].test(nav.userAgent)
-			host.env = k == "mf" ? "ff": k;
-			host.ver = arr[1];
-			host.compatMode = host.env == "ie" && document.compatMode == "BackCompat" ? "BackCompat" : "CSS1Compat";
-			break;
-		}
-	}
-	if(host.env == "unknown")
-		runtime.log("[BorderLayout::getHostenv]未知的宿主环境，userAgent:" + nav.userAgent);
-	return host;
-}
-function DomUtil(){
-	var _nodes = [];
-	var _domTemp = null;
-	this.dispose = function(){
-		_domTemp = null;
-		//解除所有DOM元素和脚本对象的绑定关系
-		for(var i = 0, len = _nodes.length; i < len; i++){
-			_nodes[i].dispose();
-			_nodes[i] = null;
-		}
-		_nodes = [];
-	};
-	this.createDomElement = function(html, parent){
-		if(!_domTemp)
-			_domTemp = window.document.createElement("div");
-		_domTemp.innerHTML = html;
-		var obj = _domTemp.removeChild(_domTemp.childNodes[0]);
-		if(parent){
-			parent.appendChild(obj);
-			/*
-			//滞后加载图片
-			var imgs = obj.getElementsByTagName("img");
-			for(var i = 0, len = imgs.length; i < len; i++){
-				imgs[i].src = imgs[i].getAttribute("src0");
-			}
-			imgs = null;
-			*/
-		}
-		return obj;
-	};
-	/**
-	 * 统一 IE 和 Moz 系列浏览器的差异
-	 */
-	this.parseInt = function(tagName, v){
-		switch(v){
-		case "medium":
-			return tagName == "DIV" ? 0 : 2;
-		case "thin":
-			return tagName == "DIV" ? 0 : 1;
-		case "thick":
-			return tagName == "DIV" ? 0 : 1;
-		default:
-			var a = parseInt(v);
-			return isNaN(a) ? 0 : a;
-		}
-	};
-	this.getStyle = function(element){
-		var style;
-		if(window.document.defaultView && window.document.defaultView.getComputedStyle)
-			style = window.document.defaultView.getComputedStyle(element, null);
-		else if(element.currentStyle)
-			style = element.currentStyle;
-		else
-			throw "无法动态获取DOM的实际样式属性";
-		return style;
-	};
-	this.getPropertyValue = function(style, name){
-		return _host.env == "ie" ? style[name] : style.getPropertyValue(name);
-	};
-	this.getStyleProperty = function(element, name){
-		var style = this.getStyle(element);
-		return this.parseInt(element.tagName, this.getPropertyValue(style, name) || element.style[name]);
-	};
-	this.setStyleProperty = function(element, name, value){
-		element.style[name] = value;
-	};
-	this.getObj = function(element){
-		var obj;
-		if(!("__ptr__" in element)){
-			obj = {
-				_self: element,
-				dispose: function(){
-					this._self.__ptr__ = null;
-					this._self = null;
-				}
-			};
-			element.__ptr__ = obj;
-			//_nodes.push(obj);
-		}else
-			obj = element.__ptr__;
-		return obj;
-	};
-	this.moveTo = function(element, x, y){
-		var obj = this.getObj(element);
-		if(!("_left" in obj)) obj._left = 0;
-		if(!("_top" in obj)) obj._top = 0;
-
-		obj._left = x;
-		this.setStyleProperty(element, "left", x + "px");
-
-		obj._top = y;
-		this.setStyleProperty(element, "top", y + "px");
-	};
-	this.setOpacity = function(element, v){
-		var obj = this.getObj(element);
-		if(!("_opacity" in obj)) obj._opacity = 0;
-		if(obj._opacity != v){
-			v = Math.max(0, Math.min(1, v));
-			obj._opacity = v;
-			switch(_host.env){
-			case "ie":
-				v = Math.round(v * 100);
-				this.setStyleProperty(element, "filter", v == 100 ? "" : "Alpha(Opacity=" + v + ")");
-				break;
-			case "ff":
-			case "ns":
-				this.setStyleProperty(element, "MozOpacity", v == 1 ? "" : v);
-				break;
-			case "opera":
-			case "safari":
-			case "chrome":
-				this.setStyleProperty(element, "opacity", v == 1 ? "" : v);
-				break;
-			}
-		}
-		obj = null;
-	};
-	this._setWidth = function(element, v){
-		//v = Math.max(v, 0);
-		this.setStyleProperty(element, "width", v + "px");
-	};
-	this._setHeight = function(element, v){
-		//v = Math.max(v, 0);
-		this.setStyleProperty(element, "height", v + "px");
-	};
-	this.getWidth = function(element){
-		var obj = this.getObj(element);
-		//if(!("_width" in obj)){
-			if(_host.compatMode != "BackCompat")
-				obj._width = element.offsetWidth;
-			else{
-				obj._width = this.getStyleProperty(element, "borderLeftWidth")
-					+ element.offsetWidth  //this.getStyleProperty(element, "width")
-					+ this.getStyleProperty(element, "borderRightWidth");
-			}
-		//}
-		return obj._width;
-		//obj = null;
-	};
-	this.getHeight = function(element){
-		var obj = this.getObj(element);
-		//if(!("_height" in obj)){
-			if(_host.compatMode != "BackCompat")
-				obj._height = element.offsetHeight;
-			else{
-				obj._height = _domutil.getStyleProperty(element, "borderTopWidth")
-					+ element.offsetHeight  //_domutil.getStyleProperty(element, "height")
-					+ _domutil.getStyleProperty(element, "borderBottomWidth");
-			}
-		//}
-		return obj._height;
-		//obj = null;
-	};
-	this.setWidth = function(element, v){
-		var obj = this.getObj(element);
-		var arr = ["borderLeftWidth", "borderRightWidth", "paddingLeft", "paddingRight"];
-		for(var i = 0, len = arr.length; i < len; i++){
-			if(!("_" + arr[i] in obj))
-				obj["_" + arr[i]] = _domutil.getStyleProperty(element, arr[i]);
-		}
-		if(!("_width" in obj)) obj._width = 0;
-		v = Math.max(v, 0);
-		if(obj._width != v){
-			obj._width = v;
-			var w = this.getInnerWidth(element, v);
-			this._setWidth(element, w);
-		}
-		obj = null;
-	};
-	this.setHeight = function(element, v){
-		var obj = this.getObj(element);
-		var arr = ["borderTopWidth", "borderBottomWidth", "paddingTop", "paddingBottom"];
-		for(var i = 0, len = arr.length; i < len; i++){
-			if(!("_" + arr[i] in obj))
-				obj["_" + arr[i]] = _domutil.getStyleProperty(element, arr[i]);
-		}
-		if(!("_height" in obj)) obj._height = 0;
-		v = Math.max(v, 0);
-		if(obj._height != v){
-			obj._height = v;
-			var w = this.getInnerHeight(element, v);
-			this._setHeight(element, w);
-		}
-		obj = null;
-	};
-	this.getInnerWidth = function(element, v){
-		var obj = this.getObj(element);
-		if(!v) v = obj._width;
-		var innerWidth = Math.max(0, _host.compatMode == "BackCompat" ? v : v - obj._borderLeftWidth - obj._borderRightWidth - obj._paddingLeft - obj._paddingRight);
-		//var innerWidth = Math.max(0, runtime.getBoxModel() == 0 ? v : v - this._borderLeftWidth - this._borderRightWidth - this._paddingLeft - this._paddingRight);
-		obj = null;
-		if(isNaN(innerWidth)) runtime.log("DomUtil::getInnerWidth isNaN(innerWidth)");
-		return innerWidth;
-	};
-	this.getInnerHeight = function(element, v){
-		var obj = this.getObj(element);
-		if(!v) v = obj._height;
-		var innerHeight = Math.max(0, _host.compatMode == "BackCompat" ? v : v - obj._borderTopWidth - obj._borderBottomWidth - obj._paddingTop - obj._paddingBottom);
-		obj = null;
-		if(isNaN(innerHeight)) runtime.log("DomUtil::getInnerHeight isNaN(innerHeight)");
-		return innerHeight;
-	};
-}
-
-init();
+_import("alz.core.BoxElement");
 
 _class("BorderLayout", "", function(_super){
 	this._init = function(){
@@ -665,6 +363,11 @@ _class("BorderLayout", "", function(_super){
 	};
 	this.init = function(obj){
 		this._self = obj;
+		if(this._self.tagName != "TD"){
+			//this._self.style.position = "absolute";
+			this._self.style.overflow = "hidden";
+		}
+		//this._self.style.backgroundColor = getColor();
 		var tags = {"NOSCRIPT":1,"INPUT":1};
 		var classes = {"wui-ModalPanel":1,"wui-Dialog":1};
 		var nodes = obj.childNodes;
@@ -705,9 +408,9 @@ _class("BorderLayout", "", function(_super){
 			this._nodes.push(nodes[i]);
 		}
 		if(this._direction == ""){
-			if(this._self.tagName != "BODY"){
-				runtime.log("[WARNING]未能正确识别布局方向，请检查使用布局的元素的子元素个数是不是只有一个且_align=client");
-			}
+			//if(this._self.tagName != "BODY"){
+			//	runtime.log("[WARNING]未能正确识别布局方向，请检查使用布局的元素的子元素个数是不是只有一个且_align=client");
+			//}
 			this._direction = "vertical";
 		}
 		if(this._direction == "horizontal"){
@@ -725,8 +428,8 @@ _class("BorderLayout", "", function(_super){
 		if(this._disposed) return;
 		this._clientNode = null;
 		for(var i = 0, len = this._nodes.length; i < len; i++){
-			if(this._nodes[i]._self)
-				this._nodes[i].dispose();  //[TODO]应该在DomUtil::dispose中处理
+			//if(this._nodes[i]._self)
+			//	this._nodes[i].dispose();  //[TODO]应该在DomUtil::dispose中处理
 			this._nodes[i] = null;
 		}
 		this._nodes = [];
@@ -740,8 +443,8 @@ _class("BorderLayout", "", function(_super){
 		//if(this._self.className == "ff_cntas_list")
 		//	alert(w + "," + h);
 		if(this._self.tagName != "BODY" && this._self.tagName != "TD"){
-			if(w) _domutil.setWidth(this._self, w);
-			if(h) _domutil.setHeight(this._self, h);
+			if(w) runtime.domutil.setWidth(this._self, w);
+			if(h) runtime.domutil.setHeight(this._self, h);
 		}
 		if(this._direction == "vertical"){
 			var hh = 0, h_client = 0;
@@ -750,16 +453,14 @@ _class("BorderLayout", "", function(_super){
 				if(node.style.display == "none") continue;
 				//node.style.top = hh + "px";
 				if(node != this._clientNode){
-					hh += _domutil.getHeight(node);
+					hh += runtime.domutil.getHeight(node);
 				}
 				node = null;
 			}
 			var h_client = h - hh;
 			hh = 0;
-			var w_fix = 0;  //this._self.className == "ff_cntas_list" ? 1 : 0
-			w_fix = this._clientNode.className == "mailDirDiv" && _host.env == "ff" ? 2 : 0
-			if(w) _domutil.setWidth(this._clientNode, w - w_fix);
-			_domutil.setHeight(this._clientNode, h_client);
+			if(w) runtime.domutil.setWidth(this._clientNode, w);
+			runtime.domutil.setHeight(this._clientNode, h_client);
 			for(var i = 0, len = this._nodes.length; i < len; i++){
 				var node = this._nodes[i];
 				var layout = node.getAttribute("_layout");
@@ -774,13 +475,15 @@ _class("BorderLayout", "", function(_super){
 				node = null;
 			}
 		}else{  //this._direction == "horizontal"
+			//横向布局使用绝对定位，marginRight在其中并不起什么实际的作用，只是在计算两个结点之间margin时有用
+			//定位元素left属性时，需要减去自身marginLeft属性的值
 			var ww = 0, w_client = 0;
 			for(var i = 0, len = this._nodes.length; i < len; i++){
 				var node = this._nodes[i];
 				if(node.style.display == "none") continue;
 				node.style.left = ww + "px";
 				if(node != this._clientNode){
-					ww += _domutil.getWidth(node);
+					ww += runtime.domutil.getWidth(node);
 				}
 				node = null;
 			}
@@ -790,16 +493,16 @@ _class("BorderLayout", "", function(_super){
 				var node = this._nodes[i];
 				node.style.left = ww + "px";
 				if(node == this._clientNode){
-					_domutil.setWidth(this._clientNode, w_client);
+					runtime.domutil.setWidth(this._clientNode, w_client);
 					ww += w_client;
 				}else{
-					ww += _domutil.getWidth(node);
+					ww += runtime.domutil.getWidth(node);
 				}
 				var h_fix = 0;
 				if(this._self.className == "ff_contact_client"){
 					h_fix = -2;  //(临时解决办法)RQFM-4934 通讯录页面有一个相素的缺
 				}
-				if(h) _domutil.setHeight(node, h - h_fix);
+				if(h) runtime.domutil.setHeight(node, h - h_fix);
 				var layout = node.getAttribute("_layout");
 				if(layout == "BorderLayout"){
 					//node.style.overflow = "hidden";
@@ -812,6 +515,124 @@ _class("BorderLayout", "", function(_super){
 				node = null;
 			}
 		}
+	};
+	//获取参与布局的结点
+	this._getAlignNodes = function(){
+		var nodes = [];
+		for(var i = 0, len = this._nodes.length; i < len; i++){
+			if(this._nodes[i].style.display == "none") continue;
+			nodes.push(new BoxElement(this._nodes[i], runtime.domutil));
+		}
+		return nodes;
+	};
+	this.getClientNodeWidth = function(w, nodes){
+		var nn = runtime.domutil.getStyleProperty(this._self, "paddingLeft");  //考虑paddingLeft
+		for(var i = 0, len = nodes.length; i < len; i++){
+			var node = nodes[i];
+			if(i == 0){  //考虑第一个元素的marginLeft
+				nn += node._marginLeft;
+			}
+			//node.setLeft(nn);
+			nn += (node._self == this._clientNode ? 0 : node.getWidth());  //node._self.offsetWidth
+			if(i < len - 1){
+				nn += Math.max(node._marginRight, nodes[i + 1]._marginLeft);  //取两个元素的margin最大值
+			}else{  //i == len - 1 考虑最后一个元素的marginRight
+				nn += node._marginRight;
+			}
+			node = null;
+		}
+		return w - nn;
+	};
+	this.getClientNodeHeight = function(h, nodes){
+		var nn = runtime.domutil.getStyleProperty(this._self, "paddingTop");  //考虑paddingTop
+		for(var i = 0, len = nodes.length; i < len; i++){
+			var node = nodes[i];
+			if(i == 0){  //考虑第一个元素的marginTop
+				nn += node._marginTop;
+			}
+			//node.setTop(nn);
+			nn += (node._self == this._clientNode ? 0 : node.getHeight());  //node._self.offsetHeight
+			if(i < len - 1){
+				nn += Math.max(node._marginBottom, nodes[i + 1]._marginTop);  //取两个元素的margin最大值
+			}else{  //i == len - 1 考虑最后一个元素的marginBottom
+				nn += node._marginBottom;
+			}
+			node = null;
+		}
+		return h - nn;
+	};
+	this.updateDock = function(w, h){
+		if(this._width == w && this._height == h) return;
+		this._width = w;
+		this._height = h;
+		//if(this._self.className == "ff_cntas_list")
+		//	alert(w + "," + h);
+		if(this._self.tagName != "BODY" && this._self.tagName != "TD"){
+			//alert(this._self.tagName + "," + w + "," + h);
+			//高度和宽度已经被父元素调整过了
+			//if(w) runtime.domutil.setWidth(this._self, w);
+			//if(h) runtime.domutil.setHeight(this._self, h);
+			//if(w) w = runtime.domutil.getInnerWidth(this._self);  //this._self.clientWidth - this._paddingLeft - this._paddingRight;
+			h = runtime.domutil.getInnerHeight(this._self);  //this._self.clientHeight - this._paddingTop - this._paddingBottom;
+		}
+		var nodes = this._getAlignNodes();
+		if(this._direction == "vertical"){
+			var n_client = this.getClientNodeHeight(h, nodes);
+			var nn = 0;
+			for(var i = 0, len = nodes.length; i < len; i++){
+				var node = nodes[i];
+				if(i == 0){  //考虑第一个元素的marginTop
+					nn += node._marginTop;
+				}
+				//node.setTop(nn);
+				if(node._self == this._clientNode){
+					//var b = this._self.className == "ff_cntas_list" ? 2 : 0;
+					node.setHeight(n_client/* - b*/);
+				}
+				nn += node._self == this._clientNode ? n_client : node.getHeight();
+				if(w){
+					node.setInnerWidth(w);
+				}
+				if(node.hasLayout()){
+					node.layout();
+				}
+				if(i < len - 1){
+					nn += Math.max(node._marginBottom, nodes[i + 1]._marginTop);  //取两个元素的margin最大值
+				}else{  //i == len - 1 考虑最后一个元素的marginBottom
+					nn += node._marginBottom;
+				}
+				node = null;
+			}
+		}else{  //this._direction == "horizontal"
+			//横向布局使用绝对定位，marginRight在其中并不起什么实际的作用，只是在计算两个结点之间margin时有用
+			//定位元素left属性时，需要减去自身marginLeft属性的值
+			var n_client = this.getClientNodeWidth(w, nodes);  //w - nn + runtime.domutil.getStyleProperty(this._self, "paddingLeft");  //补上考虑paddingRight值
+			var nn = 0;
+			for(var i = 0, len = nodes.length; i < len; i++){
+				var node = nodes[i];
+				node.setLeft(nn);
+				if(i == 0){  //考虑第一个元素的marginLeft
+					nn += node._marginLeft;
+				}
+				if(node._self == this._clientNode){
+					node.setInnerWidth(n_client, true);
+				}
+				nn += node._self == this._clientNode ? n_client : node.getWidth();
+				if(h){
+					node.setInnerHeight(h);
+				}
+				if(node.hasLayout()){
+					node.layout();
+				}
+				if(i < len - 1){
+					nn += Math.max(node._marginRight, nodes[i + 1]._marginLeft);  //取两个元素的margin最大值
+				}else{  //i == len - 1 考虑最后一个元素的marginRight
+					nn += node._marginRight;
+				}
+				node = null;
+			}
+		}
+		nodes = null;
 	};
 });
 /*#file end*/
@@ -857,8 +678,10 @@ _class("AppTestWin", Application, function(_super){
 	this.test_window = function(){
 		this._win1 = new Window();
 		this._win1.init($("win1"), $("body1"));
+		this._win1._self.style.zIndex = runtime.getNextZIndex();
 		this._win2 = new Window();
 		this._win2.init($("win2"), $("body2"));
+		this._win2._self.style.zIndex = runtime.getNextZIndex();
 		var _this = this;
 		this._win1._self.getElementsByTagName("input")[0].checked = true;
 		this._win1._self.getElementsByTagName("input")[0].onclick = function(){
@@ -887,7 +710,7 @@ _class("AppTestWin", Application, function(_super){
 /*#file end*/
 
 runtime.regLib("test_win", function(){
-	application = runtime.createApp("AppTestWin");
+	application = runtime.createApp("alz.tools.AppTestWin");
 });
 
 }})(this);
