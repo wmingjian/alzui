@@ -1,0 +1,9 @@
+@charset "utf-8";
+/**
+ * 表格组件
+ * tag: table
+ */
+.mui-Table{overflow:auto;height:200px;border:1px solid #DDDDDD;}
+.mui-Table table{width:auto !important;width:100%;border-collapse:collapse;font:12px 宋体;}
+.mui-Table th{padding:1px;background-color:#EEEEEE;}
+.mui-Table td{padding:1px;}
