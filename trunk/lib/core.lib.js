@@ -1,14 +1,11 @@
 /*
- * alzui-mini JavaScript Framework, v0.0.3
+ * alzui-mini JavaScript Framework, v0.0.4
  * Copyright (c) 2009 wmingjian@gmail.com. All rights reserved.
  *
  * Licensed under the GNU General Public License v2.
  * For details, see: http://code.google.com/p/alzui/
  */
 (function(){with(runtime.createContext("core")){
-
-//_import("AObject,ui.Component");
-//_export("DOMUtil,DOMUtil2,AjaxEngine,EventTarget,AppManager,Application");
 
 /*#file begin=alz.core.DOMUtil.js*/
 _package("alz.core");
