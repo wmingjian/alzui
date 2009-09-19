@@ -1,5 +1,5 @@
 /*
- * alzui-mini JavaScript Framework, v0.0.4
+ * alzui-mini JavaScript Framework, v0.0.5
  * Copyright (c) 2009 wmingjian@gmail.com. All rights reserved.
  *
  * Licensed under the GNU General Public License v2.
@@ -98,8 +98,12 @@ _class("ActionManager", "", function(_super){
 		}
 		nodes = null;
 	};*/
-	this.enable = function(action){this.updateState(action, {"disabled":false});};
-	this.disable = function(action){this.updateState(action, {"disabled":true});};
+	this.enable = function(action){
+		this.updateState(action, {"disabled":false});
+	};
+	this.disable = function(action){
+		this.updateState(action, {"disabled":true});
+	};
 	this.updateState = function(action, state){
 		if(action){
 			this.update(action, state);
@@ -153,6 +157,7 @@ _class("Component", EventTarget, function(_super){
 		this._owner = null;
 		//this._id = null;
 		this._self = null;  //组件所关联的DOM元素
+		this._containerNode = null;
 		this._jsonData = null;
 		this._data = null;  //结点的json数据
 		this._currentPropertys = {};
@@ -185,7 +190,7 @@ _class("Component", EventTarget, function(_super){
 	this.toString = function(){
 		return "{tag:'" + this._className + "',align:'" + this._align + "'}";
 	};
-	this._create = function(tag){
+	this._createElement = function(tag){
 		return this._doc.createElement(tag);
 	};
 	this.parseInt = function(v){
@@ -284,7 +289,7 @@ _class("Component", EventTarget, function(_super){
 	//	this._parent = parent;
 	//};
 	this.create = function(parent){
-		var obj = this._create(this._tagName || "div");
+		var obj = this._createElement(this._tagName || "div");
 		//obj.style.border = "1px solid #000000";
 		if(parent) this.setParent(parent, obj);
 		this.init(obj);
@@ -296,6 +301,7 @@ _class("Component", EventTarget, function(_super){
 		this._domBuildType = domBuildType;
 		obj._ptr = this;
 		this._self = obj;
+		this._containerNode = obj;  //基础组件默认_self就是具体的容器节点
 		//this._self._ptr = this;
 		//this._id = "__dlg__" + Math.round(10000 * Math.random());
 		//this._self.id = this._id;
@@ -311,6 +317,7 @@ _class("Component", EventTarget, function(_super){
 		if(this._disposed) return;
 		this._data = null;
 		this._jsonData = null;
+		this._containerNode = null;
 		if(this._self){
 			if(this._self._ptr)
 				this._self._ptr = null;
@@ -345,8 +352,13 @@ _class("Component", EventTarget, function(_super){
 		_super.setParent.apply(this, arguments);
 		var parent = v._self ? v : (v._ptr ? v._ptr : null);
 		if(!parent) throw "找不到父组件的 DOM 元素";
-		if(!obj.parentNode)
-			parent._self.appendChild(obj);
+		if(obj.parentNode){
+			obj.parentNode.removeChild(obj);
+		}
+		parent._containerNode.appendChild(obj);
+	};
+	this.getOwner = function(){
+		return this._owner;
 	};
 	this.setOwner = function(v){
 		this._owner = v;
@@ -830,8 +842,9 @@ _class("ModalPanel", Component, function(_super){
 	};
 	this.setVisible = function(v){
 		_super.setVisible.apply(this, arguments);
-		if(this._iframe)
+		if(this._iframe){
 			this._iframe.style.display = v ? "" : "none";
+		}
 		this._panel.style.display = v ? "" : "none";
 		if(this._visible){  //如果面板已经显示
 			//this.getActiveTarget().setVisible(false);
@@ -1033,7 +1046,7 @@ _class("Pane", Container, function(_super){
 	 *   列表框： SELECT
 	 */
 	this.initComponents = function(element){
-		var tags = ["form", "a", "select", "input"];
+		var tags = ["FORM", "A", "SELECT", "INPUT"];
 		for(var i = 0, len = tags.length; i < len; i++){
 			var nodes = element.getElementsByTagName(tags[i]);
 			for(var j = 0, len1 = nodes.length; j < len1; j++){
@@ -1041,14 +1054,25 @@ _class("Pane", Container, function(_super){
 				if(node.getAttribute("_action")){
 					var component;
 					switch(tags[i]){
-					case "form"  : component = new FormElement();break;
-					case "a"     : component = new LinkLabel();break;
-					case "select": component = new ComboBox();break;
-					case "input" :
+					case "FORM":
+						component = new FormElement();
+						break;
+					case "A":
+						component = new LinkLabel();
+						break;
+					case "SELECT":
+						component = new ComboBox();
+						break;
+					case "INPUT":
 						switch(node.type){
-						case "button"  : component = new Button();break;
-						case "checkbox": component = new CheckBox();break;
-						default        : continue;
+						case "button":
+							component = new Button();
+							break;
+						case "checkbox":
+							component = new CheckBox();
+							break;
+						default:
+							continue;
 						}
 						//application._buttons[btn._action] = btn;
 						break;
@@ -1104,7 +1128,7 @@ _class("Workspace", Container, function(_super){
 		/*
 		var rect = this.getViewPort();
 		//alert(rect.x + "," + rect.y + "," + rect.w + "," + rect.h);
-		var div = this._create("div");
+		var div = this._createElement("div");
 		div.style.position = "absolute";
 		div.style.border = "10px";
 		div.style.left = (rect.x - 10) + "px";
@@ -1113,7 +1137,7 @@ _class("Workspace", Container, function(_super){
 		div.style.height = (rect.h + 20) + "px";
 		div.style.backgroundColor = "#DDDDDD";
 		div.style.zIndex = "200";  // + runtime.getNextZIndex();
-		var d = this._create("div");
+		var d = this._createElement("div");
 		d.style.width = "100%";
 		d.style.height = "100px";
 		d.style.backgroundColor = "#AAAAAA";
@@ -1296,7 +1320,7 @@ _class("Workspace", Container, function(_super){
 	this._mousemoveForNormal = function(ev){
 		if(runtime._debug){  //如果调试状态的话，更新 MouseEvent 的信息
 			if(!this._tipMouse){
-				this._tipMouse = this._create(!runtime.ns ? "div" : "textarea");  //NS 有性能问题，改用 textarea
+				this._tipMouse = this._createElement(!runtime.ns ? "div" : "textarea");  //NS 有性能问题，改用 textarea
 				this._tipMouse.style.position = "absolute";
 				this._tipMouse.style.border = "1px solid #AAAAAA";
 				this._tipMouse.style.font = "12px 宋体";
@@ -1458,7 +1482,7 @@ _class("ListItem", Component, function(_super){
 		this._self.style.verticalAlign = "middle";
 		this._self.onselectstart = function(ev){return false;};
 
-		this._icon = this._create("img");
+		this._icon = this._createElement("img");
 		this._icon.src = "skin/Icon_delete.gif";
 		this._icon.style.border = "0px";
 		this._icon.style.width = "16px";
@@ -1468,7 +1492,7 @@ _class("ListItem", Component, function(_super){
 		var text = this._self.removeChild(this._self.firstChild);
 		var size = runtime.getTextSize(text.data, "12px 宋体");
 
-		this._label = this._create("label");
+		this._label = this._createElement("label");
 		this._label.style.backgroundColor = "#CCCCCC";
 		this._label.style.width = (size.w + 10) + "px";
 		//this._label.style.height = (size.h + 2) + "px";
@@ -1488,6 +1512,7 @@ _class("ListItem", Component, function(_super){
 		if(this._disposed) return;
 		this._label = null;
 		this._icon = null;
+		this._self.onselectstart = null;
 		_super.dispose.apply(this);
 	};
 });
@@ -1512,7 +1537,7 @@ _class("Dialog", Component, function(_super){
 	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
-		//this._skin = this._create("div");
+		//this._skin = this._createElement("div");
 		this._self.className = "wui-Dialog2";
 		//this._self.appendChild(this._skin);
 		//this.setStyleProperty("border", "2px outset");  //runtime.ie ? "2px outset" : "2px solid #97A4B2"
@@ -1625,7 +1650,7 @@ _class("Dialog", Component, function(_super){
 		this._borders = [];
 		var cursors = ["nw", "n", "ne", "w", "e", "sw", "s", "se"];
 		for(var i = 0, len = cursors.length; i < len; i++){
-			var o = this._create("div");
+			var o = this._createElement("div");
 			//if(i % 2 == 0) o.style.backgroundColor = "red";
 			o.style.position = "absolute";
 			o.style.overflow = "hidden";
@@ -1918,7 +1943,7 @@ _class("WindowSkinWINXP", Component, function(_super){
 				this._parent[k]._cssData = this._cssHash[k];
 			}
 		}
-		var obj = this._create("div");
+		var obj = this._createElement("div");
 		obj.className = "wui-skin";
 		if(parent) parent._self.appendChild(obj);
 		this.init(obj);
@@ -1929,7 +1954,7 @@ _class("WindowSkinWINXP", Component, function(_super){
 		this._xpath = ".mui-Window-winxp";
 		//this._skins = [];
 		for(var i = 0, len = this._cursors.length; i < len; i++){
-			var o = this._create("div");
+			var o = this._createElement("div");
 			o.className = this._cursors[i];
 			/*
 			o.style.position = "absolute";
@@ -1946,9 +1971,9 @@ _class("WindowSkinWINXP", Component, function(_super){
 		}
 		this._ee["_title1"] =
 		this._title =
-		this._title1 = this._create("img");
+		this._title1 = this._createElement("img");
 		this._ee["_title2"] =
-		this._title2 = this._create("img");
+		this._title2 = this._createElement("img");
 		this._self.appendChild(this._title1);
 		this._self.appendChild(this._title2);
 		this._title1.src = runtime.getConfigData("pathimg") + "win-xp-title-bg1.gif";
@@ -2080,7 +2105,7 @@ _class("WindowSkinWIN2K", Component, function(_super){
 				this._parent[k]._cssData = this._cssHash[k];
 			}
 		}
-		var obj = this._create("div");
+		var obj = this._createElement("div");
 		obj.className = "wui-skin";
 		if(parent) parent._self.appendChild(obj);
 		this.init(obj);
@@ -2090,7 +2115,7 @@ _class("WindowSkinWIN2K", Component, function(_super){
 		_super.init.apply(this, arguments);
 		this._xpath = ".mui-Window-win2k";
 		for(var i = 0, len = this._cursors.length; i < len; i++){
-			var o = this._create("div");
+			var o = this._createElement("div");
 			o.className = this._cursors[i];
 			/*
 			o.style.position = "absolute";
@@ -2103,7 +2128,7 @@ _class("WindowSkinWIN2K", Component, function(_super){
 			this._self.appendChild(o);
 			this._ee["_skin" + i] = o;
 		}
-		this._title = this._create("img");
+		this._title = this._createElement("img");
 		this._self.appendChild(this._title);
 		this._title.src = runtime.getConfigData("pathimg") + "win-2k-title-bg.gif";
 		this._title._dlg = this;
@@ -2380,7 +2405,7 @@ _class("Window", Component, function(_super){
 	this._createBorders = function(){
 		this._borders = [];
 		for(var i = 0, len = this._cursors.length; i < len; i++){
-			var o = this._create("div");
+			var o = this._createElement("div");
 			o.style.position = "absolute";
 			o.style.overflow = "hidden";
 			o.style.zIndex = 3;
@@ -2502,7 +2527,7 @@ _extension("WebAppRuntime", function(){  //注册 WebAppRuntime 扩展
 			this._testCaseWin.resize(500, 300);
 			this._testCaseWin.setClientBgColor("#FFFFFF");
 			this._testCaseWin.log = function(msg){
-				var div = this._create("div");
+				var div = this._createElement("div");
 				div.style.borderBottom = "1px solid #CCCCCC";
 				div.innerHTML = msg;
 				this._body.appendChild(div, this._body.childNodes[0]);
