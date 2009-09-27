@@ -24,7 +24,7 @@ if(typeof __global.runtime != "undefined"){  //内嵌模式，重新初始化
 */
 
 var __version = "0.0.7";  //当前版本信息，格式:"主版本号.副版本号.修订版本号"
-var __buildtime = 1254057771015;
+var __buildtime = 1254058620328;
 var __start = new Date().getTime();  //记录开始时间
 var __proto = "prototype";
 var __inDeclare = false;  //标识是否处于类声明过程中

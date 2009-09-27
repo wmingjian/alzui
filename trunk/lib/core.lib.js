@@ -948,7 +948,7 @@ _class("AjaxEngine", "", function(_super){
 	this.getTestCase = function(){return this._testCase;};
 	this.setTestCase = function(v){this._testCase = v;};
 	this._getScriptLoader = function(){
-		if(runtime.getBrowser().moz || !this._scriptLoader){
+		if(runtime.moz || !this._scriptLoader){
 			this._scriptLoader = new ScriptLoader();
 			this._scriptLoader.create();
 		}
