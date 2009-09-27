@@ -1,5 +1,5 @@
 /*
- * alzui-mini JavaScript Framework, v0.0.6
+ * alzui-mini JavaScript Framework, v0.0.7
  * Copyright (c) 2009 wmingjian@gmail.com. All rights reserved.
  *
  * Licensed under the GNU General Public License v2.
