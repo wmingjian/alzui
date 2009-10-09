@@ -1,5 +1,5 @@
 /*
- * alzui-mini JavaScript Framework, v0.0.7
+ * alzui-mini JavaScript Framework, v0.0.8
  * Copyright (c) 2009 wmingjian@gmail.com. All rights reserved.
  *
  * Licensed under the GNU General Public License v2.
@@ -617,10 +617,176 @@ _class("Component", EventTarget, function(_super){
 	};
 });
 /*#file end*/
+/*#file begin=alz.mui.TextHistory.js*/
+_package("alz.mui");
+
+_class("TextHistory", "", function(_super){
+	this._init = function(){
+		_super._init.call(this);
+		this._historys = [];
+		this._curIndex = 0;  //历史记录的位置
+	};
+	this.dispose = function(){
+		for(var i = 0, len = this._historys.length; i < len; i++){
+			this._historys[i] = null;
+		}
+		this._historys = [];
+		_super.dispose.apply(this);
+	};
+	this.getText = function(num){
+		if(num == -1 && this._historys.length - 1 == 0){  //特殊处理这种情况
+			return this._historys[0];
+		}else if(this._historys.length - 1 > 0){
+			var n = Math.max(0, Math.min(this._historys.length - 1, this._curIndex + num));
+			if(this._curIndex != n){
+				this._curIndex = n;
+				return this._historys[n];
+			}
+		}
+	};
+	this.append = function(text){
+		this._historys.push(text);
+		this._curIndex = this._historys.length;
+	};
+});
+/*#file end*/
+/*#file begin=alz.mui.TextItem.js*/
+_package("alz.mui");
+
+_import("alz.mui.Component");
+
+_class("TextItem", Component, function(_super){
+	this._init = function(){
+		_super._init.call(this);
+		this._type = "sys";  //当前文本的类型
+		this._text = "";     //文本内容
+		this._active = false;  //当前文本是否处于活动状态之下
+		this._cursor = -1;     //如果处在活动状态下，当前光标位置
+		//this.create(parent, type, text);
+	};
+	this.create = function(parent, type, text){
+		this._parent = parent;
+		this._type = type;
+		this._text = text;
+		var obj = window.document.createElement("span");
+		obj.className = this._type;
+		parent._self.appendChild(obj);
+		this.init(obj);
+		return obj;
+	};
+	this.init = function(obj){
+		_super.init.apply(this, arguments);
+		this.update();
+	};
+	this.dispose = function(){
+		_super.dispose.apply(this);
+	};
+	this.getTextLength = function(){
+		return this._text.length;
+	};
+	this.getText = function(){
+		return this._text;
+	};
+	this.setText = function(text){
+		this._text = text;
+		this._cursor = text.length;
+		this.update();
+	};
+	this.getCursor = function(){
+		return this._cursor;
+	};
+	this.setCursor = function(v){
+		this._cursor = v;
+		this.update();
+	};
+	this.appendText = function(text){
+		if(this._cursor == -1 || this._cursor == this._text.length){
+			this._text += text;
+		}else{
+			this._text = this._text.substr(0, this._cursor) + text + this._text.substr(this._cursor);
+		}
+		this._cursor += text.length;
+		this.update();
+	};
+	this.removeChar = function(n){
+		if(n == -1){  //backspace
+			this._text = this._text.substr(0, this._cursor - 1) + this._text.substr(this._cursor);
+			this._cursor--;
+		}else{  //del
+			this._text = this._text.substr(0, this._cursor) + this._text.substr(this._cursor + 1);
+		}
+		this.update();
+	};
+	this.update = function(){
+		if(!runtime._host.xul){
+			this._self.innerHTML = this.getInnerHTML();
+		}else{
+			while(this._self.hasChildNodes()){
+				this._self.removeChild(this._self.childNodes[0]);
+			}
+			if(this._active && this._type == "in"){
+				var type = this._parent.getCursorType();
+				var cursor = type ? 'cursor ' + type : 'cursor';
+
+				var text = this._createTextNode(this._text.substr(0, this._cursor));
+				this._self.appendChild(text);
+
+				text = this._createTextNode(this._text.charAt(this._cursor) || " ");
+				var span = this._createElement("span");
+				span.className = cursor;
+				span.appendChild(text);
+				this._self.appendChild(span);
+
+				text = this._createTextNode(this._text.substr(this._cursor + 1));
+				this._self.appendChild(text);
+			}else{
+				this._self.appendChild(this._createTextNode(this._text));
+			}
+		}
+	};
+	/*
+	var html = '<span class="sys">' + runtime.encodeHTML(this._text.substr(0, this._start)) + '</span>'
+		+ '<span class="in">'
+		+ runtime.encodeHTML(this._text.substr(this._start, this._col))
+		+ '<span class="cursor">' + runtime.encodeHTML(this._text.charAt(this._col) || " ") + '</span>'
+		+ this._text.substr(this._col + 1)
+		+ '</span>';
+	this._self.innerHTML = html;
+	*/
+	this.toHTML = function(){
+		return '<span class="' + this._type + '">' + this.getInnerHTML() + '</span>';
+	};
+	this.getInnerHTML = function(){
+		if(this._active && this._type == "in"){
+			var type = this._parent.getCursorType();
+			var cursor = type ? 'cursor ' + type : 'cursor';
+			return runtime.encodeHTML(this._text.substr(0, this._cursor))
+				+ '<span class="' + cursor + '">'
+				+ runtime.encodeHTML(this._text.charAt(this._cursor) || " ")
+				+ '</span>'
+				+ this._text.substr(this._cursor + 1);
+		}else{
+			return runtime.encodeHTML(this._text);
+		}
+	};
+	this.deactivate = function(){
+		this._active = false;
+		this._cursor = -1;
+	};
+	this.activate = function(){
+		this._active = true;
+		if(this._type == "in"){
+			this._cursor = this._text.length;
+		}
+	};
+});
+/*#file end*/
 /*#file begin=alz.mui.LineEdit.js*/
 _package("alz.mui");
 
 _import("alz.mui.Component");
+_import("alz.mui.TextHistory");
+_import("alz.mui.TextItem");
 
 //<div id="d1" class="LineEdit">&gt;window.<span class="cursor">a</span>lert("aaaa");</div>
 _class("LineEdit", Component, function(_super){
@@ -645,7 +811,7 @@ _class("LineEdit", Component, function(_super){
 	var KEY_DEL       = 46;
 	var KEY_CH_0      = 48;
 	var KEY_CH_9      = 57;
-	                  //59    //;
+	var KEY_SEMICOLON = 59;   //;
 	var KEY_CH_A      = 65;
 	var KEY_CH_Z      = 90;
 	var KEY_F1        = 110;  //
@@ -666,24 +832,6 @@ _class("LineEdit", Component, function(_super){
 	this._letter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	function trim(str){  //strip
 		return str.replace(/^\s+|[\s\xA0]+$/g, "");
-	}
-	/**
-	 * HTML 代码编码方法
-	 * @param html {String} 要编码的 HTML 代码字符串
-	 */
-	function encodeHTML(html){
-		if(!html)
-			return "";
-		else
-			return html
-				.replace(/&/g, "&amp;")
-				.replace(/</g, "&lt;")
-				.replace(/>/g, "&gt;")
-				.replace(/\"/g, "&quot;")
-				//.replace(/\'/g, "&apos;")
-				.replace(/ /g, "&nbsp;")
-				.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
-				.replace(/\r?\n/g, "<br />");
 	}
 	/*
 	function getInputCursorIndex(){
@@ -719,9 +867,10 @@ _class("LineEdit", Component, function(_super){
 		this._app = null;
 		this._timer = 0;
 		this._pos = 0;
-		this._historys = [];
-		this._curIndex = 0;  //历史记录的位置
-		this._text = "";
+		this._history = new TextHistory();  //历史记录管理
+		this._cursorType = "gray";  //默认为gray
+		this._items = [];
+		this._activeItem = null;
 		this._start = 0;
 		this._end = 80;
 		this._col = 4;
@@ -730,7 +879,7 @@ _class("LineEdit", Component, function(_super){
 	this.create = function(parent, app){
 		this._parent = parent;
 		if(app) this._app = app;
-		var obj = document.createElement("div");
+		var obj = this._createElement("div");
 		obj.className = "aui-LineEdit";
 		if(parent){
 			parent._self.appendChild(obj);
@@ -770,6 +919,7 @@ _class("LineEdit", Component, function(_super){
 				ev.cancelBubble = true;
 			};
 		}else{
+			/*
 			if(runtime.moz){
 				document.onkeydown = function(ev){
 					return _this.onKeyDown(ev || window.event, _this._self);
@@ -779,15 +929,28 @@ _class("LineEdit", Component, function(_super){
 					return this._ptr.onKeyDown(ev || window.event, this);
 				};
 			}
+			*/
 		}
 	};
 	this.reinit = function(){
-		this._text = "";
+		this._activeItem = null;
+		for(var i = 0, len = this._items.length; i < len; i++){
+			this._items[i].dispose();
+			this._items[i] = null;
+		}
+		this._items = [];
 		this._col = 0;
 		this.print(this._parent.getPrompt(), "sys");
 		this.setIomode("in");
 	};
 	this.dispose = function(){
+		this._activeItem = null;
+		for(var i = 0, len = this._items.length; i < len; i++){
+			this._items[i].dispose();
+			this._items[i] = null;
+		}
+		this._items = [];
+		this._app = null;
 		if(this._useInput){
 			this._input.onclick = null;
 			this._input.ondblclick = null;
@@ -802,13 +965,52 @@ _class("LineEdit", Component, function(_super){
 		}
 		_super.dispose.apply(this);
 	};
+	this.setCursorType = function(v){
+		this._cursorType = v;
+	};
+	this.getCursorType = function(){
+		return this._cursorType;
+	};
+	this.getText = function(){
+		var sb = [];
+		for(var i = 0, len = this._items.length; i < len; i++){
+			sb.push(this._items[i].getText());
+		}
+		return sb.join("");
+	};
+	this.appendItem = function(type, text){
+		var item = new TextItem();
+		item.create(this, type, text);
+		this._items.push(item);
+		this.activeItem(item);
+		return item;
+	};
 	this.setIomode = function(v){
+		var oldiomode = this._iomode;
 		this._iomode = v;
 		if(v == "in"){
+			this.appendItem("in", "");
 			this._start = this._col;
 			this._parent._self.appendChild(this._self);
 			this.setFocus();
 		}else{  //out
+			var item = this._activeItem;
+			this.activeItem(null);
+			if(oldiomode == "in"){
+				item.update();
+				var line = this._parent.insertBlankLine();
+				this._activeItem = null;
+				for(var i = 0, len = this._items.length; i < len; i++){
+					var obj = this._items[i]._self;
+					obj.parentNode.removeChild(obj);
+					line.appendChild(obj);
+					obj._ptr = null;
+					this._items[i]._self = null;
+					this._items[i].dispose();
+					this._items[i] = null;
+				}
+				this._items = [];
+			}
 			this._parent._self.removeChild(this._self);
 		}
 		/*
@@ -831,26 +1033,49 @@ _class("LineEdit", Component, function(_super){
 		this._input.value = v;
 	};
 	this.getHistoryText = function(num){
-		if(this._historys.length - 1 > 0){
-			var n = Math.max(0, Math.min(this._historys.length - 1, this._curIndex + num));
-			if(this._curIndex != n){
-				this.setInText(this._historys[n]);
-				this._curIndex = n;
-			}
+		var text = this._history.getText(num);
+		if(text){
+			this._activeItem.setText(text);
+			this._col = this._start + text.length;
 		}
 	};
-	this.setCursor = function(){
-		this._self.innerHTML = "";
-		var html = encodeHTML(this._text.substr(0, this._col))
-			+ '<span class="cursor">' + encodeHTML(this._text.charAt(this._col) || " ") + '</span>'
-			+ this._text.substr(this._col + 1);
-		this._self.innerHTML = html;
-		window.status = /*"row=" + this._row + ","
-			+ */"col=" + this._col + ","
-			+ "start=" + this._start + ","
-			+ "curIndex=" + this._curIndex + ","
-			+ "text=" + this._text;
+	this.activeItem = function(item){
+		if(this._activeItem == item) return;
+		if(this._activeItem){
+			this._activeItem.deactivate();
+		}
+		if(item){
+			item.activate();
+		}
+		this._activeItem = item;
 	};
+	/*
+	this.setText = function(v){
+		var sb = [];
+		for(var i = 0, len = this._items.length; i < len; i++){
+			sb.push(this._items[i].getText());
+		}
+		if(v != sb.join("")) window.alert(123123);
+		this._text = v;
+	};
+	this._formatLine = function(){
+		var sb = [];
+		for(var i = 0, len = this._items.length; i < len; i++){
+			sb.push(this._items[i].toHTML());
+		}
+		return sb.join("");
+	};
+	this.updateLine = function(){
+		this._self.innerHTML = this._formatLine();
+		var sb = [];
+		//sb.push("row=" + this._row);
+		sb.push("col=" + this._col);
+		sb.push("start=" + this._start);
+		sb.push("curIndex=" + this._history._curIndex);
+		sb.push("text=" + this.getText());
+		window.status = sb.join(",");
+	};
+	*/
 	this.setFocus = function(){
 		if(this._useInput){
 			if(!this._input.parentNode) return;
@@ -866,16 +1091,17 @@ _class("LineEdit", Component, function(_super){
 				this._parent._self.appendChild(this._self);
 			}
 			if(this._iomode == "in"){
-				try{
-					this._self.focus();  //(通过焦点的转换,)重新定位光标的位置
-				}catch(ex){
-				}
-				this.setCursor();
+				//try{
+				//	this._self.focus();  //(通过焦点的转换,)重新定位光标的位置
+				//}catch(ex){
+				//}
+				this._activeItem.update();
+				this._parent.scrollToBottom();
 			}
 		}
 	};
 	this.getFrontText = function(){
-		var s = document.selection.createRange();
+		var s = window.document.selection.createRange();
 		s.setEndPoint("StartToStart", this._input.createTextRange());
 		var text = s.text;
 		s = null;
@@ -900,10 +1126,6 @@ _class("LineEdit", Component, function(_super){
 	this.isEndLine = function(row){
 		//return (row == this._rows.length - 1);
 		return true;
-	};
-	this.setInText = function(text){
-		this._text = this._text.substr(0, this._start) + text;
-		this._col = this._start + text.length;
 	};
 	/**
 	 * 往行编辑器里面打印一段文本
@@ -930,26 +1152,28 @@ _class("LineEdit", Component, function(_super){
 					if(i < arr.length - 1){
 						this._parent.insertLine(arr[i], this._iomode == "in" ? this._self : null, type);
 					}else{
-						this.printText(arr[i], type);
+						if(arr[i] != ""){
+							this.printText(arr[i], type);
+						}
 					}
 				}
 				//this._lastLine = this.insertLine(arr[i]);
 				//line.style.backgroundColor = getRandomColor();
-				//line.innerHTML = encodeHTML(str);
+				//line.innerHTML = runtime.encodeHTML(str);
 				//this._self.insertBefore(line, _input.parentNode);
 			}
-			this._parent.scrollToBottom();
 		}
 	};
 	this.printText = function(str, type){
-		//this._start = str.length;
-		this._text += str;
+		this.appendItem(type, str);
 		this._col += str.length;
+		/*
 		var span = this._createElement("span");
 		span.className = type;
 		span.appendChild(this._createTextNode(str));
 		this._self.appendChild(span);
 		span = null;
+		*/
 	};
 	this.incCol = function(n){
 		if(this._col + n <= 80){
@@ -962,10 +1186,10 @@ _class("LineEdit", Component, function(_super){
 	//插入一段不含回车符的字符串
 	this.insertText = function(str){
 		if(this.incCol(str.length)){
-			if(this._col == this._text.length){
-				this._text = this._text + str;
+			if(this._col == this.getText().length + str.length){
+				this._activeItem.appendText(str);
 			}else{
-				this._text = this._text.substr(0, this._col - 1) + str + this._text.substr(this._col - 1);
+				this._activeItem.appendText(str);
 			}
 		}
 	};
@@ -977,8 +1201,7 @@ _class("LineEdit", Component, function(_super){
 			var text = v + "\n";
 			sender.value = "";
 			this._input.parentNode.removeChild(this._input);
-			this._historys.push(text);
-			this._curIndex = this._historys.length;
+			this._history.append(text);
 			this.print(text, "in");
 			this._parent.getCallback()(text);
 		}else if(ch == "."){  //自动完成功能
@@ -1050,25 +1273,19 @@ _class("LineEdit", Component, function(_super){
 			}
 		}
 		if(kc >= KEY_CH_0 && kc <= KEY_CH_9){  //如果是数字(或相应特殊字符)
-			if(ev.shiftKey)
-				this.insertText(this.getNumber(kc - KEY_CH_0 + 10));
-			else
-				this.insertText(this.getNumber(kc - KEY_CH_0));
+			this.insertText(this.getNumber(kc - KEY_CH_0 + (ev.shiftKey ? 10 : 0)));
 		}else if(kc >= KEY_CH_A && kc <= KEY_CH_Z){  //如果是字母
-			if(ev.shiftKey)
-				this.insertText(this.getChar(kc - KEY_CH_A + 26));
-			else
-				this.insertText(this.getChar(kc - KEY_CH_A));
+			this.insertText(this.getChar(kc - KEY_CH_A + (ev.shiftKey ? 26 : 0)));
+		}else if(kc == 61){
+			this.insertText(ev.shiftKey ? "+" : "=");
+		}else if(kc == 109){
+			this.insertText(ev.shiftKey ? "_" : "-");
+		}else if(kc == KEY_SEMICOLON){
+			this.insertText(ev.shiftKey ? ":" : ";");
 		}else if(kc >= 186 && kc <= 192){
-			if(ev.shiftKey)
-				this.insertText(":+<_>?~".substr(kc - 186, 1));
-			else
-				this.insertText(";=,-./`".substr(kc - 186, 1));
+			this.insertText((ev.shiftKey ? ":+<_>?~" : ";=,-./`").substr(kc - 186, 1));
 		}else if(kc >= 219 && kc <= 222){
-			if(ev.shiftKey)
-				this.insertText("{|}\"".substr(kc - 219, 1));
-			else
-				this.insertText("[\\]'".substr(kc - 219, 1));
+			this.insertText((ev.shiftKey ? "{|}\"" : "[\\]'").substr(kc - 219, 1));
 		}else if(kc == KEY_TAB){
 			this.insertText("\t");
 		}else if(kc == KEY_SPACE){
@@ -1077,7 +1294,6 @@ _class("LineEdit", Component, function(_super){
 			//redraw = this.do_control(ev);
 			ret = this.do_control(ev);
 		}
-		this.setCursor();
 		if(this._col < 0){
 			window.alert("Error");
 		}
@@ -1091,14 +1307,21 @@ _class("LineEdit", Component, function(_super){
 	this.do_control = function(ev){
 		var kc = ev.keyCode;
 		switch(kc){
+		case KEY_ESC:
+			if(this._activeItem.getText() == ""){
+				
+			}else{
+				this._activeItem.setText("");
+				this._col = this._start;
+			}
+			break;
 		case KEY_ENTER:  //确定输入，而无论光标在哪里
 			if(this._col > this._start){
-				var text = this._text.substr(this._start);
+				var text = this.getText().substr(this._start);
+				this._history.append(text);
 				this.setIomode("out");
-				this._historys.push(text);
-				this._curIndex = this._historys.length;
-				//this.print(text, "in");
-				this._parent.insertLine(this._text.substr(0, this._start) + text);
+				//this.print("\n", "in");
+				//this._parent.insertLine(this.getText().substr(0, this._start) + text);
 				this._parent.getCallback()(text + "\n");
 				//this._parent.insertLine(text);
 				//this.reinit();
@@ -1112,45 +1335,43 @@ _class("LineEdit", Component, function(_super){
 				*/
 			}
 			break;
-		case KEY_ESC:
-			this._text = this._text.substr(0, this._start);
-			this._col = this._start;
-			break;
 		case KEY_BACKSPACE:
 			if(this._col > this._start){  //如果没有在开始处
-				this._text = this._text.substr(0, this._col - 1) + this._text.substr(this._col);
+				this._activeItem.removeChar(-1);
 				this._col--;
 			}
-			ev.cancelBubble = true;  //阻止页面后退
-			break;
+			ev.cancelBubble = true;
+			return false;  //阻止页面后退
 		case KEY_DEL:
-			if(this._col < this._text.length){  //如果没有在行末
-				this._text = this._text.substr(0, this._col) + this._text.substr(this._col + 1);
+			if(this._col < this.getText().length){  //如果没有在行末
+				this._activeItem.removeChar();
 			}
 			break;
 		case KEY_HOME:
+			this._activeItem.setCursor(0);
 			this._col = this._start;
-			this.setCursor();
 			return false;
 		case KEY_END:
-			this._col = this._text.length;
-			this.setCursor();
+			this._activeItem.setCursor(this._activeItem.getTextLength());
+			this._col = this.getText().length;
 			return false;
 		case KEY_LEFT:
 			if(this._col > this._start){
+				this._activeItem.setCursor(this._activeItem.getCursor() - 1);
 				this._col--;
 			}
-			this.setCursor();
 			return false;
 		case KEY_RIGHT:
 			//if(this.isEndLine(this._row)){  //如果是最后一行的话
-				if(this._col < this._text.length)  //this._rows[this._row].getLength()
+				if(this._col < this.getText().length){  //this._rows[this._row].getLength()
+					this._activeItem.setCursor(this._activeItem.getCursor() + 1);
 					this.incCol(1);
-				else
+				}else{
 					return;  //已在编辑文本的最末端
+				}
 			/*
 			}else{
-				if(this._col < this._text.length - 1){  //this._rows[this._row].getLength() - 1
+				if(this._col < this.getText().length - 1){  //this._rows[this._row].getLength() - 1
 					this.incCol(1);
 				}else{  //光标移到下一行开始
 					this._col = 0;
@@ -1158,7 +1379,6 @@ _class("LineEdit", Component, function(_super){
 				}
 			}
 			*/
-			this.setCursor();
 			return false;
 		case KEY_UP:
 			/*
@@ -1168,7 +1388,7 @@ _class("LineEdit", Component, function(_super){
 					this._col = len - 1;
 				}
 				this._row--;
-				this.setCursor();
+				this.updateLine();
 			}
 			return false;
 			*/
@@ -1188,7 +1408,7 @@ _class("LineEdit", Component, function(_super){
 					}
 				}
 				this._row++;
-				this.setCursor();
+				this.updateLine();
 			}
 			return false;
 			*/
@@ -1269,7 +1489,26 @@ _class("Console", Component, function(_super){
 		this._lineEdit = new LineEdit();
 		this._lineEdit.create(this, this._app);
 		this._self.onclick = function(){
+			this.focus();
+		};
+		this._self.onfocus = function(){
+			this._ptr._lineEdit.setCursorType("");
 			this._ptr._lineEdit.setFocus();
+		};
+		this._self.onblur = function(){
+			this._ptr._lineEdit.setCursorType("gray");
+			this._ptr._lineEdit.setFocus();
+		};
+		/*
+		if(runtime.moz){
+			document.onkeydown = function(ev){
+				return _this.onKeyDown(ev || window.event, _this._self);
+			};
+		}else{
+		}
+		*/
+		this._self.onkeydown = function(ev){
+			return this._ptr._lineEdit.onKeyDown(ev || window.event, this._ptr._lineEdit._self);
 		};
 		//this._lastLine = this._lineEdit._self;
 		this._lineEdit.setIomode("out");
@@ -1286,6 +1525,9 @@ _class("Console", Component, function(_super){
 		}
 		this._lines = [];
 		this._app = null;
+		this._self.onkeydown = null;
+		this._self.onblur = null;
+		this._self.onfocus = null;
 		this._self.onclick = null;
 		_super.dispose.apply(this);
 	};
@@ -1341,12 +1583,23 @@ _class("Console", Component, function(_super){
 	this.getCallback = function(){
 		return this._callback;
 	};
+	this.insertBlankLine = function(){
+		var line = this._createElement("div");
+		line.className = "aui-LineEdit";
+		this._self.appendChild(line);
+		this._lines.push(line);
+		return line;
+	};
 	this.insertLine = function(text, refNode, type){
 		var line = this._createElement("div");
 		line.className = "aui-LineEdit";
 		if(text){
 			//line.innerHTML = runtime.encodeHTML(text);
-			line.appendChild(this._createTextNode(text));
+			var span = this._createElement("span");
+			span.className = type;
+			span.appendChild(this._createTextNode(text));
+			line.appendChild(span);
+			span = null;
 		}
 		if(refNode){
 			this._self.insertBefore(line, refNode);
@@ -1368,6 +1621,7 @@ _class("Console", Component, function(_super){
 		}
 		this._lineEdit.print(str, type);
 	};
+	//[TODO]XUL环境下不起作用
 	this.scrollToBottom = function(){
 		this._self.scrollTop = this._self.scrollHeight;
 	};

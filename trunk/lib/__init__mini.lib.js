@@ -1,5 +1,5 @@
 /*
- * alzui-mini JavaScript Framework, v0.0.7
+ * alzui-mini JavaScript Framework, v0.0.8
  * Copyright (c) 2009 wmingjian@gmail.com. All rights reserved.
  *
  * Licensed under the GNU General Public License v2.
@@ -23,8 +23,8 @@ if(typeof __global.runtime != "undefined"){  //内嵌模式，重新初始化
 }
 */
 
-var __version = "0.0.7";  //当前版本信息，格式:"主版本号.副版本号.修订版本号"
-var __buildtime = 1254058620328;
+var __version = "0.0.8";  //当前版本信息，格式:"主版本号.副版本号.修订版本号"
+var __buildtime = 1255054776649;
 var __start = new Date().getTime();  //记录开始时间
 var __proto = "prototype";
 var __inDeclare = false;  //标识是否处于类声明过程中
@@ -269,6 +269,7 @@ function createContext(name/*, libs*/){  //bootstrap
 			classImp.apply(_p, [_s]);  //function(_super){};  //初始化类对象
 		}
 		_p = null;
+		_s = null;
 		//clazz = null;
 		return clazz;
 	}

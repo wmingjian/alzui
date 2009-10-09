@@ -1,6 +1,7 @@
 .aui-Console {position:relative;overflow:hidden;width:567px;height:300px;margin:0px;border:1px solid #181818;padding:1px;color:#00B400;background-color:#000000;cursor:text;}
-.aui-LineEdit {position:relative;overflow:hidden;height:12px;font:12px "Lucida Console","ËÎÌו";color:#33D011;background-color:#181818;white-space:nowrap;margin-bottom:1px;}
+.aui-LineEdit {position:relative;overflow:hidden;height:12px;font:12px "Lucida Console","ËÎÌו";white-space:nowrap;color:#33D011;background-color:#181818;margin-bottom:1px;}
 .aui-LineEdit .cursor {position:relative;display:inline-block;width:6px;height:12px;line-height:12px;color:#181818;background-color:#33D011;}
+.aui-LineEdit .gray {background-color:gray;}
 .aui-LineEdit .input {position:relative;top:-1px;/*width:100%;*/border:0px;padding:0px;margin:0px;line-height:100%;height:12px;color:lightgreen;background-color:transparent;}
 .aui-LineEdit .input {position:absolute;display:block;color:#FF0000;z-index:2;filter:alpha(opacity=80);}
 .aui-LineEdit .input textarea {position:relative;overflow:hidden;margin:-1px;border:0px;height:13px;width:3px;font:12px "Lucida Console","ËÎÌו";line-height:14px;/*background:url(../lib/src/input_bg.gif);*/}
