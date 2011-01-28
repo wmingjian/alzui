@@ -9,11 +9,11 @@
 
 function $(id){return window.document.getElementById(id);}
 
-/*#file begin=alz.core.DomUtil2.js*/
+/*<file name="alz.core.DomUtil2">*/
 
-/*#file end*/
+/*</file>*/
 //_import("alz.mui.Component2");
-/*#file begin=alz.mui.Workspace2.js*/
+/*<file name="alz.mui.Workspace2">*/
 _package("alz.mui");
 
 _import("alz.mui.Component");
@@ -71,8 +71,8 @@ _class("Workspace", Component, function(_super){
 		}
 	};
 });
-/*#file end*/
-/*#file begin=alz.mui.SilverButton.js*/
+/*</file>*/
+/*<file name="alz.mui.SilverButton">*/
 _package("alz.mui");
 
 _import("alz.mui.Component");
@@ -128,8 +128,8 @@ _class("SilverButton", Component, function(_super){
 		runtime.dom.applyCssStyle(this, _css, v);
 	};
 });
-/*#file end*/
-/*#file begin=alz.tools.AppTestWin.js*/
+/*</file>*/
+/*<file name="alz.tools.AppTestWin">*/
 _package("alz.tools");
 
 _import("alz.core.Application");
@@ -250,7 +250,7 @@ _class("AppTestWin", Application, function(_super){
 		$("tbl1").innerHTML = sb.join("");
 	};
 });
-/*#file end*/
+/*</file>*/
 
 runtime.regLib("test_win", function(){
 	application = runtime.createApp("alz.tools.AppTestWin");

@@ -8,7 +8,7 @@
 (function(__global){  // Using a closure to keep global namespace clean.
 
 //_import("alz.changelog");
-/*#file begin=alz.init.js*/
+/*<file name="alz.init">*/
 /*
 if(typeof __global.runtime != "undefined"){  //内嵌模式，重新初始化
 	if(!__global.confirm("alzui系统已经加载完毕，确认要重新初始化吗？")){
@@ -455,10 +455,10 @@ _class("Context", null, function(){
 	}
 	return bootstrap();
 }
-/*#file end*/
+/*</file>*/
 with(createContext("__init__")){
 
-/*#file begin=alz.core.IMetaTable.js*/
+/*<file name="alz.core.IMetaTable">*/
 _package("alz.core");
 
 _interface("IMetaTable", "", function(_property){
@@ -479,8 +479,8 @@ _interface("IMetaTable", "", function(_property){
 	this.removeItem = function(id){
 	};
 });
-/*#file end*/
-/*#file begin=alz.lang.AObject.js*/
+/*</file>*/
+/*<file name="alz.lang.AObject">*/
 _package("alz.lang");
 
 /**
@@ -571,8 +571,8 @@ _class("AObject", null, function(){
 		return this._className;
 	};
 });
-/*#file end*/
-/*#file begin=alz.lang.Exception.js*/
+/*</file>*/
+/*<file name="alz.lang.Exception">*/
 _package("alz.lang");
 
 /**
@@ -595,8 +595,8 @@ _class("Exception", "", function(_super){
 		});
 	};
 });
-/*#file end*/
-/*#file begin=alz.core.WebRuntime.js*/
+/*</file>*/
+/*<file name="alz.core.WebRuntime">*/
 _package("alz.core");
 
 _import("alz.lang.Exception");
@@ -621,9 +621,9 @@ _class("WebRuntime", "", function(_super){
 		this.pathApp   = this.pathAui + "netapp/";      //app所在根目录
 		this.pathSrv   = this.pathAui + "data/";        //服务端程序的根目录
 		this.pathHtml  = this.pathAui + "html/";        //HtmlApp 目录
-		this.pathTpl   = this.pathLib + "images/tpl/";     //tpl模版文件目录
-		this.pathCss   = this.pathLib + "images/css/";     //css文件目录
-		this.pathImg   = this.pathLib + "images/";         //图片资源
+		this.pathTpl   = this.pathLib + "res/tpl/";     //tpl模版文件目录
+		this.pathCss   = this.pathLib + "res/css/";     //css文件目录
+		this.pathImg   = this.pathLib + "res/images/";  //图片资源
 		this.pathSkin  = this.pathLib + "skin/win2k/";  //皮肤(图标)
 		this.pathPlugin = this.pathAui + "plugins/";    //插件目录
 
@@ -1623,8 +1623,8 @@ _class("WebRuntime", "", function(_super){
 		//return eval("(" + sb.join("\n") + ")")();
 	};
 });
-/*#file end*/
-/*#file begin=alz.core.LibManager.js*/
+/*</file>*/
+/*<file name="alz.core.LibManager">*/
 _package("alz.core");
 
 _class("LibManager", "", function(_super){
@@ -1695,8 +1695,8 @@ _class("LibManager", "", function(_super){
 		}
 	};
 });
-/*#file end*/
-/*#file begin=alz.core.ScriptLoader.js*/
+/*</file>*/
+/*<file name="alz.core.ScriptLoader">*/
 _package("alz.core");
 
 _class("ScriptLoader", "", function(_super){
@@ -1745,8 +1745,8 @@ _class("ScriptLoader", "", function(_super){
 		}
 	};
 });
-/*#file end*/
-/*#file begin=alz.core.LibLoader.js*/
+/*</file>*/
+/*<file name="alz.core.LibLoader">*/
 _package("alz.core");
 
 _import("alz.core.ScriptLoader");
@@ -1887,8 +1887,8 @@ _class("LibLoader", "", function(_super){
 		fun = null;
 	};
 });
-/*#file end*/
-/*#file begin=alz.core.WebRuntime_init.js*/
+/*</file>*/
+/*<file name="alz.core.WebRuntime_init">*/
 _package("alz.core");
 
 _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
@@ -1956,7 +1956,7 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 		}
 	};
 });
-/*#file end*/
+/*</file>*/
 
 runtime = new WebRuntime();
 runtime.regLib("__init__", function(){  //加载之后的初始化工作
