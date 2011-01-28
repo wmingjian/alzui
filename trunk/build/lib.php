@@ -1,7 +1,7 @@
 <?php
 require_once('_inc.php');
 
-$path_classes = $path_root . '/alzui-X201/lib/classes/';
+$path_classes = $path_root . '/' . $install_dir . '/lib/classes/';
 $map = array(
 	'__init__mini.lib.js' => array(),
 	'aui.lib.js' => array(
