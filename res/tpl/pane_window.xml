@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<div class="pane">
+	<div id="win1" class="mui-Window-winxp" _icon="images/win-icon.gif" _caption="窗体组件标题栏 - Windown XP"><div class="body">
+		<input type="checkbox" checked="checked" /> Resizable
+		<br /><textarea id="ta" rows="6" cols="60"></textarea>
+	</div></div>
+	<div id="win2" class="mui-Window-win2k" _icon="images/win-icon.gif" _caption="窗体组件标题栏 - Windown 2000"><div class="body">
+		<input type="checkbox" checked="checked" /> Resizable
+		<p>这是一个Window组件的Demo，刚刚加到UI组件库中，想把它做成一个能够支持动态换肤的Window组件。</p>
+	</div></div>
+</div>

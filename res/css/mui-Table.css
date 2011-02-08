@@ -9,7 +9,7 @@
 .mui-Table th{padding:1px;background-color:#EEEEEE}
 .mui-Table td{padding:1px}
 */
-.mui-Table{width:80%;height:80%;margin:20px;border:1px solid #A5A29D;font-family:Verdana,"宋体",Helvetica,sans-serif;font-size:12px}
+.mui-Table{border-collapse:collapse;width:80%;height:80%;margin:10px;border:1px solid #A5A29D;font:12px "宋体"}
 .mui-Table table{width:100%;*width:auto;table-layout:fixed;border-collapse:collapse;border-spacing:0px;/*border-top:1px solid #E3E3E3;*/border-bottom:1px solid #A5A29D}
 .mui-Table table td{height:16px;line-height:16px;text-align:center}
 .mui-Table table .w_chk{width:24px}
