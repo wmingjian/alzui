@@ -2,18 +2,14 @@
 require_once('_inc.php');
 
 $tpls = array(
-	"/apps/citylife/lib/aui.tpl.js" => array(
-		"aui",
-		"/apps/citylife/res/tpl/"
-	),
-	"/apps/citylife/lib/citylife.tpl.js" => array(
-		"citylife",
-		"/apps/citylife/res/tpl/"
-	)
+	"aui.tpl.js"      => array("aui"     , "/apps/citylife/res/tpl/"),
+	"citylife.tpl.js" => array("citylife", "/apps/citylife/res/tpl/"),
+	"test_win.tpl.js" => array("test_win", "/alzui-X201/res/tpl/")
 );
 
 $f = strtolower($_GET['f']);
-$path_xml = $path_root . $tpls[$f][1];
+$basename = basename($f);
+$path_xml = $path_root . $tpls[$basename][1];
 /*
 $arr = array();
 foreach(glob($path_root . $tpls[$f][1] . "*.xml") as $file){

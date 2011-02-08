@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<div class="pane">
+	<div style="margin:10px;">
+		<h5>概要</h5>
+		<p>目前还没有任何内容，仅仅演示了加载框架代码的语法。</p>
+		<h5>控制台组件</h5>
+		<p>主要供开发调试时使用</p>
+		<h5>Window组件</h5>
+		<h5>Table组件</h5>
+	</div>
+</div>

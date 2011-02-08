@@ -43,6 +43,7 @@ _class("WebRuntime", "", function(_super){
 		 * screen  string  桌面屏幕组件的DOM容器id
 		 */
 		this._conf = {};
+		this._tpls = {};       //模板库集合
 		this._srvFiles = {};  //服务的文件列表
 		this._parentRuntime = null;  //父WebRuntime对象
 		this._libManager = null;  //库文件管理者
@@ -751,6 +752,15 @@ _class("WebRuntime", "", function(_super){
 			}
 			this._libManager.reg(name, lib);
 		}
+	};
+	this.regTpl = function(name, tplData){
+		if(name in this._tpls){
+			this.error("[WebRuntime::regTpl]模版库重名name=" + name);
+		}
+		this._tpls[name] = tplData;
+	};
+	this.getTplData = function(name){
+		return this._tpls[name];
 	};
 	/**
 	 * 每个lib文件加载完成时的回调方法
