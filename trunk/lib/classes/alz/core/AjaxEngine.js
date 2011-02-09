@@ -13,7 +13,7 @@ _import("alz.core.ScriptLoader");
  * 异步数据调用引擎
  * [TODO]跨页面工作
  */
-_class("AjaxEngine", "", function(_super){
+_class("AjaxEngine", "", function(){
 	AjaxEngine._version = "1.01.0001";  //Ajax引擎的当前版本
 	AjaxEngine._PROGIDS = [
 		"Microsoft.XMLHTTP",

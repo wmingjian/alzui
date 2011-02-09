@@ -1,6 +1,7 @@
 _package("alz.template");
 
 _import("alz.template.TrimPath");
+//_import("alz.core.Ajax");
 
 /**
  * 提供对模板数据的管理支持，实现了对多种类型的前端模板的管理和方便的外部调用接
@@ -13,24 +14,13 @@ _import("alz.template.TrimPath");
  * tpl  = 符合 /\{[\$=]\w+\}/ 规则的简易模板
  * asp  = 仿 ASP 语法的模板
  */
-_class("TemplateManager", "", function(_super){
+_class("TemplateManager", "", function(){
 	//var RE_TPL = /<!-- template name=\"(\w+\.tpl)\" type=\"(html|tpl|asp)\"( title=\"[^\"]+\")* -->/;
 	var RE_TPL = /<template name=\"(\w+\.tpl)\" type=\"(html|tpl|asp|tmpl|xml)\"(?: params=\"([^\"]+)\")*( title=\"[^\"]+\")*>/;
-	function str2xmldoc(str){
-		var xmldoc;
-		if(runtime.ie){
-			xmldoc = runtime.createComObject("Msxml.DOMDocument");
-			xmldoc.async = false;
-			xmldoc.loadXML(str);
-		}else{
-			xmldoc = (new DOMParser()).parseFromString(str, "text/xml");
-		}
-		return xmldoc;
-	}
 	this._init = function(){
 		_super._init.call(this);
 		this._path = "";
-		this._templates = {};  //模板库 "name":{tpl:"",func:null}
+		this._hash = {};  //模板数据哈希表 {"name":{tpl:"",func:null},...}
 		this._func = null;
 		this._trimPath = null;
 		this._context = {  //[只读]模板编译后的函数公用的上下文环境对象
@@ -43,82 +33,75 @@ _class("TemplateManager", "", function(_super){
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
-		for(var k in this._templates){
-			this._templates[k].data = null;
-			this._templates[k].func = null;
-			delete this._templates[k];
+		for(var k in this._hash){
+			this._hash[k].data = null;
+			this._hash[k].code = "";
+			this._hash[k].func = null;
+			delete this._hash[k];
 		}
 		_super.dispose.apply(this);
 	};
+	/*
 	this.load1 = function(tpls, callback){
 		var i = 0;
 		var _this = this;
 		function cb(data){
-			_this.addTemplate(tpls[i], "asp", data);
+			_this.appendItem(tpls[i], "asp", data);
 			i++;
 			if(i < tpls.length){
-				window.setTimeout(function(){
-					runtime.getAjax().netInvoke("GET", _this._path + tpls[i], "", "text", cb);
-				}, 0);
+				runtime.addThread(0, _this, function(){
+					new Ajax().netInvoke("GET", this._path + tpls[i], "", "text", cb);
+				});
 			}else{
 				callback();  //模板加载完毕后，执行回调函数
 			}
 		}
-		runtime.getAjax().netInvoke("GET", this._path + tpls[i], "", "text", cb);
+		new Ajax().netInvoke("GET", this._path + tpls[i], "", "text", cb);
 	};
 	this.load2 = function(tpls, callback){
 		var arr = $("tpldata").innerHTML.split("$$$$");
 		for(var i = 0, len = arr.length; i < len; i++){
-			this.addTemplate(tpls[i], "asp", arr[i]);
+			this.appendItem(tpls[i], "asp", arr[i]);
 		}
 		callback();
 	};
-	/**
+	/ **
 	 * 使用脚本解析原始的模版文件
-	 */
+	 * /
 	this.load3 = function(tplData, callback){
 		var arr = tplData.split("$$$$");
 		for(var i = 0, len = arr.length; i < len; i++){
-			/*
+			/ *
 			if(runtime.opera){
 				arr[i] = runtime.decodeHTML(arr[i]);
 			}
-			*/
+			* /
 			var a = RE_TPL.exec(arr[i]);
 			if(a){
-				this.addTemplate(a[1], a[2], arr[i]);
+				this.appendItem(a[1], a[2], arr[i]);
 			}else{
 				window.alert("找不到模板的 name 属性");
 			}
 		}
 		callback();
 	};
-	/**
+	/ **
 	 * @param data {Array} 数组类型的模板列表
 	 * @param agent {Object} 回调代理对象
 	 * @param fun {Function} 回调函数
-	 */
+	 * /
 	this.load = function(data, agent, fun){
-		for(var i = 0, len = data.length; i < len; i++){
-			/*
-			var a = RE_TPL.exec(data[i]);
-			if(a){
-				this.addTemplate(a[1], a[2], data[i]);
-			}else{
-				window.alert("找不到模板的 name 属性");
-			}
-			*/
-			this.addTemplate1(data[i]);
-		}
+		this.appendItems(data);
 		fun.call(agent);
 	};
 	this.loadData = function(url, agent, funName){
-		runtime.getAjax().netInvoke("POST", url, "", "json", this, function(json){
+		new Ajax().netInvoke("POST", url, "", "json", this, function(json){
 			this.load(json, this, function(){
 				funName.apply(agent);
 			});
 		});
 	};
+	*/
 	/**
 	 * 添加一个模板到模板管理类中
 	 * @param name {String} 必选，要添加的模板的名称
@@ -126,35 +109,53 @@ _class("TemplateManager", "", function(_super){
 	 * @param data {String} 必选，模板内容
 	 * @return {void} 原始的模板内容
 	 */
-	this.addTemplate = function(name, type, data){
-		if(this._templates[name]){
-			window.alert("模板 " + name + " 已经存在！");
-		}else{
-			var tpl = {"name":name, "data":data, "type":type, "func": null};
-			if(type == "asp"){  //html,tpl 类型模板，不需要编译
-				with(this._context){
-					eval("var func = " + this.parse(data) + ";");
-				}
-				tpl.func = func;
-			}
-			this._templates[name] = tpl;
-		}
-	};
-	this.addTemplate1 = function(data){
+	this._appendItem = function(data){
 		var name = data.name;
 		var type = data.type;
 		var tpl = data.tpl;
-		if(this._templates[name]){
-			window.alert("模板 " + name + " 已经存在！");
+		if(this._hash[name]){
+			runtime.warning("[TemplateManager::_appendItem]模板 " + name + " 已经存在！");
 		}else{
-			var template = {"name":name, "data":tpl, "type":type, "func": null};
+			if(type == "html" || type == "tpl"){
+				tpl = tpl
+					.replace(/>\r?\n\t*</g, "><")
+					.replace(/\r?\n\t*/g, " ");
+			}
+			var template = {
+				"name": name,
+				"data": tpl,
+				"type": type,
+				"code": "",
+				"func": null
+			};
 			if(type == "asp"){  //html,tpl 类型模板，不需要编译
+				template.code = "var func = " + this.parse(tpl, data.params) + ";";
 				with(this._context){
-					eval("var func = " + this.parse(tpl, data.params) + ";");
+					eval(template.code);
 				}
 				template.func = func;
 			}
-			this._templates[name] = template;
+			this._hash[name] = template;
+		}
+	};
+	this.appendItem = function(name, type, data){
+		this._appendItem({
+			"name": name,
+			"type": type,
+			"tpl" : data
+		});
+	};
+	this.appendItems = function(data){
+		for(var i = 0, len = data.length; i < len; i++){
+			/*
+			var a = RE_TPL.exec(data[i]);
+			if(a){
+				this.appendItem(a[1], a[2], data[i]);
+			}else{
+				window.alert("找不到模板的 name 属性");
+			}
+			*/
+			this._appendItem(data[i]);
 		}
 	};
 	this.callTpl = function(html, json){
@@ -169,34 +170,86 @@ _class("TemplateManager", "", function(_super){
 			}
 		});
 	};
-	this.getTemplate = function(name){
-		if(this._templates[name].type == "xml"){
-			return str2xmldoc(this._templates[name].data);
+	/*
+	this.callTpl = function(html, json){
+		if(!json) return html;
+		var sb = [];
+		var p2 = 0;
+		for(var p1 = html.indexOf("{", p2); p1 != -1; p1 = html.indexOf("{", ++p2)){
+			var p = p1 + 1;
+			var ch = html.charAt(p);
+			if(ch == "$" || ch == "="){
+				var p3 = html.indexOf("}", p);
+				if(p3 != -1){
+					sb.push(html.substring(p2, p1));
+					var k = html.substring(p + 1, p3);
+					if(ch == "$"){
+						sb.push(k in json ? json[k] : "{$" + k + "}");
+					}else{  //ch == "="
+						sb.push(this.getTemplate(k + ".tpl"));
+					}
+					p2 = p3;
+				}else{
+					p2 = p;
+				}
+			}else{
+				p2 = p1;
+			}
+		}
+		//获取最后一个模板变量之后的内容
+		//如果一个模板变量都没有，则获取整个字符串
+		sb.push(html.substr(p2));
+		return sb.join("");
+	};
+	*/
+	this.str2xmldoc = function(str){
+		var xmldoc;
+		if(runtime.ie){
+			xmldoc = runtime.createComObject("Msxml.DOMDocument");
+			xmldoc.async = false;
+			xmldoc.loadXML(str);
 		}else{
-			return this._templates[name].data;
+			xmldoc = (new DOMParser()).parseFromString(str, "text/xml");
+		}
+		return xmldoc;
+	};
+	this.getTemplate = function(name){
+		if(!(name in this._hash)){
+			window.alert("[TemplateManager::getTemplate]请确认模板" + name + "已经存在");
+		}else{
+			if(this._hash[name].type == "xml"){
+				return this.str2xmldoc(this._hash[name].data);
+			}else{
+				return this._hash[name].data;
+			}
 		}
 	};
 	this.invoke = function(name){
+		/*
 		var arr = [];
 		for(var i = 1, len = arguments.length; i < len; i++){
 			arr.push(arguments[i]);
 		}
-		var html, tpl = this._templates[name];
-		if(!tpl){
-			window.alert("请确认模板" + name + "已经存在");
+		var arr = Array.prototype.slice.call(arguments, 1);
+		*/
+		var html;
+		if(!(name in this._hash)){
+			window.alert("[TemplateManager::invoke]请确认模板" + name + "已经存在");
 		}else{
+			var tpl = this._hash[name];
 			switch(tpl.type){  //根据模板的类型，使用不同的方式生成 HTML 代码
 			case "html":  //直接输出
 				html = tpl.data;
 				break;
 			case "tpl":  //使用正则替换
-				html = this.callTpl(tpl.data, arr[0]);
+				html = this.callTpl(tpl.data, arguments[1]);
 				break;
 			case "asp":  //执行函数调用
-				html = this._templates[name].func.apply(null, arr);
+				var arr = Array.prototype.slice.call(arguments, 1);
+				html = this._hash[name].func.apply(null, arr);
 				break;
 			case "tmpl":
-				html = this._trimPath.parseTemplate(this._templates[name].data).process(arguments[1]);
+				html = this._trimPath.parseTemplate(this._hash[name].data).process(arguments[1]);
 				break;
 			case "xml":
 				html = tpl.data;
@@ -211,10 +264,13 @@ _class("TemplateManager", "", function(_super){
 	 * @param tplName {String}
 	 */
 	this.render = function(element, tplName){
+		/*
 		var arr = [];
 		for(var i = 1, len = arguments.length; i < len; i++){
 			arr.push(arguments[i]);
 		}
+		*/
+		var arr = Array.prototype.slice.call(arguments, 1);
 		element.innerHTML = this.invoke.apply(this, arr);  //arr[0] = tplName;
 	};
 	/**
@@ -222,12 +278,15 @@ _class("TemplateManager", "", function(_super){
 	 * 方便的布局的正常工作
 	 */
 	this.render2 = function(element, tplName){
+		/*
 		var arr = [];
 		for(var i = 1, len = arguments.length; i < len; i++){
 			arr.push(arguments[i]);
 		}
+		*/
+		var arr = Array.prototype.slice.call(arguments, 1);
 		var tpl = this.invoke.apply(this, arr);  //arr[0] = tplName;
-		element.appendChild(runtime.createDomElement(tpl));
+		return element.appendChild(runtime.createDomElement(tpl));
 	};
 	/**
 	 * 渲染指定的模板和数据到Pane组件中
@@ -238,6 +297,11 @@ _class("TemplateManager", "", function(_super){
 		this.render.apply(this, arguments);
 		pane.initComponents();
 	};
+	/*
+	this.createTplElement = function(tplName){
+		return runtime.createDomElement(this.invoke(tplName));
+	};
+	*/
 	var TAGS = {
 		"start": [
 			{"tag":"<!--%","len":5,"p":-1},
@@ -248,10 +312,10 @@ _class("TemplateManager", "", function(_super){
 			{"tag":"%)"   ,"len":2,"p":-1}
 		]
 	};
-	function dumpTag(t){
-		alert(t.tag + "," + t.len + "," + t.p);
-	}
-	function findTag(code, t, start){  //indexOf
+	this.dumpTag = function(t){
+		window.alert(t.tag + "," + t.len + "," + t.p);
+	};
+	this.findTag = function(code, t, start){  //indexOf
 		var tags = TAGS[t];
 		var pos = Number.MAX_VALUE;
 		var t = null;
@@ -264,17 +328,17 @@ _class("TemplateManager", "", function(_super){
 			}
 		}
 		if(t == null){
-			return {"tag":"#tag#","len":0,"p":-1};
+			return {"tag": "#tag#", "len": 0, "p": -1};
 		}else{
 			return t;
 		}
-	}
+	};
 	/**
 	 * 将字符串转换成可以被字符串表示符号(",')括起来已表示原来字符串意义的字符串
 	 * @param str {String} 要转换的字符串内容
 	 */
 	this.toJsString = function(str){
-		if(typeof(str) != "string") return "";
+		if(typeof str != "string") return "";
 		return str.replace(/[\\\'\"\r\n]/g, function(_0){
 			switch(_0){
 			case "\\": return "\\\\";
@@ -298,8 +362,8 @@ _class("TemplateManager", "", function(_super){
 		var p0 = code.indexOf(tag0, 0);
 		var t0 = {"tag":tag0,"len":l0,"p":p0};
 		*/
-		var t0 = findTag(code, "start", 0);  //寻找开始标签
-		//dumpTag(t0);
+		var t0 = this.findTag(code, "start", 0);  //寻找开始标签
+		//this.dumpTag(t0);
 		var tag1 = "%--" + ">";
 		var l1 = tag1.length;
 		var p1 = -l1;
@@ -320,8 +384,8 @@ _class("TemplateManager", "", function(_super){
 					sb.push("\n__sb.push(\"" + this.toJsString(code.substring(t1.p + t1.len, t0.p)) + "\");");
 				}
 			}
-			t1 = findTag(code, "end", t0.p + t0.len);  //寻找结束标签
-			//dumpTag(t1);
+			t1 = this.findTag(code, "end", t0.p + t0.len);  //寻找结束标签
+			//this.dumpTag(t1);
 			//t1.p = code.indexOf(t1.tag, t0.p + t0.len);
 			if(t1.p != -1){
 				switch(code.charAt(t0.p + t0.len)){
@@ -354,8 +418,8 @@ _class("TemplateManager", "", function(_super){
 			}else{
 				return "模板中的'" + t0.tag + "'与'" + t1.tag + "'不匹配！";
 			}
-			t0 = findTag(code, "start", t1.p + t1.len);  //寻找开始标签
-			//dumpTag(t0);
+			t0 = this.findTag(code, "start", t1.p + t1.len);  //寻找开始标签
+			//this.dumpTag(t0);
 			//t0.p = code.indexOf(t0.tag, t1.p + t1.len);
 		}
 		if(t1.p + t1.len >= 0 && t1.p + t1.len < code.length){  //保存结束标志之后的代码
@@ -391,13 +455,13 @@ _class("TemplateManager", "", function(_super){
 						print("[error]" + tagName + "不允许存在" + name+ "属性(value=" + value + ")\n");
 					}
 				}else if(name.charAt(0) == "_"){
-					print("[warning]" + tagName + "含有自定义属性" + name+ "=\"" + value + "\"\n");
+					runtime.warning(tagName + "含有自定义属性" + name+ "=\"" + value + "\"\n");
 				}else if(name == "style"){
-					print("[warning]" + tagName + "含有属性" + name+ "=\"" + value + "\"\n");
+					runtime.warning(tagName + "含有属性" + name+ "=\"" + value + "\"\n");
 				}else if(name.substr(0, 2) == "on"){
-					print("[warning]" + tagName + "含有事件代码" + name+ "=\"" + value + "\"\n");
+					runtime.warning(tagName + "含有事件代码" + name+ "=\"" + value + "\"\n");
 				}else if(!(name in this._att)){
-					print("[error]" + tagName + "含有未知属性" + name+ "=\"" + value + "\"\n");
+					runtime.error(tagName + "含有未知属性" + name+ "=\"" + value + "\"\n");
 				}
 				*/
 				sb.push(" " + name + "=\"" + value + "\"");
@@ -414,7 +478,7 @@ _class("TemplateManager", "", function(_super){
 				if(tagName in this._hashTag){
 					sb.push(" />");
 				}else{
-					//print("[warning]" + tagName + "是空标签\n");
+					//runtime.warning(tagName + "是空标签\n");
 					sb.push("></" + tagName + ">");
 				}
 			}
@@ -429,7 +493,7 @@ _class("TemplateManager", "", function(_super){
 			//sb.push("<!--" + node.data + "-->");
 			break;
 		default:
-			//print("[warning]无法处理的nodeType" + node.nodeType + "\n");
+			//runtime.warning("无法处理的nodeType" + node.nodeType + "\n");
 			break;
 		}
 		return sb.join("");

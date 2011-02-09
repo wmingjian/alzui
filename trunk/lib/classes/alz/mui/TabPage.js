@@ -5,7 +5,7 @@ _import("alz.mui.Component");
 /**
  * 选项卡组件
  */
-_class("TabPage", Component, function(_super){
+_class("TabPage", Component, function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._tabs = [];
@@ -15,17 +15,13 @@ _class("TabPage", Component, function(_super){
 	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
-		this._head = runtime.getDocument().createElement("div");
-		this._head.className = "mui-TabPage-Head";
-		this._self.appendChild(this._head);
-		this._body = runtime.getDocument().createElement("div");
-		this._body.className = "mui-TabPage-Body";
+		this._head = this._createElement2(this._self, "div", "mui-TabPage-Head");
+		this._body = this._createElement2(this._self, "div", "mui-TabPage-Body");
 		this._body.innerHTML =
 				'<table width="95%" border="1" cellspacing="0" cellpadding="2" bordercolor="#869FA1"><tbody></tbody></table>'
 			+ '<table width="95%" border="1" cellspacing="0" cellpadding="2" bordercolor="#869FA1"><tbody></tbody></table>'
 			+ '<table width="95%" border="1" cellspacing="0" cellpadding="2" bordercolor="#FFCCB4"><tbody></tbody></table>'
 			+ '<table width="95%" border="1" cellspacing="0" cellpadding="2" bordercolor="#0A0064"><tbody></tbody></table>';
-		this._self.appendChild(this._body);
 	};
 	this.dispose = function(){
 		if(this._disposed) return;

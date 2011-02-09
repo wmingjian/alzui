@@ -17,6 +17,7 @@ import alz.test.PaneHome;
 import alz.test.PaneConsole;
 import alz.test.PaneWindow;
 import alz.test.PaneTable;
+import alz.test.PaneForm;
 import alz.test.AppTestWin;
 
 runtime.regLib("test_win", function(){

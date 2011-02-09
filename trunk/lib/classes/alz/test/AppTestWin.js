@@ -4,13 +4,15 @@ _import("alz.core.Application");
 _import("alz.test.PaneHome");
 _import("alz.test.PaneWindow");
 _import("alz.test.PaneTable");
+_import("alz.test.PaneForm");
 
-_class("AppTestWin", Application, function(_super){
+_class("AppTestWin", Application, function(){
 	var pane_conf = [
 		{id: "home"   , name:"介绍"      , url: "index.html"  , title: "默认页"  , clazz: "PaneHome"   },
 		{id: "console", name:"控制台"    , url: "console.html", title: "控制台"  , clazz: "PaneConsole"},
 		{id: "win"    , name:"Window组件", url: "Window.html" , title: "窗体皮肤", clazz: "PaneWindow" },
-		{id: "table"  , name:"Table组件" , url: "Table.html"  , title: "表格组件", clazz: "PaneTable"  }
+		{id: "table"  , name:"Table组件" , url: "Table.html"  , title: "表格组件", clazz: "PaneTable"  },
+		{id: "form"   , name:"通用表单"  , url: "Form.html"   , title: "通用表单", clazz: "PaneForm"   }
 	];
 	var pane_hash = {};
 	this._init = function(){

@@ -193,12 +193,12 @@ function createContext(name/*, libs*/){  //bootstrap
 				}
 				var ret;
 				switch(a.length){
-				case 0: ret = thisObj.__apply__(); break; 
-				case 1: ret = thisObj.__apply__(a[0]); break; 
-				case 2: ret = thisObj.__apply__(a[0], a[1]); break; 
-				case 3: ret = thisObj.__apply__(a[0], a[1], a[2]); break; 
-				case 4: ret = thisObj.__apply__(a[0], a[1], a[2], a[3]); break; 
-				case 5: ret = thisObj.__apply__(a[0], a[1], a[2], a[3], a[4]); break; 
+				case 0: ret = thisObj.__apply__(); break;
+				case 1: ret = thisObj.__apply__(a[0]); break;
+				case 2: ret = thisObj.__apply__(a[0], a[1]); break;
+				case 3: ret = thisObj.__apply__(a[0], a[1], a[2]); break;
+				case 4: ret = thisObj.__apply__(a[0], a[1], a[2], a[3]); break;
+				case 5: ret = thisObj.__apply__(a[0], a[1], a[2], a[3], a[4]); break;
 				case 6: ret = thisObj.__apply__(a[0], a[1], a[2], a[3], a[4], a[5]); break;
 				case 7: ret = thisObj.__apply__(a[0], a[1], a[2], a[3], a[4], a[5], a[6]); break;
 				case 8: ret = thisObj.__apply__(a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7]); break;
@@ -307,7 +307,7 @@ _package("alz.core");
  *
  * _package,_import,_class三个OOP关键特性的重要程度是反过来的。
  */
-_class("Context", null, function(){
+_class("Context", null, function(_super){
 	this.__classes__ = _classes;
 	this.alz = alz;
 	this._init = _init;
@@ -486,7 +486,7 @@ _package("alz.lang");
 /**
  * 根类 AObject
  */
-_class("AObject", null, function(){
+_class("AObject", null, function(_super){
 	//[memleak]AObject.__hash__ = {};
 	//[memleak]AObject.__id__ = 0;
 	//this._className = "";  //static property
@@ -637,6 +637,7 @@ _class("EventTarget", "", function(_super){
 		return this._disabled;
 	};
 	this.setDisabled = function(v){
+		if(this._disabled == v) return;
 		this._disabled = v;
 	};
 	this.addEventListener1 = function(eventMap, listener){
@@ -789,6 +790,7 @@ _class("WebRuntime", "", function(_super){
 		 * screen  string  桌面屏幕组件的DOM容器id
 		 */
 		this._conf = {};
+		this._tpls = {};       //模板库集合
 		this._srvFiles = {};  //服务的文件列表
 		this._parentRuntime = null;  //父WebRuntime对象
 		this._libManager = null;  //库文件管理者
@@ -809,10 +811,12 @@ _class("WebRuntime", "", function(_super){
 		this.safari = false;  //是否Safari
 		this.chrome = false;  //是否谷歌浏览器
 		this.moz = false;     //是否Mozilla系列浏览器
-		this.ie5 = false;
-		this.ie55 = false;
+		this.ie5 = false;     //是否IE5
+		this.ie55 = false;    //是否IE5.5
 		this.ie6 = false;     //是否IE6
 		this.ie7 = false;     //是否IE7
+		this.ff1 = false;     //是否FF1
+		this.ff2 = false;     //是否FF2
 		this.max = false;     //是否Maxthon
 		this.tt = false;      //是否TencentTraveler
 
@@ -835,25 +839,21 @@ _class("WebRuntime", "", function(_super){
 
 		//core.lib
 		//this.dom = null;   //{DOMUtil}
-		//this.ajax = null;  //{AjaxEngine}
+		//this._ajax = null;  //{AjaxEngine}
 
 		//ui.lib
 		//this._workspace = null;
 
 		this._funs = [];
-
+		this.__eventHandle = null;
 		this._inited = false;
 	};
 	this.init = function(){
-		var _this = this;
-		function __eventHandle(ev){
-			_this.eventHandle(ev || _this._win.event);
-		}
-
 		this.exportInterface(this._win);  //导出全局变量
 		this._checkHostEnv();
 		this._pathCss = this._config["pathcss"];
 		//this._pathCss = this._products[this._productName].pathCss;
+		this._pathSkin = this._config["pathskin"];
 		this.pathPlugin = this._config["pathplugin"];
 
 		this._libManager = new LibManager();
@@ -866,7 +866,7 @@ _class("WebRuntime", "", function(_super){
 				+ " href=\"" + url + "\""
 				+ " />");
 		}
-		this._preLoadFile("css", this._pathCss, this._config["css"].split(","));
+		this._preLoadFile("css", this._pathCss, this._config["css"].split(","), this._pathSkin);
 		if(this._config["plugin"]){  //如果有插件，加载插件的CSS文件
 			var plugins = this._config["plugin"].split(",");
 			for(var i = 0, len = plugins.length; i < len; i++){
@@ -881,23 +881,27 @@ _class("WebRuntime", "", function(_super){
 			this._doc.write('<script type="text/javascript" src="' + this._config["autotest"] + '" charset=\"utf-8\"></sc'+'ript>');
 		}
 
+		var _this = this;
+		this.__eventHandle = function(ev){
+			_this.eventHandle(ev || _this._win.event);
+		};
 		if(this._doc.attachEvent){
 			try{  //下面这句在WinXP+IE6下报错，所以加上防错处理
 				this._doc.execCommand("BackgroundImageCache", false, true);
 			}catch(ex){
 			}
-			this._doc.attachEvent("onreadystatechange", __eventHandle);
+			this._doc.attachEvent("onreadystatechange", this.__eventHandle);
 		}else{
-			this._doc.addEventListener("DOMContentLoaded", __eventHandle, false);
+			this._doc.addEventListener("DOMContentLoaded", this.__eventHandle, false);
 		}
 		if(this.safari || this.chrome){
-			this.bindEventListener(this._win, "load", __eventHandle);
+			this.addEventListener(this._win, "load", this.__eventHandle);
 		}
-		this.bindEventListener(this._win, "unload", __eventHandle);
-		this.bindEventListener(this._win, "resize", __eventHandle);
+		this.addEventListener(this._win, "unload", this.__eventHandle);
+		this.addEventListener(this._win, "resize", this.__eventHandle);
 		var types = ["contextmenu", "mousedown", "mousemove", "mouseup", "keydown", "keypress", "keyup"];
 		for(var i = 0, len = types.length; i < len; i++){
-			this.bindEventListener(this._doc, types[i], __eventHandle);
+			this.addEventListener(this._doc, types[i], this.__eventHandle);
 		}
 
 		if(this._conf["runmode"] == "11"){
@@ -918,6 +922,13 @@ _class("WebRuntime", "", function(_super){
 	this.onContentLoaded = function(bNewWorkspace){
 		if(this._inited) return;
 		this._inited = true;
+		var code = this._config["onstartloading"];
+		if(code){
+			try{
+				eval(code);
+			}catch(ex){
+			}
+		}
 		//按顺序执行构造扩展
 		//for(var i = 1, len = this._exts.length; i < len; i++){
 		//	this._exts[i].init.call(this);
@@ -930,8 +941,8 @@ _class("WebRuntime", "", function(_super){
 			this.eventHandle({type:"resize"});  //主动触发一次 resize 事件
 		}
 		//var _this = this;
-		//this.bindEventListener(this._win, "mousemove", function(ev){_this.eventHandle(ev || _this._win.event);});
-		//this.bindEventListener(this._doc.body, "mousemove", function(ev){_this.eventHandle(ev || _this._win.event);});
+		//this.addEventListener(this._win, "mousemove", function(ev){_this.eventHandle(ev || _this._win.event);});
+		//this.addEventListener(this._doc.body, "mousemove", function(ev){_this.eventHandle(ev || _this._win.event);});
 		this._boxModel = this._testBoxModel();  //探测盒模型
 		//[TODO]库代码的加载时机应该更早才对，至少要在 onContentLoaded 之前，最好是在初始化脚本加载并初始化完毕的时候
 		var libs = this._config["lib"];  //.replace(/^core,ui,/, "");  //忽略core,ui库代码
@@ -940,6 +951,21 @@ _class("WebRuntime", "", function(_super){
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
+		if(this._doc.detachEvent){
+			this._doc.detachEvent("onreadystatechange", this.__eventHandle);
+		}else{
+			this._doc.removeEventListener("DOMContentLoaded", this.__eventHandle, false);
+		}
+		if(this.safari || this.chrome){
+			this.removeEventListener(this._win, "load", this.__eventHandle);
+		}
+		this.removeEventListener(this._win, "unload", this.__eventHandle);
+		this.removeEventListener(this._win, "resize", this.__eventHandle);
+		var types = ["contextmenu", "mousedown", "mousemove", "mouseup", "keydown", "keypress", "keyup"];
+		for(var i = 0, len = types.length; i < len; i++){
+			this.removeEventListener(this._doc, types[i], this.__eventHandle);
+		}
+		this.__eventHandle = null;
 		for(var k in this._plugins){
 			this._plugins[k].dispose();
 			delete this._plugins[k];
@@ -979,8 +1005,8 @@ _class("WebRuntime", "", function(_super){
 			"ie"    : /MSIE\x20(\d+(?:\.\d+)+)/,    //MSIE 6.0
 			"ff"    : /Firefox\/(\d+(?:\.\d+)+)/,   //Firefox/2.0.0.2
 			"ns"    : /Netscape\/(\d+(?:\.\d+)+)/,  //Netscape/7.0
-			"safari": /Version\/(\d+(?:\.\d+)+) Safari\/(\d+(?:\.\d+)+)/, //Version/3.0.3 Safari/522.15.5
-			"chrome": /Chrome\/(\d+(?:\.\d+)+) Safari\/(\d+(?:\.\d+)+)/,  //Chrome/0.2.149.27 Safari/525.13
+			"safari": /Version\/(\d+(?:\.\d+)+)\x20Safari\/(\d+(?:\.\d+)+)/, //Version/3.0.3 Safari/522.15.5
+			"chrome": /Chrome\/(\d+(?:\.\d+)+)\x20Safari\/(\d+(?:\.\d+)+)/,  //Chrome/0.2.149.27 Safari/525.13
 			"mf"    : /Minefield\/(\d+(?:\.\d+)+)/  //Minefield/3.0b4pre
 		};
 		var host = {"os":"unix","env":"unknown","ver":"0","compatMode":""};
@@ -1009,7 +1035,7 @@ _class("WebRuntime", "", function(_super){
 			}
 		}
 		if(host.env == "unknown"){
-			runtime.log("[BorderLayout::getHostenv]未知的宿主环境，userAgent:" + nav.userAgent);
+			runtime.log("[WebRuntime::getHostenv]未知的宿主环境，userAgent:" + nav.userAgent);
 		}
 		return host;
 	};
@@ -1029,6 +1055,8 @@ _class("WebRuntime", "", function(_super){
 		this.moz = this.ns || this.ff;  //nav.product == "Gecko";
 		this.ie6 = nav.userAgent.indexOf("MSIE 6.0") != -1;
 		this.ie7 = nav.userAgent.indexOf("MSIE 7.0") != -1;
+		this.ff1 = nav.userAgent.indexOf("Firefox/1.0") != -1;
+		this.ff2 = nav.userAgent.indexOf("Firefox/2.0") != -1;
 		this.max = nav.userAgent.indexOf("Maxthon") != -1;
 		this.tt = nav.userAgent.indexOf("TencentTraveler") != -1;
 		/*
@@ -1067,14 +1095,15 @@ _class("WebRuntime", "", function(_super){
 		//配置信息
 		var keys = [
 			"src",
-			"pathlib", "pathapp", "pathcss", "pathimg", "pathtpl", "pathplugin",
+			"pathlib", "pathapp", "pathcss", "pathskin", "pathimg", "pathtpl", "pathplugin",
 			"css", "lib", "plugin",
-			"conf", "runmode", "skinid", "skin", "codeprovider", "autotest", "action"
+			"conf", "runmode", "skinid", "skin", "codeprovider", "autotest", "action",
+			"onstartloading"  //开始加载时执行的代码
 		];
 		for(var i = 0, len = keys.length; i < len; i++){
 			var key = keys[i];
 			var value = this._domScript.getAttribute(key);
-			this._config[keys[i]] = value != null ? value : "";
+			this._config[key] = value != null ? value : "";
 		}
 		this._conf = this.parseJson(this._config["conf"] || "{}");
 		var rt = this.getMainWindow().runtime;
@@ -1093,7 +1122,8 @@ _class("WebRuntime", "", function(_super){
 				if(_1 in conf){
 					if(_1 == "skinid"){
 						var no = "" + (parseInt(conf[_1]) + 1);
-						return "000".substr(0, 3 - no.length) + no;
+						//return "000".substr(0, 3 - no.length) + no;
+						return no;
 					}else{
 						return conf[_1];
 					}
@@ -1125,9 +1155,14 @@ _class("WebRuntime", "", function(_super){
 
 		this._extendSystemObject();
 	};
-	this._preLoadFile = function(ext, path, files){
+	this._preLoadFile = function(ext, path, files, pathSkin){
 		for(var i = 0, len = files.length; i < len; i++){
-			var url = path + files[i];
+			var file = files[i], skin = false;
+			if(file.charAt(0) == "#"){
+				file = file.substr(1).replace(/(\d+)\.css$/, "$1/_skin.css");
+				skin = true;
+			}
+			var url = (skin ? pathSkin : path) + file;
 			this._files[url] = true;  //标识已经加载
 			if(ext == "css"){
 				if(!this._host.xul){
@@ -1147,9 +1182,14 @@ _class("WebRuntime", "", function(_super){
 			}
 		}
 	};
-	this.dynamicLoadFile = function(ext, path, files){
+	this.dynamicLoadFile = function(ext, path, files, pathSkin){
 		for(var i = 0, len = files.length; i < len; i++){
-			var url = path + files[i];
+			var file = files[i], skin = false;
+			if(file.charAt(0) == "#"){  //皮肤文件
+				file = file.substr(1).replace(/(\d+)\.css$/, "$1/_skin.css");
+				skin = true;
+			}
+			var url = (skin ? pathSkin : path) + file;
 			if(url in this._files) continue;  //如果已经加载，则忽略
 			this._files[url] = true;  //标识已经加载
 			if(ext == "css"){
@@ -1163,7 +1203,7 @@ _class("WebRuntime", "", function(_super){
 			}else if(ext == "js"){
 				var loader = new ScriptLoader();
 				loader.create(this, function(){});
-				loader.load(url, "", true);  //this.getUrlByName(libName)
+				loader.load(url, "", true);  //this.getUrlByName(lib)
 				loader = null;
 			}
 		}
@@ -1364,13 +1404,22 @@ _class("WebRuntime", "", function(_super){
 	this.addOnLoad = function(fun){
 		this._funs.push(fun);
 	};
-	this.bindEventListener = function(obj, type, eventHandle){
+	this.addEventListener = function(obj, type, eventHandle){
 		if(obj.attachEvent){
 			obj.attachEvent("on" + type, eventHandle);
 		}else if(obj.addEventListener){
 			obj.addEventListener(type, eventHandle, false);
 		}else{
-			throw new Exception("[WebRuntime::bindEventListener]该浏览器无法对 DOM 元素绑定事件");
+			throw new Exception("[WebRuntime::addEventListener]该浏览器无法对 DOM 元素绑定事件");
+		}
+	};
+	this.removeEventListener = function(obj, type, eventHandle){
+		if(obj.detachEvent){
+			obj.detachEvent("on" + type, eventHandle);
+		}else if(obj.removeEventListener){
+			obj.removeEventListener(type, eventHandle, false);
+		}else{
+			throw new Exception("[WebRuntime::removeEventListenerEventListener]该浏览器无法对 DOM 元素绑定事件");
 		}
 	};
 	/**
@@ -1392,7 +1441,7 @@ _class("WebRuntime", "", function(_super){
 			if(this._inited) return;
 			this.onContentLoaded();
 			//this.init();  //系统初始化
-			//alert(runtime.getBrowser().getTestMode());
+			//window.alert(runtime.getBrowser().getTestMode());
 			break;
 		case "unload":
 			//try{  //屏蔽页面onunload时可能产生的错误
@@ -1498,35 +1547,52 @@ _class("WebRuntime", "", function(_super){
 			this._libManager.reg(name, lib);
 		}
 	};
+	this.regTpl = function(name, tplData){
+		if(name in this._tpls){
+			this.error("[WebRuntime::regTpl]模版库重名name=" + name);
+		}
+		this._tpls[name] = tplData;
+	};
+	this.getTplData = function(name){
+		return this._tpls[name];
+	};
 	/**
 	 * 每个lib文件加载完成时的回调方法
-	 * @param libName {String} core|ui|...
+	 * @param {String} libName core|ui|...
+	 * @param {Lib} lib {type:"",name:"",inApp:false}
+	 * @param {LibConf} libConf lib配置信息
 	 */
-	this.onLibLoad = function(libName){
-		var lib = this._libManager.getLib(libName);
-		if(lib){
-			lib.init.apply(this);  //绑定在 runtime 对象上面，这是对runtime对象的一种扩展机制
-			lib._inited = true;
+	this.onLibLoad = function(lib, libConf, loaded){
+		if(!loaded){
+			if(lib.type == "lib"){
+				var libConf = this._libManager.getLib(lib.name);
+				if(libConf){
+					libConf.init.apply(this);  //绑定在 runtime 对象上面，这是对runtime对象的一种扩展机制
+					libConf._inited = true;
+				}
+				libConf = null;
+			}
 		}else{  //找不到，则认为库已经加载完毕
-			if(typeof this.onLoad == "function"){
-				this.onLoad();
-			}
-			for(var i = 0, len = this._funs.length; i < len; i++){
-				this._funs[i]();  //依次调用绑定的函数
-			}
-			if(this._appManager){
-				this._appManager.init();  //初始化所有应用
-			}
-			//if(!this.ie){  //非 IE 在此时触发 resize
-				this.eventHandle({type:"resize"});  //主动触发一次 resize 事件
-			//}
-			if(typeof this._win.onContentLoaded == "function"){
-				this._win.onContentLoaded();
-			}else if(this._win.__webpage__){
-				new this._win.__webpage__().main();
+			if(lib.type == "lib" || lib.type == "tpl"){
+				if(typeof this.onLoad == "function"){
+					this.onLoad();
+				}
+				for(var i = 0, len = this._funs.length; i < len; i++){
+					this._funs[i]();  //依次调用绑定的函数
+				}
+				if(this._appManager){
+					this._appManager.init();  //初始化所有应用
+				}
+				//if(!this.ie){  //非 IE 在此时触发 resize
+					this.eventHandle({type:"resize"});  //主动触发一次 resize 事件
+				//}
+				if(typeof this._win.onContentLoaded == "function"){
+					this._win.onContentLoaded();
+				}else if(this._win.__webpage__){
+					new this._win.__webpage__().main();
+				}
 			}
 		}
-		lib = null;
 	};
 	/**
 	 * 日志输出接口
@@ -1552,8 +1618,8 @@ _class("WebRuntime", "", function(_super){
 		/**
 		 * 获取 DOM 元素对应的脚本组件
 		 */
-		scope.$get = function(id){return this.runtime.getComponentById(id);};
-		scope.$init = function(ids){return this.runtime.initComponents(ids);};
+		//scope.$get = function(id){return this.runtime.getComponentById(id);};
+		//scope.$init = function(ids){return this.runtime.initComponents(ids);};
 		/*
 		scope._alert = this.alert;
 		scope.alert = function(msg){
@@ -1619,10 +1685,10 @@ _class("WebRuntime", "", function(_super){
 			this._testDiv = this._createTestDiv();
 		}
 		this._testDiv.style.font = font || "8pt tahoma";
-		this._testDiv.innerHTML = text;
+		this._testDiv.innerHTML = runtime.encodeHTML(text);
 		return {
-			w: this._testDiv.offsetWidth,
-			h: this._testDiv.offsetHeight
+			"w": this._testDiv.offsetWidth,
+			"h": this._testDiv.offsetHeight
 		};
 	};
 	this.getParentRuntime = function(){
@@ -1679,6 +1745,9 @@ _class("WebRuntime", "", function(_super){
 	 * @param url {String} 插件JS的URL地址
 	 */
 	this.loadPlugin = function(url){
+	};
+	this.getPlugin = function(name){
+		return this._plugins[name];
 	};
 	this.getRandomColor = function(){
 		var a = [];
@@ -1768,6 +1837,39 @@ _class("WebRuntime", "", function(_super){
 		sb.push("\n}");
 		return sb.join("");
 		//return eval("(" + sb.join("\n") + ")")();
+	};
+	//var _pool = [];  //模拟线程池
+	//添加并启动一个线程
+	this.addThread = function(msec, agent, fun){
+		var f = typeof fun == "string" ? agent[fun] : fun;
+		/*
+		_pool.push({
+			"agent": agent,       //代理对象
+			"fun"  : f,           //要执行的代码
+			"time" : new Date(),  //当前时间
+			"msec" : msec         //时间间隔
+		});
+		*/
+		return window.setTimeout(function(){
+			f.apply(agent);
+		}, msec);
+	};
+	this.startTimer = function(msec, agent, fun){
+		var f = typeof fun == "string" ? agent[fun] : fun;
+		var timer = runtime.addThread(msec, this, function(){
+			try{
+				var ret = f.apply(agent);
+				if(ret === true){
+					timer = runtime.addThread(msec, this, arguments.callee);
+				}else{
+					window.clearTimeout(timer);
+					timer = 0;
+				}
+			}catch(ex){
+				runtime.log("[WebRuntime::startTimer]" + ex.message);
+			}
+		});
+		return timer;
 	};
 });
 /*</file>*/
@@ -1882,7 +1984,7 @@ _class("ScriptLoader", "", function(_super){
 	this.load = function(url, data, skipcb){
 		if(!skipcb){
 			url = url + "?"
-				+ "_cb_=0,runtime.ajax._data"  //0=(变量赋值，n=v),1=(函数回调，f(v))
+				+ "_cb_=0,runtime._ajax._data"  //0=(变量赋值，n=v),1=(函数回调，f(v))
 				+ "&ts=" + new Date().getTime()
 				+ (data ? "&" + data : "");
 		}
@@ -1907,7 +2009,7 @@ _class("LibLoader", "", function(_super){
 	this._init = function(){
 		_super._init.call(this);
 		this._libs = [];
-		this._libExt = ".lib.js";  //库文件默认的后缀名
+		this._fileExt = ".js";  //库文件默认的后缀名
 		this._codeProvider = "";
 		this._index = 0;
 		this._agent = null;
@@ -1928,36 +2030,59 @@ _class("LibLoader", "", function(_super){
 	 * loaded  = 资源请求队列是否加载完毕
 	 */
 	this.init = function(libs, codeProvider, agent, funName){  //加载库代码
-		this._libs = libs;
+		for(var i = 0, len = libs.length; i < len; i++){
+			var lib = libs[i];
+			if(typeof lib == "string"){
+				var type;  //lib|tpl
+				var name = lib;
+				var inApp = name.charAt(0) == "#";
+				if(inApp){
+					name = name.substr(1);  //过滤掉名字开头的"#"
+				}
+				var p = name.lastIndexOf(".");
+				if(p == -1){
+					type = "lib";
+				}else{
+					type = name.substr(p + 1);
+					name = name.substring(0, p);
+				}
+				this._libs.push({"type": type, "name": name, "inApp": inApp});
+			}else{
+				this._libs.push(lib);
+			}
+		}
 		this._codeProvider = codeProvider;
 		this._agent = agent;
 		this._funName = funName;
 		this._start();
 	};
 	this._start = function(){
-		var _this = this;
-		runtime._win.setTimeout(function(){
-			_this._loadLib();
-		}, 10);
+		runtime.addThread(10, this, "_loadLib");
 	};
-	this.getUrlByName = function(name){
+	/**
+	 * 根据库名计算对应的url地址
+	 * @param {String} name lib或tpl库名称
+	 */
+	this.getUrlByName = function(lib){
 		/*
 		var libUrl = "http://www.alzui.net/build/lib.php";
-		if(name.substr(0, 1) != "#"){
-			return libUrl + "?lib=" + name;
+		if(!lib.inApp){  //lib.name.charAt(0) != "#"
+			return libUrl + "?lib=" + lib.name;
 		}else{
-			return libUrl + "?lib=" + name.substr(1);
+			return libUrl + "?lib=" + lib.name.substr(1);
 		}
 		*/
 		var src;
 		if(this._codeProvider != ""){
-			src = this._codeProvider.replace(/\{libname\}/g, name.substr(0, 1) != "#" ? name : name.substr(1));
+			src = this._codeProvider.replace(/\{filename\}/g, lib.name + "." + lib.type);
 		}else{
-			if(name.substr(0, 1) != "#"){
-				src = runtime.pathLib + name + this._libExt;  //内核扩展库
-			}else{
-				src = (runtime._config["pathapp"] || runtime.pathLib) + name.substr(1) + this._libExt;  //与版本相关的库
+			var path;
+			if(!lib.inApp){  //lib.name.charAt(0) != "#"
+				path = runtime.pathLib;  //内核扩展库
+			}else{  //从应用目录下加载库文件
+				path = runtime.getConfigData("pathapp") || runtime.pathLib;  //具体应用库
 			}
+			src = path + lib.name + "." + lib.type + this._fileExt;
 		}
 		return src;
 	};
@@ -1975,13 +2100,16 @@ _class("LibLoader", "", function(_super){
 		*/
 		this.loadLibScript(this._libs[this._index]);
 	};
-	this.loadLibScript = function(libName, agent, fun){
+	this.loadLibScript = function(lib, agent, fun){
+		var name = lib.name;
 		var _this = this;
 		if(runtime._host.xul){
-			if(libName.substr(0, 1) == "#") libName = libName.substr(1);
-			//<script type="text/javascript" src="/sinamail-dev/build/file.php?f=/rny/sinamail52/js/090731/{$libName}.lib.js"/>
-			//var url = this.getUrlByName(libName);
-			var url = "/sinamail-dev/build/file.php?f=/rny/sinamail52/js/090731/" + libName + ".lib.js";
+			//if(lib.inApp){  //name.charAt(0) == "#"
+			//	lib.name = name.substr(1);
+			//}
+			//<script type="text/javascript" src="/sinamail-dev/build/file.php?f=/rny/sinamail52/js/090731/{$name}.lib.js"/>
+			//var url = this.getUrlByName(lib);
+			var url = "/sinamail-dev/build/file.php?f=/rny/sinamail52/js/090731/" + name + ".lib.js";
 			var http = new XMLHttpRequest();
 			http.open("GET", url, false);
 			http.onreadystatechange = function(){
@@ -1990,7 +2118,7 @@ _class("LibLoader", "", function(_super){
 					var code = http.responseText;
 					eval(code);
 					if(agent){
-						fun.call(agent, libName, runtime._libManager._hash[libName]);
+						fun.apply(agent, [lib, _this.getLibConf(lib), false]);
 					}else{
 						_this._onLoad();
 					}
@@ -1998,40 +2126,49 @@ _class("LibLoader", "", function(_super){
 				http.onreadystatechange = null;
 			};
 			http.send("");  //FF下面参数null不能省略
-		}else{
+		}else{  //加载(lib.js,tpl.js)文件
 			var loader = new ScriptLoader();
 			loader.create(this, function(){
 				if(agent){
-					fun.call(agent, libName, runtime._libManager._hash[libName]);
+					fun.apply(agent, [lib, this.getLibConf(lib), false]);
 				}else{
 					this._onLoad();
 				}
 			});
-			loader.load(this.getUrlByName(libName), "", true);
+			loader.load(this.getUrlByName(lib), "", true);
 			loader = null;
 		}
 	};
 	this._onLoad = function(){
-		var name = this._libs[this._index].replace(/#/g, "");
-		var argv = [name, runtime._libManager._hash[name]];
+		var lib = this._libs[this._index];
+		//var name = lib.name.replace(/#/g, "");
+		var argv = [lib, this.getLibConf(lib), false];
 		var fun = typeof this._funName == "function" ? this._funName : this._agent[this._funName];
 		fun.apply(this._agent, argv);
 		this._index++;
 		if(this._index < this._libs.length){
-			if(this._index == 1 && (name == "core" && runtime._conf["product"])){  //有产品配置的话，加载产品配置数据
+			if(this._index == 1 && (lib.name == "core" && runtime.getConfData("product"))){  //有产品配置的话，加载产品配置数据
 				var loader = new ScriptLoader();
 				loader.create(this, function(){
-					this._start();
+					this._start();  //加载完毕，再开始加载剩余的库文件
 					loader = null;
 				});
-				loader.load(runtime._config["pathlib"] + runtime._conf["product"], "", true);
+				loader.load(runtime.getConfigData("pathlib") + runtime.getConfData("product"), "", true);
 			}else{
 				this._start();
 			}
 		}else{  //加载完毕
-			fun.apply(this._agent);  //注意没有库名
+			argv[2] = true;  //表示加载完毕
+			fun.apply(this._agent, argv);
 		}
 		fun = null;
+	};
+	this.getLibConf = function(lib){
+		if(lib.type == "tpl"){
+			return null;  //runtime._libManager._hash[lib.name]
+		}else{
+			return runtime._libManager._hash[lib.name];
+		}
 	};
 });
 /*</file>*/

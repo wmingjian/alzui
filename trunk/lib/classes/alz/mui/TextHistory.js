@@ -1,6 +1,9 @@
 _package("alz.mui");
 
-_class("TextHistory", "", function(_super){
+/**
+ * ÃüÁîÀúÊ·¼ÍÂ¼
+ */
+_class("TextHistory", "", function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._historys = [];

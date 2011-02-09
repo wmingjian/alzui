@@ -3,7 +3,7 @@ _package("alz.mui");
 /**
  * ×´Ì¬°´Å¥·Ö×é
  */
-_class("ToggleGroup", "", function(_super){
+_class("ToggleGroup", "", function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._buttons = [];

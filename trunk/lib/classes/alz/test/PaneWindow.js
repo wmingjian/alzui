@@ -6,7 +6,7 @@ _import("alz.mui.Window");
 /**
  * 窗体组件面板
  */
-_class("PaneWindow", Pane, function(_super){
+_class("PaneWindow", Pane, function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._app = null;

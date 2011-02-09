@@ -2,7 +2,10 @@ _package("alz.mui");
 
 _import("alz.mui.Component");
 
-_class("ModalPanel", Component, function(_super){
+/**
+ * 模态对话框使用的遮挡面板组件
+ */
+_class("ModalPanel", Component, function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._targetList = [];
@@ -16,7 +19,7 @@ _class("ModalPanel", Component, function(_super){
 		this.moveTo(0, 0);
 		this.setOpacity(0.2);
 		if(runtime.ie){
-			this._iframe = this._doc.createElement("iframe");
+			this._iframe = this._createElement("iframe");
 			this._iframe.setAttribute("scrolling", "no");
 			this._iframe.setAttribute("frameBorder", "0");
 			this._iframe.setAttribute("frameSpacing", "0");
@@ -27,7 +30,7 @@ _class("ModalPanel", Component, function(_super){
 			this._iframe.src = "about:blank";
 			this._self.appendChild(this._iframe);
 		}
-		this._panel = this._doc.createElement("div");
+		this._panel = this._createElement("div");
 		this._panel.style.display = "none";
 		this._panel.style.position = "absolute";
 		this._panel.style.left = "0px";

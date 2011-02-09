@@ -127,56 +127,79 @@ _class("SilverButton", Component, function(_super){
 	};
 });
 /*</file>*/
-/*<file name="alz/test/AppTestWin.js">*/
+/*<file name="alz/test/PaneHome.js">*/
 _package("alz.test");
 
-_import("alz.core.Application");
-_import("alz.mui.Window");
-_import("alz.mui.Console");
+_import("alz.mui.Pane");
 
-_class("AppTestWin", Application, function(_super){
+/**
+ * 默认面板
+ */
+_class("PaneHome", Pane, function(_super){
 	this._init = function(){
 		_super._init.call(this);
-		this._console = null;
-		this._win1 = null;
-		this._win2 = null;
+		this._app = null;
+		this._tpl = "pane_home.xml";
 	};
-	this.init = function(){
-		_super.init.apply(this, arguments);
-		this.createConsole();
-		switch(runtime.getConfData("action")){
-		case "index" : this.test_index();break;
-		case "window": this.test_window();break;
-		case "table" : this.test_table();break;
-		}
+	/*
+		<li><a href="index.html">介绍</a></li>
+		<li><a href="Window.html">Window组件</a></li>
+		<li><a href="Table.html">Table组件</a></li>
+	*/
+	this.create = function(parent, app){
+		this._app = app;
+		var obj = runtime.dom.createDomElement(this._app._template.getTpl(this._tpl));
+		parent.appendChild(obj);
+		this.init(obj);
+		return obj;
 	};
 	this.dispose = function(){
-		if(this._win1){
-			this._win2.dispose();
-			this._win2 = null;
-			this._win1.dispose();
-			this._win1 = null;
-		}
-		this._console.dispose();
-		this._console = null;
+		this._app = null;
 		_super.dispose.apply(this);
 	};
-	this.onResize = function(w, h){
-		if(this._win1){
-			w -= 220;
-			h -= 220;
-			this._win1.resize(w, h);
-			this._win2.resize(w, h);
-		}
+});
+/*</file>*/
+/*<file name="alz/test/PaneConsole.js">*/
+_package("alz.test");
+
+_import("alz.mui.Pane");
+_import("alz.mui.Console");
+
+/**
+ * 控制台面板
+ */
+_class("PaneConsole", Pane, function(_super){
+	this._init = function(){
+		_super._init.call(this);
+		this._app = null;
+		this._tpl = "pane_console.xml";
+		this._console = null;
+	};
+	this.create = function(parent, app){
+		this._app = app;
+		var obj = runtime.dom.createDomElement(this._app._template.getTpl(this._tpl));
+		parent.appendChild(obj);
+		this.init(obj);
+		return obj;
+	};
+	this.init = function(obj){
+		_super.init.apply(this, arguments);
+		this.createConsole();
+	};
+	this.dispose = function(){
+		this._console.dispose();
+		this._console = null;
+		this._app = null;
+		_super.dispose.apply(this);
 	};
 	this.getLogTime = function(){
 		return "[" + new Date().toMyString(3) + "]";  //hh:mm:ss
 	};
 	this.createConsole = function(){
 		this._console = new Console();
-		this._console.create(document.body, null/*this*/);
+		this._console.create(this._self, null/*this*/);
 		this._console.resize(640, 100);
-		this._console._self.setAttribute("_align", "bottom");
+		//this._console._self.setAttribute("_align", "bottom");
 		var _this = this;
 		//打印之前缓存的日志信息
 		for(var i = 0, len = runtime._log.length; i < len; i++){
@@ -214,9 +237,34 @@ _class("AppTestWin", Application, function(_super){
 			return false;
 		}
 	};
-	this.test_index = function(){
+});
+/*</file>*/
+/*<file name="alz/test/PaneWindow.js">*/
+_package("alz.test");
+
+_import("alz.mui.Pane");
+_import("alz.mui.Window");
+
+/**
+ * 窗体组件面板
+ */
+_class("PaneWindow", Pane, function(_super){
+	this._init = function(){
+		_super._init.call(this);
+		this._app = null;
+		this._tpl = "pane_window.xml";
+		this._win1 = null;
+		this._win2 = null;
 	};
-	this.test_window = function(){
+	this.create = function(parent, app){
+		this._app = app;
+		var obj = runtime.dom.createDomElement(this._app._template.getTpl(this._tpl));
+		parent.appendChild(obj);
+		this.init(obj);
+		return obj;
+	};
+	this.init = function(obj){
+		_super.init.apply(this, arguments);
 		this._win1 = new Window();
 		this._win1.init($("win1"), $("body1"));
 		this._win1._self.style.zIndex = runtime.getNextZIndex();
@@ -233,9 +281,47 @@ _class("AppTestWin", Application, function(_super){
 			_this._win2.setResizable(this.checked);
 		};
 	};
-	this.test_table = function(){
+	this.dispose = function(){
+		this._win2.dispose();
+		this._win2 = null;
+		this._win1.dispose();
+		this._win1 = null;
+		this._app = null;
+		_super.dispose.apply(this);
+	};
+	this.resize = function(w, h){
+		w -= 220;
+		h -= 220;
+		this._win1.resize(w, h);
+		this._win2.resize(w, h);
+	};
+});
+/*</file>*/
+/*<file name="alz/test/PaneTable.js">*/
+_package("alz.test");
+
+_import("alz.mui.Pane");
+
+/**
+ * 表格组件面板
+ */
+_class("PaneTable", Pane, function(_super){
+	this._init = function(){
+		_super._init.call(this);
+		this._app = null;
+		this._tpl = "pane_table.xml";
+	};
+	this.create = function(parent, app){
+		this._app = app;
+		var obj = runtime.dom.createDomElement(this._app._template.getTpl(this._tpl));
+		parent.appendChild(obj);
+		this.init(obj);
+		return obj;
+	};
+	this.init = function(obj){
+		_super.init.apply(this, arguments);
 		var sb = [];
-		sb.push('<table class="wui-Table" border="0" cellspacing="0" cellpadding="0">');
+		sb.push('<table class="mui-Table" border="1" bordercolor="gray" cellspacing="0" cellpadding="1">');
 		sb.push('<thead>');
 		sb.push('<tr><th>id</th><th>name</th><th>value</th><th>col3</th><th>col4</th><th>col5</th><th>col6</th><th>col7</th><th>col8</th><th>col9</th><th>col10</th></tr>');
 		sb.push('</thead>');
@@ -245,7 +331,129 @@ _class("AppTestWin", Application, function(_super){
 		}
 		sb.push('</tbody>');
 		sb.push('</table>');
-		$("tbl1").innerHTML = sb.join("");
+		this._self.innerHTML = sb.join("");
+	};
+	this.dispose = function(){
+		this._app = null;
+		_super.dispose.apply(this);
+	};
+});
+/*</file>*/
+/*<file name="alz/test/PaneForm.js">*/
+_package("alz.test");
+
+_import("alz.mui.Pane");
+
+/**
+ * 通用表单面板
+ */
+_class("PaneForm", Pane, function(_super){
+	this._init = function(){
+		_super._init.call(this);
+		this._app = null;
+		this._tpl = "pane_form.xml";
+	};
+	this.create = function(parent, app){
+		this._app = app;
+		var obj = runtime.dom.createDomElement(this._app._template.getTpl(this._tpl));
+		parent.appendChild(obj);
+		this.init(obj);
+		return obj;
+	};
+	this.init = function(obj){
+		_super.init.apply(this, arguments);
+	};
+	this.dispose = function(){
+		this._app = null;
+		_super.dispose.apply(this);
+	};
+});
+/*</file>*/
+/*<file name="alz/test/AppTestWin.js">*/
+_package("alz.test");
+
+_import("alz.core.Application");
+_import("alz.test.PaneHome");
+_import("alz.test.PaneWindow");
+_import("alz.test.PaneTable");
+_import("alz.test.PaneForm");
+
+_class("AppTestWin", Application, function(_super){
+	var pane_conf = [
+		{id: "home"   , name:"介绍"      , url: "index.html"  , title: "默认页"  , clazz: "PaneHome"   },
+		{id: "console", name:"控制台"    , url: "console.html", title: "控制台"  , clazz: "PaneConsole"},
+		{id: "win"    , name:"Window组件", url: "Window.html" , title: "窗体皮肤", clazz: "PaneWindow" },
+		{id: "table"  , name:"Table组件" , url: "Table.html"  , title: "表格组件", clazz: "PaneTable"  },
+		{id: "form"   , name:"通用表单"  , url: "Form.html"   , title: "通用表单", clazz: "PaneForm"   }
+	];
+	var pane_hash = {};
+	this._init = function(){
+		_super._init.call(this);
+		this._template = {
+			getTpl: function(name){
+				return runtime.getTplData("test_win")[name];
+			}
+		};
+		this._panes = {};
+		this._activePane = null;
+	};
+	this.init = function(){
+		_super.init.apply(this, arguments);
+		var obj = runtime.dom.createDomElement(this._template.getTpl("pane_main.xml"));
+		document.body.appendChild(obj);
+		var sb = [];
+		for(var i = 0, len = pane_conf.length; i < len; i++){
+			var item = pane_conf[i];
+			pane_hash[item.id] = item;
+			sb.push('<li _id="' + item.id + '"><a href="' + item.url + '">' + item.name + '</a></li>');
+		}
+		$("left1").innerHTML = sb.join("");
+		var _this = this;
+		function handle_click(ev){
+			_this.getPane2(this.getAttribute("_id"));
+			return false;
+		}
+		var nodes = $("left1").getElementsByTagName("li");
+		for(var i = 0, len = nodes.length; i < len; i++){
+			nodes[i].onclick = handle_click;
+		}
+		switch(runtime.getConfData("action")){
+		case "home": this.getPane2("home");break;
+		}
+	};
+	this.dispose = function(){
+		this._activePane = null;
+		for(var k in this._panes){
+			this._panes[k].dispose();
+			delete this._panes[k];
+		}
+		_super.dispose.apply(this);
+	};
+	this.onResize = function(w, h){
+		var mw = Math.max(0, w - $("left1").offsetWidth);
+		$("left1").style.height = h + "px";
+		$("main1").style.width = mw + "px";
+		$("main1").style.height = h + "px";
+		if(this._activePane && this._activePane.resize){
+			this._activePane.resize(mw, h);
+		}
+	};
+	this.getPane2 = function(id){
+		if(!(id in this._panes)){
+			var clazz = __context__[pane_hash[id].clazz];
+			var pane = new clazz();
+			pane.create($("main1"), this);
+			this._panes[id] = pane;
+		}
+		this.setActivePane(this._panes[id]);
+	};
+	this.setActivePane = function(v){
+		if(this._activePane == v) return;
+		if(this._activePane){
+			this._activePane._self.style.display = "none";
+		}
+		v._self.style.display = "";
+		this._activePane = v;
 	};
 });
 /*</file>*/

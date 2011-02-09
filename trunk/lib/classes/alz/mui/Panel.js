@@ -5,7 +5,7 @@ _import("alz.mui.Container");
 /**
  * 面板组件，支持布局自适应特性的面板
  */
-_class("Panel", Container, function(_super){
+_class("Panel", Container, function(){
 	this._init = function(){
 		_super._init.call(this);
 	};

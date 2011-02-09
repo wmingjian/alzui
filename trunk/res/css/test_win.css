@@ -3,3 +3,8 @@
 .pane-left{float:left;width:140px;background-color:#DDDDDD;}
 .pane-main{float:left;overflow:hidden;width:500px;background-color:#EEEEEE;}
 .pane{position:relative;overflow:auto;width:100%;height:100%;}
+
+form,
+form input,
+form textarea,
+form select{font:12px "宋体";}

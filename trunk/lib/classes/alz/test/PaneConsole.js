@@ -6,7 +6,7 @@ _import("alz.mui.Console");
 /**
  * ¿ØÖÆÌ¨Ãæ°å
  */
-_class("PaneConsole", Pane, function(_super){
+_class("PaneConsole", Pane, function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._app = null;

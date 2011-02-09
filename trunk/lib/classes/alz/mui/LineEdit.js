@@ -4,8 +4,11 @@ _import("alz.mui.Component");
 _import("alz.mui.TextHistory");
 _import("alz.mui.TextItem");
 
-//<div id="d1" class="LineEdit">&gt;window.<span class="cursor">a</span>lert("aaaa");</div>
-_class("LineEdit", Component, function(_super){
+/**
+ * 行编辑器组件
+ * <div id="d1" class="LineEdit">&gt;window.<span class="cursor">a</span>lert("aaaa");</div>
+ */
+_class("LineEdit", Component, function(){
 	var KEY_BACKSPACE = 8;
 	var KEY_TAB       = 9;   //\t
 	var KEY_ENTER     = 13;  //\n
@@ -46,24 +49,24 @@ _class("LineEdit", Component, function(_super){
 	//var count = 0;
 	this._number = "0123456789)!@#$%^&*(";
 	this._letter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	function trim(str){  //strip
+	this.trim = function(str){  //strip
 		return str.replace(/^\s+|[\s\xA0]+$/g, "");
-	}
+	};
 	/*
-	function getInputCursorIndex(){
+	this.getInputCursorIndex = function(){
 		var s = document.selection.createRange();
 		s.setEndPoint("StartToStart", this._input.createTextRange());
-		alert('left:'+(s.text.length)+'\nright:'+(obj.value.length-s.text.length));
+		window.alert('left:'+(s.text.length)+'\nright:'+(obj.value.length-s.text.length));
 		var selection = document.selection;
 		var rng = selection.createRange();
 		this._input.select();
 		rng.setEndPoint("StartToStart", selection.createRange());
-		alert(rng.text);
+		window.alert(rng.text);
 		var pos = rng.text.length;
 		rng.collapse(false);
 		rng.select();
 		return pos;
-	}
+	};
 	*/
 	function getCursorIndex(){
 		var selection = window.document.selection;
@@ -95,11 +98,7 @@ _class("LineEdit", Component, function(_super){
 	this.create = function(parent, app){
 		this._parent = parent;
 		if(app) this._app = app;
-		var obj = this._createElement("div");
-		obj.className = "aui-LineEdit";
-		if(parent){
-			parent._self.appendChild(obj);
-		}
+		var obj = this._createElement2(parent ? parent._self : null, "div", "aui-LineEdit");
 		this.init(obj);
 		return obj;
 	};
@@ -107,16 +106,16 @@ _class("LineEdit", Component, function(_super){
 		_super.init.apply(this, arguments);
 		var _this = this;
 		if(this._useInput){
-			this._input = this._createElement("input");
-			this._input.type = "text";
-			this._input.className = "input";
-			this._input.maxLength = "78";
+			this._input = this._createElement2(null, "input", "input", {
+				"type"     : "text",
+				"maxLength": "78"
+			});
 			//if(debug) this._input.style.backgroundColor = "#444444";
 			this._input.onkeydown = function(ev){
 				return _this.onKeyDown1(ev || window.event, this);
 			};
 			this._input.onkeyup = function(){
-				//_this._timer = window.setTimeout(getCursorIndex, 200);
+				//_this._timer = runtime.addThread(200, this, getCursorIndex);
 			};
 			this._input.onkeypress = function(ev){
 				return _this.onKeyPress(ev || window.event, this);
@@ -131,7 +130,7 @@ _class("LineEdit", Component, function(_super){
 			};
 			this._input.onclick = function(ev){
 				ev = ev || window.event;
-				//_this._timer = window.setTimeout(getCursorIndex, 200);
+				//_this._timer = runtime.addThread(200, this, getCursorIndex);
 				ev.cancelBubble = true;
 			};
 		}else{
@@ -148,7 +147,7 @@ _class("LineEdit", Component, function(_super){
 			*/
 		}
 	};
-	this.reinit = function(){
+	this.reset = function(){
 		this._activeItem = null;
 		for(var i = 0, len = this._items.length; i < len; i++){
 			this._items[i].dispose();
@@ -300,13 +299,12 @@ _class("LineEdit", Component, function(_super){
 			rng.moveStart('character', this._pos);
 			rng.select();
 			rng = null;
-			var _this = this;
-			window.setTimeout(function(){
+			runtime.addThread(0, this, function(){
 				try{
-					_this._input.focus();
+					this._input.focus();
 				}catch(ex){
 				}
-			}, 0);
+			});
 		}else{
 			if(!this._self.parentNode){
 				this._parent._self.appendChild(this._self);
@@ -369,8 +367,8 @@ _class("LineEdit", Component, function(_super){
 				this.printText(str, type);
 			}else{
 				var arr = str.split("\n");
-				for(var i = 0; i < arr.length; i++){
-					if(i < arr.length - 1){
+				for(var i = 0, len = arr.length; i < len; i++){
+					if(i < len - 1){
 						this._parent.insertLine(arr[i], this._iomode == "in" ? this._self : null, type);
 					}else{
 						if(arr[i] != ""){
@@ -389,10 +387,8 @@ _class("LineEdit", Component, function(_super){
 		this.appendItem(type, str);
 		this._col += str.length;
 		/*
-		var span = this._createElement("span");
-		span.className = type;
+		var span = this._createElement2(this._self, "span", type);
 		span.appendChild(this._createTextNode(str));
-		this._self.appendChild(span);
 		span = null;
 		*/
 	};
@@ -418,7 +414,7 @@ _class("LineEdit", Component, function(_super){
 	this.onKeyPress = function(ev, sender){
 		var ch = String.fromCharCode(ev.keyCode);
 		var v = sender.value;
-		if(ch == "\r" && trim(v) != ""){
+		if(ch == "\r" && this.trim(v) != ""){
 			var text = v + "\n";
 			sender.value = "";
 			this._input.parentNode.removeChild(this._input);
@@ -432,7 +428,6 @@ _class("LineEdit", Component, function(_super){
 				//var name = nameChain || "#global";
 			}
 		}else if(ch == "("){  //语法提示功能
-			
 		}/*else if(ch == "\t"){
 			window.alert(111);
 		}*/
@@ -530,7 +525,6 @@ _class("LineEdit", Component, function(_super){
 		switch(kc){
 		case KEY_ESC:
 			if(this._activeItem.getText() == ""){
-				
 			}else{
 				this._activeItem.setText("");
 				this._col = this._start;
@@ -545,7 +539,7 @@ _class("LineEdit", Component, function(_super){
 				//this._parent.insertLine(this.getText().substr(0, this._start) + text);
 				this._parent.getCallback()(text + "\n");
 				//this._parent.insertLine(text);
-				//this.reinit();
+				//this.reset();
 				/*
 				var row = this._rows[this._row];
 				var str = row._text.substr(this._col);  //保存行尾被截断的字符串
@@ -561,6 +555,7 @@ _class("LineEdit", Component, function(_super){
 				this._activeItem.removeChar(-1);
 				this._col--;
 			}
+			ev.returnValue = 0;  //防止chrome等浏览器的后退
 			ev.cancelBubble = true;
 			return false;  //阻止页面后退
 		case KEY_DEL:
@@ -625,7 +620,7 @@ _class("LineEdit", Component, function(_super){
 					}
 				}else{
 					if(this._col > len - 1){
-						this._col = len - 1; //如果大于下一行的长度
+						this._col = len - 1;  //如果大于下一行的长度
 					}
 				}
 				this._row++;

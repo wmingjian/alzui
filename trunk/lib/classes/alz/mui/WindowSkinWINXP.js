@@ -22,7 +22,7 @@ _import("alz.mui.Component");
 	bsSizeToolWin
 	bsToolWindow
 */
-_class("WindowSkinWINXP", Component, function(_super){
+_class("WindowSkinWINXP", Component, function(){
 	this._cssData = {
 		"normal":{
 			"_title1":{"display":"none"},
@@ -86,9 +86,7 @@ _class("WindowSkinWINXP", Component, function(_super){
 				this._parent[k]._cssData = this._cssHash[k];
 			}
 		}
-		var obj = this._createElement("div");
-		obj.className = "wui-skin";
-		if(parent) parent._self.appendChild(obj);
+		var obj = this._createElement2(parent ? parent._self : null, "div", "wui-skin");
 		this.init(obj);
 		return obj;
 	};
@@ -97,17 +95,14 @@ _class("WindowSkinWINXP", Component, function(_super){
 		this._xpath = ".mui-Window-winxp";
 		//this._skins = [];
 		for(var i = 0, len = this._cursors.length; i < len; i++){
-			var o = this._createElement("div");
-			o.className = this._cursors[i];
-			/*
-			o.style.position = "absolute";
-			o.style.overflow = "hidden";
-			o.style.backgroundColor = "#000000";
-			o.style.filter = "Alpha(Opacity=20)";
-			o.style.zIndex = 10;
-			o.style.cursor = this._cursors[i] + "-resize";
-			*/
-			this._self.appendChild(o);
+			var o = this._createElement2(this._self, "div", this._cursors[i]/*, {
+				"position"       : "absolute",
+				"overflow"       : "hidden",
+				"backgroundColor": "#000000",
+				"filter"         : "Alpha(Opacity=20)",
+				"zIndex"         : 10,
+				"cursor"         : this._cursors[i] + "-resize"
+			}*/);
 			//this._skins.push(o);
 			this._ee["_skin" + i] = o;
 			o = null;

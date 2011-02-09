@@ -7,7 +7,7 @@ _import("alz.mui.ToggleButton");
 /**
  * 工具栏组件
  */
-_class("ToolBar", Component, function(_super){
+_class("ToolBar", Component, function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._app = null;
@@ -26,7 +26,7 @@ _class("ToolBar", Component, function(_super){
 			case "wui-ToggleButton": btn = new ToggleButton();break;
 			}
 			if(btn){
-				btn.init(nodes[i], this._app);
+				btn.init(nodes[i], this._app);  //[TODO]改用bind实现
 				this._buttons.push(btn);
 			}
 			btn = null;

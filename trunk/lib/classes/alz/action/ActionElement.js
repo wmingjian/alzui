@@ -2,12 +2,15 @@ _package("alz.action");
 
 _import("alz.mui.Component");
 
-_class("ActionElement", Component, function(_super){
+/**
+ * 具有action特性的组件的基类
+ */
+_class("ActionElement", Component, function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._actionManager = null;
 		this._action = "";
-		this._disabled = false;
+		this._timer = 0;  //计时器，防止用户多次重复点击
 	};
 	this.init = function(obj, actionManager){
 		_super.init.apply(this, arguments);
@@ -36,27 +39,44 @@ _class("ActionElement", Component, function(_super){
 	this.setAction = function(v){
 		this._action = v;
 	};
-	this.getDisabled = function(){
-		return this._disabled;
-	};
 	this.setDisabled = function(v){
-		if(this._disabled == v) return;
-		this._disabled = v;
-		if(this._self){
+		_super.setDisabled.apply(this, arguments);
+		if(!this._disabled && this._self){
 			this._self.disabled = v;
 		}
 	};
 	this.dispatchAction = function(sender, ev){
-		if(this._disabled) return false;
-		//if(this._self.tagName == "INPUT" && this._self.type == "checkbox"){
-		//onDispatchAction可以用来记录用户的完整的行为，并对此进行“用户行为分析”
-		if(typeof this.onDispatchAction == "function"){
-			this.onDispatchAction(action, sender, ev);
-		}
-		if(this._className == "CheckBox"){
-			this._actionManager.dispatchAction(this._action[sender.checked ? 0 : 1], sender, ev);
-		}else{
-			return this._actionManager.dispatchAction(this._action, sender, ev);
-		}
+		//try{
+			if(this._disabled) return false;
+			var d = new Date().getTime();
+			if(this._timer != 0){
+				if(d - this._timer <= 500){  //两次点击间隔必须大于500毫秒
+					runtime.log("cancel");
+					this._timer = d;
+					return false;
+				}
+			}
+			this._timer = d;
+			//if(this._self.tagName == "INPUT" && this._self.type == "checkbox"){
+			//onDispatchAction可以用来记录用户的完整的行为，并对此进行“用户行为分析”
+			if(typeof this.onDispatchAction == "function"){
+				this.onDispatchAction(this._action, sender, ev);
+			}
+			if(this._className == "CheckBox"){
+				this._actionManager.dispatchAction(this._action[sender.checked ? 0 : 1], sender, ev);
+			}else{
+				return this._actionManager.dispatchAction(this._action, sender, ev);
+			}
+		/*}catch(ex){  //对所有action触发的逻辑产生的错误进行容错处理
+			var sb = [];
+			for(var k in ex){
+				sb.push(k + "=" + ex[k]);
+			}
+			window.alert("[ActionElement::dispatchAction]\n" + sb.join("\n"));
+		}*/
+	};
+	this.onDispatchAction = function(action, sender, ev){
+		//[TODO]iframe 模式下_actionCollection 未定义
+		//runtime._actionCollection.onDispatchAction(action, sender);
 	};
 });

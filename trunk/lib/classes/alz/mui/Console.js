@@ -6,7 +6,7 @@ _import("alz.mui.LineEdit");
 /**
  * 控制台组件
  */
-_class("Console", Component, function(_super){
+_class("Console", Component, function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._app = null;
@@ -21,9 +21,7 @@ _class("Console", Component, function(_super){
 	//this.build = function(parent, node){_super.build.apply(this, arguments);};
 	this.create = function(parent, app){
 		this._app = app;
-		var obj = this._createElement("div");
-		obj.className = "aui-Console";
-		parent.appendChild(obj);
+		var obj = this._createElement2(parent, "div", "aui-Console");
 		this.init(obj);
 		return obj;
 	};
@@ -32,35 +30,34 @@ _class("Console", Component, function(_super){
 		//<div class="aui-LineEdit">&gt;<input class="input" type="text" value="" /></div>
 		//this.setFont("12px 宋体");
 		/*
-		this._lastLine = this._createElement("div");
-		this._lastLine.className = "aui-LineEdit";
-		//this._lastLine.style.backgroundColor = "#888888";
-		this._lastLine.innerHTML = encodeHTML(this._prompt);
+		this._lastLine = this._createElement2("div", "aui-LineEdit", {
+			"backgroundColor": "#888888",
+			"innerHTML"      : encodeHTML(this._prompt)
+		});
 		*/
 		this._lineEdit = new LineEdit();
 		this._lineEdit.create(this, this._app);
 		this._self.onclick = function(){
-			this.focus();
+			//this.focus();
+			this._ptr.activate();
 		};
 		this._self.onfocus = function(){
-			this._ptr._lineEdit.setCursorType("");
-			this._ptr._lineEdit.setFocus();
+			this._ptr.activate();
 		};
 		this._self.onblur = function(){
-			this._ptr._lineEdit.setCursorType("gray");
-			this._ptr._lineEdit.setFocus();
+			this._ptr.deactivate();
 		};
-		/*
-		if(runtime.moz){
-			document.onkeydown = function(ev){
-				return _this.onKeyDown(ev || window.event, _this._self);
+		if(!runtime.ie){
+			var _this = this;
+			this.__onkeydown = function(ev){
+				return _this._lineEdit.onKeyDown(ev || window.event, _this._lineEdit._self);
 			};
+			window.document.addEventListener("keydown", this.__onkeydown, false);
 		}else{
+			this._self.onkeydown = function(ev){
+				return this._ptr._lineEdit.onKeyDown(ev || window.event, this._ptr._lineEdit._self);
+			};
 		}
-		*/
-		this._self.onkeydown = function(ev){
-			return this._ptr._lineEdit.onKeyDown(ev || window.event, this._ptr._lineEdit._self);
-		};
 		//this._lastLine = this._lineEdit._self;
 		this._lineEdit.setIomode("out");
 	};
@@ -76,7 +73,11 @@ _class("Console", Component, function(_super){
 		}
 		this._lines = [];
 		this._app = null;
-		this._self.onkeydown = null;
+		if(!runtime.ie){
+			window.document.removeEventListener("keydown", this.__onkeydown, false);
+		}else{
+			this._self.onkeydown = null;
+		}
 		this._self.onblur = null;
 		this._self.onfocus = null;
 		this._self.onclick = null;
@@ -89,6 +90,14 @@ _class("Console", Component, function(_super){
 		//this._self.style.width = (window.document.body.clientWidth - 14) + "px";
 		w = this._self.clientWidth - 14 - 8 - 20;
 		this._lineEdit.setWidth(w);
+	};
+	this.activate = function(){
+		this._lineEdit.setCursorType("");
+		this._lineEdit.setFocus();
+	};
+	this.deactivate = function(){
+		this._lineEdit.setCursorType("gray");
+		this._lineEdit.setFocus();
 	};
 	this.getPrompt = function(){
 		return this._prompt;
@@ -126,7 +135,7 @@ _class("Console", Component, function(_super){
 			this._callback = callback;
 		}
 		this.resize();
-		this._lineEdit.reinit();
+		this._lineEdit.reset();
 	};
 	this.getLineEdit = function(){
 		return this._lineEdit;
@@ -135,9 +144,7 @@ _class("Console", Component, function(_super){
 		return this._callback;
 	};
 	this.insertBlankLine = function(){
-		var line = this._createElement("div");
-		line.className = "aui-LineEdit";
-		this._self.appendChild(line);
+		var line = this._createElement2(this._self, "div", "aui-LineEdit");
 		this._lines.push(line);
 		return line;
 	};
@@ -146,10 +153,8 @@ _class("Console", Component, function(_super){
 		line.className = "aui-LineEdit";
 		if(text){
 			//line.innerHTML = runtime.encodeHTML(text);
-			var span = this._createElement("span");
-			span.className = type;
+			var span = this._createElement2(line, "span", type);
 			span.appendChild(this._createTextNode(text));
-			line.appendChild(span);
 			span = null;
 		}
 		if(refNode){

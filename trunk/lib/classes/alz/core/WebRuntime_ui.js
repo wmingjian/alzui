@@ -1,7 +1,7 @@
 _package("alz.core");
 
+_import("alz.core.ActionManager");
 _import("alz.mui.ToggleManager");
-_import("alz.mui.ActionManager");
 _import("alz.mui.Workspace");
 _import("alz.mui.Dialog");
 
@@ -25,9 +25,10 @@ _extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
 			this._testCaseWin.resize(500, 300);
 			this._testCaseWin.setClientBgColor("#FFFFFF");
 			this._testCaseWin.log = function(msg){
-				var div = this._createElement("div");
-				div.style.borderBottom = "1px solid #CCCCCC";
-				div.innerHTML = msg;
+				var div = this._createElement2(null, "div", "", {
+					"borderBottom": "1px solid #CCCCCC",
+					"innerHTML"   : msg
+				});
 				this._body.appendChild(div, this._body.childNodes[0]);
 				div = null;
 			};

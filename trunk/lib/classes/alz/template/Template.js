@@ -5,7 +5,7 @@ _package("alz.template");
  * @param content 模板内容
  * @param etc 配置信息
  */
-_class("Template", "", function(_super){
+_class("Template", "", function(){
 	this._init = function(name, content, etc){
 		this._name = name;
 		this._source = content;
@@ -71,14 +71,14 @@ _class("Template", "", function(_super){
 			while(begStmt >= 0){
 				var endStmt = this._source.indexOf('}', begStmt + 1);
 				var stmt = this._source.substring(begStmt, endStmt);
-				var blockrx = stmt.match(/^\{(cdata|minify|eval)/); // From B. Bittman, minify/eval/cdata implementation.
+				var blockrx = stmt.match(/^\{(cdata|minify|eval)/);  // From B. Bittman, minify/eval/cdata implementation.
 				if(blockrx){
 					var blockType = blockrx[1];
 					var blockMarkerBeg = begStmt + blockType.length + 1;
 					var blockMarkerEnd = this._source.indexOf('}', blockMarkerBeg);
 					if(blockMarkerEnd >= 0){
 						var blockMarker;
-						if( blockMarkerEnd - blockMarkerBeg <= 0 ){
+						if(blockMarkerEnd - blockMarkerBeg <= 0){
 							blockMarker = "{/" + blockType + "}";
 						}else{
 							blockMarker = this._source.substring(blockMarkerBeg + 1, blockMarkerEnd);
@@ -112,7 +112,7 @@ _class("Template", "", function(_super){
 			if(begStmt < 0){  // In "a{for}c", begStmt will be 1.
 				break;
 			}
-			var endStmt = this._source.indexOf("}", begStmt + 1); // In "a{for}c", endStmt will be 5.
+			var endStmt = this._source.indexOf("}", begStmt + 1);  // In "a{for}c", endStmt will be 5.
 			if(endStmt < 0){
 				break;
 			}
@@ -141,7 +141,7 @@ _class("Template", "", function(_super){
 	};
 	this._emitStatement = function(stmtStr, state){
 		var parts = stmtStr.slice(1, -1).split(' ');
-		var stmt = this._etc.statementDef[parts[0]]; // Here, parts[0] == for/if/else/...
+		var stmt = this._etc.statementDef[parts[0]];  // Here, parts[0] == for/if/else/...
 		if(stmt == null){  // Not a real statement.
 			this._emitSectionText(stmtStr);
 			return;
@@ -194,7 +194,7 @@ _class("Template", "", function(_super){
 		}
 		if(nlPrefix > 0){
 			this._buffer.push('if(_FLAGS.keepWhitespace == true) _OUT.write("');
-			var s = text.substring(0, nlPrefix).replace('\n', '\\n'); // A macro IE fix from BJessen.
+			var s = text.substring(0, nlPrefix).replace('\n', '\\n');  // A macro IE fix from BJessen.
 			if(s.charAt(s.length - 1) == '\n'){
 				s = s.substring(0, s.length - 1);
 			}
@@ -223,7 +223,7 @@ _class("Template", "", function(_super){
 		var endExprPrev = -1;
 		while(endExprPrev + endMarkPrev.length < line.length){
 			var begMark = "${", endMark = "}";
-			var begExpr = line.indexOf(begMark, endExprPrev + endMarkPrev.length); // In "a${b}c", begExpr == 1
+			var begExpr = line.indexOf(begMark, endExprPrev + endMarkPrev.length);  // In "a${b}c", begExpr == 1
 			if(begExpr < 0){
 				break;
 			}
@@ -264,7 +264,7 @@ _class("Template", "", function(_super){
 	};
 	this._emitExpression = function(exprArr, index){
 		// Ex: foo|a:x|b:y1,y2|c:z1,z2 is emitted as c(b(a(foo,x),y1,y2),z1,z2)
-		var expr = exprArr[index]; // Ex: exprArr == [firstName,capitalize,default:"John Doe"]
+		var expr = exprArr[index];  // Ex: exprArr == [firstName,capitalize,default:"John Doe"]
 		if(index <= 0){  // Ex: expr == 'default:"John Doe"'
 			this._buffer.push(expr);
 			return;
@@ -280,6 +280,6 @@ _class("Template", "", function(_super){
 		return str.replace(/^\s+/g, "")
 			.replace(/\s+$/g, "")
 			.replace(/\s+/g, " ")
-			.replace(/^(\s*\S*(\s+\S+)*)\s*$/, "$1"); // Right trim by Igor Poteryaev.
+			.replace(/^(\s*\S*(\s+\S+)*)\s*$/, "$1");  // Right trim by Igor Poteryaev.
 	};
 });

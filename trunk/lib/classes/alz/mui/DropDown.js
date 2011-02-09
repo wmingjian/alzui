@@ -2,7 +2,7 @@ _package("alz.mui");
 
 _import("alz.mui.Component");
 
-_class("DropDown", Component, function(_super){
+_class("DropDown", Component, function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._drop = null;
@@ -36,7 +36,7 @@ _class("DropDown", Component, function(_super){
 			this._self.onclick = function(ev){return false;};
 			this._drop._self.onmousedown = function(ev){
 				ev = ev || this._ptr._win.event;
-				alert((ev.srcElement || ev.target).innerHTML);
+				window.alert((ev.srcElement || ev.target).innerHTML);
 			};
 		}
 	};

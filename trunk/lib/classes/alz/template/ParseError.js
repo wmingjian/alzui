@@ -1,6 +1,6 @@
 _package("alz.template");
 
-_class("ParseError", "", function(_super){
+_class("ParseError", "", function(){
 	this._init = function(name, line, message){
 		_super._init.call(this);
 		this.name = name;

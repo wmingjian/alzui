@@ -29,8 +29,8 @@ header("Content-Type: text/javascript; charset=utf-8");
 echo '/* autogen by tpl.php */';
 echo "\n";
 if($autoGenFile){
-	//$name = preg_replace('/\.tpl\.js/', ".tpl0.js", $f);
-	$name = $f;
+	$name = preg_replace('/\.tpl\.js/', ".tpl0.js", $f);
+	//$name = $f;
 	file_put_contents($path_root . $name, $code);
 }
 echo $code;

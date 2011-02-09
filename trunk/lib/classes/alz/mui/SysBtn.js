@@ -5,7 +5,8 @@ _import("alz.mui.Component");
 /**
  * 窗体组件上的系统按钮组件
  */
-_class("SysBtn", Component, function(_super){
+_class("SysBtn", Component, function(){
+	//#_interface("IActionSource");
 	this._init = function(){
 		_super._init.call(this);
 		this._win = null;
@@ -16,6 +17,8 @@ _class("SysBtn", Component, function(_super){
 		this._cssName = "." + this._self.className;
 		this._xpath = this._win._cssName + " .head " + this._cssName;
 		this._capture = false;
+		this._self.onclick = function(ev){
+		};
 		this._self.onmousedown = function(ev){
 			return this._ptr.onMouseDown(ev || window.event);
 			/*
@@ -65,6 +68,7 @@ _class("SysBtn", Component, function(_super){
 		this._self.onmouseover = null;
 		this._self.onmousedown = null;
 		this._self.onmouseup = null;
+		this._self.onclick = null;
 		_super.dispose.apply(this);
 	};
 	this.onMouseDown = function(ev){

@@ -8,87 +8,11 @@
 (function(){with(runtime.createContext("ui_action")){
 
 //import alz.mui.ThemeManager;
-/*<file name="alz/mui/ActionManager.js">*/
-_package("alz.mui");
-
-_class("ActionManager", "", function(_super){
-	this._init = function(){
-		_super._init.call(this);
-		this._actionEngine = null;  //动作执行引擎，实现了doAction接口的类的实例
-		this._actions = {};
-	};
-	this.init = function(actionEngine){
-		this._actionEngine = actionEngine;
-	};
-	this.dispose = function(){
-		if(this._disposed) return;
-		for(var k in this._actions){
-			for(var i = 0, len = this._actions[k].length; i < len; i++){
-				this._actions[k][i] = null;  //再此无需调用 dispose 方法
-			}
-			delete this._actions[k];
-		}
-		this._actionEngine = null;
-		_super.dispose.apply(this);
-	};
-	this.add = function(component){
-		//var act = component._self.getAttribute("_action");
-		var act = component.getAction();
-		if(!this._actions[act]){
-			this._actions[act] = [];
-		}
-		this._actions[act].push(component);
-	};
-	/*this.enable = function(action){
-		var nodes = this._actions[action];
-		if(!nodes) return;
-		for(var i = 0, len = nodes.length; i < len; i++){
-			nodes[i].setDisabled(false);
-		}
-		nodes = null;
-	};*/
-	this.enable = function(action){
-		this.updateState(action, {"disabled":false});
-	};
-	this.disable = function(action){
-		this.updateState(action, {"disabled":true});
-	};
-	this.updateState = function(action, state){
-		if(action){
-			this.update(action, state);
-		}else{
-			for(var k in this._actions){
-				this.update(k, state);
-			}
-		}
-	};
-	this.multipleUpdateState = function(actions){
-		for(var k in actions){
-			this.update(k, actions[k]);
-		}
-	};
-	this.update = function(action, state){
-		var nodes = this._actions[action];
-		if(!nodes) return;
-		for(var i = 0, len = nodes.length; i < len; i++){
-			for(var k in state){  //visible,disabled
-				var name = "set" + k.charAt(0).toUpperCase() + k.substr(1);
-				if(name in nodes[i]) nodes[i][name](state[k]);
-			}
-		}
-		nodes = null;
-	};
-	this.dispatchAction = function(action, sender, ev){
-		if(this._actionEngine.doAction){
-			return this._actionEngine.doAction(action, sender, ev);
-		}
-	};
-});
-/*</file>*/
 /*<file name="alz/template/TemplateManager.js">*/
 _package("alz.template");
 
 _import("alz.template.TrimPath");
+//_import("alz.core.Ajax");
 
 /**
  * 提供对模板数据的管理支持，实现了对多种类型的前端模板的管理和方便的外部调用接
@@ -104,21 +28,10 @@ _import("alz.template.TrimPath");
 _class("TemplateManager", "", function(_super){
 	//var RE_TPL = /<!-- template name=\"(\w+\.tpl)\" type=\"(html|tpl|asp)\"( title=\"[^\"]+\")* -->/;
 	var RE_TPL = /<template name=\"(\w+\.tpl)\" type=\"(html|tpl|asp|tmpl|xml)\"(?: params=\"([^\"]+)\")*( title=\"[^\"]+\")*>/;
-	function str2xmldoc(str){
-		var xmldoc;
-		if(runtime.ie){
-			xmldoc = runtime.createComObject("Msxml.DOMDocument");
-			xmldoc.async = false;
-			xmldoc.loadXML(str);
-		}else{
-			xmldoc = (new DOMParser()).parseFromString(str, "text/xml");
-		}
-		return xmldoc;
-	}
 	this._init = function(){
 		_super._init.call(this);
 		this._path = "";
-		this._templates = {};  //模板库 "name":{tpl:"",func:null}
+		this._hash = {};  //模板数据哈希表 {"name":{tpl:"",func:null},...}
 		this._func = null;
 		this._trimPath = null;
 		this._context = {  //[只读]模板编译后的函数公用的上下文环境对象
@@ -131,82 +44,75 @@ _class("TemplateManager", "", function(_super){
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
-		for(var k in this._templates){
-			this._templates[k].data = null;
-			this._templates[k].func = null;
-			delete this._templates[k];
+		for(var k in this._hash){
+			this._hash[k].data = null;
+			this._hash[k].code = "";
+			this._hash[k].func = null;
+			delete this._hash[k];
 		}
 		_super.dispose.apply(this);
 	};
+	/*
 	this.load1 = function(tpls, callback){
 		var i = 0;
 		var _this = this;
 		function cb(data){
-			_this.addTemplate(tpls[i], "asp", data);
+			_this.appendItem(tpls[i], "asp", data);
 			i++;
 			if(i < tpls.length){
-				window.setTimeout(function(){
-					runtime.getAjax().netInvoke("GET", _this._path + tpls[i], "", "text", cb);
-				}, 0);
+				runtime.addThread(0, _this, function(){
+					new Ajax().netInvoke("GET", this._path + tpls[i], "", "text", cb);
+				});
 			}else{
 				callback();  //模板加载完毕后，执行回调函数
 			}
 		}
-		runtime.getAjax().netInvoke("GET", this._path + tpls[i], "", "text", cb);
+		new Ajax().netInvoke("GET", this._path + tpls[i], "", "text", cb);
 	};
 	this.load2 = function(tpls, callback){
 		var arr = $("tpldata").innerHTML.split("$$$$");
 		for(var i = 0, len = arr.length; i < len; i++){
-			this.addTemplate(tpls[i], "asp", arr[i]);
+			this.appendItem(tpls[i], "asp", arr[i]);
 		}
 		callback();
 	};
-	/**
+	/ **
 	 * 使用脚本解析原始的模版文件
-	 */
+	 * /
 	this.load3 = function(tplData, callback){
 		var arr = tplData.split("$$$$");
 		for(var i = 0, len = arr.length; i < len; i++){
-			/*
+			/ *
 			if(runtime.opera){
 				arr[i] = runtime.decodeHTML(arr[i]);
 			}
-			*/
+			* /
 			var a = RE_TPL.exec(arr[i]);
 			if(a){
-				this.addTemplate(a[1], a[2], arr[i]);
+				this.appendItem(a[1], a[2], arr[i]);
 			}else{
 				window.alert("找不到模板的 name 属性");
 			}
 		}
 		callback();
 	};
-	/**
+	/ **
 	 * @param data {Array} 数组类型的模板列表
 	 * @param agent {Object} 回调代理对象
 	 * @param fun {Function} 回调函数
-	 */
+	 * /
 	this.load = function(data, agent, fun){
-		for(var i = 0, len = data.length; i < len; i++){
-			/*
-			var a = RE_TPL.exec(data[i]);
-			if(a){
-				this.addTemplate(a[1], a[2], data[i]);
-			}else{
-				window.alert("找不到模板的 name 属性");
-			}
-			*/
-			this.addTemplate1(data[i]);
-		}
+		this.appendItems(data);
 		fun.call(agent);
 	};
 	this.loadData = function(url, agent, funName){
-		runtime.getAjax().netInvoke("POST", url, "", "json", this, function(json){
+		new Ajax().netInvoke("POST", url, "", "json", this, function(json){
 			this.load(json, this, function(){
 				funName.apply(agent);
 			});
 		});
 	};
+	*/
 	/**
 	 * 添加一个模板到模板管理类中
 	 * @param name {String} 必选，要添加的模板的名称
@@ -214,35 +120,53 @@ _class("TemplateManager", "", function(_super){
 	 * @param data {String} 必选，模板内容
 	 * @return {void} 原始的模板内容
 	 */
-	this.addTemplate = function(name, type, data){
-		if(this._templates[name]){
-			window.alert("模板 " + name + " 已经存在！");
-		}else{
-			var tpl = {"name":name, "data":data, "type":type, "func": null};
-			if(type == "asp"){  //html,tpl 类型模板，不需要编译
-				with(this._context){
-					eval("var func = " + this.parse(data) + ";");
-				}
-				tpl.func = func;
-			}
-			this._templates[name] = tpl;
-		}
-	};
-	this.addTemplate1 = function(data){
+	this._appendItem = function(data){
 		var name = data.name;
 		var type = data.type;
 		var tpl = data.tpl;
-		if(this._templates[name]){
-			window.alert("模板 " + name + " 已经存在！");
+		if(this._hash[name]){
+			runtime.warning("[TemplateManager::_appendItem]模板 " + name + " 已经存在！");
 		}else{
-			var template = {"name":name, "data":tpl, "type":type, "func": null};
+			if(type == "html" || type == "tpl"){
+				tpl = tpl
+					.replace(/>\r?\n\t*</g, "><")
+					.replace(/\r?\n\t*/g, " ");
+			}
+			var template = {
+				"name": name,
+				"data": tpl,
+				"type": type,
+				"code": "",
+				"func": null
+			};
 			if(type == "asp"){  //html,tpl 类型模板，不需要编译
+				template.code = "var func = " + this.parse(tpl, data.params) + ";";
 				with(this._context){
-					eval("var func = " + this.parse(tpl, data.params) + ";");
+					eval(template.code);
 				}
 				template.func = func;
 			}
-			this._templates[name] = template;
+			this._hash[name] = template;
+		}
+	};
+	this.appendItem = function(name, type, data){
+		this._appendItem({
+			"name": name,
+			"type": type,
+			"tpl" : data
+		});
+	};
+	this.appendItems = function(data){
+		for(var i = 0, len = data.length; i < len; i++){
+			/*
+			var a = RE_TPL.exec(data[i]);
+			if(a){
+				this.appendItem(a[1], a[2], data[i]);
+			}else{
+				window.alert("找不到模板的 name 属性");
+			}
+			*/
+			this._appendItem(data[i]);
 		}
 	};
 	this.callTpl = function(html, json){
@@ -257,34 +181,86 @@ _class("TemplateManager", "", function(_super){
 			}
 		});
 	};
-	this.getTemplate = function(name){
-		if(this._templates[name].type == "xml"){
-			return str2xmldoc(this._templates[name].data);
+	/*
+	this.callTpl = function(html, json){
+		if(!json) return html;
+		var sb = [];
+		var p2 = 0;
+		for(var p1 = html.indexOf("{", p2); p1 != -1; p1 = html.indexOf("{", ++p2)){
+			var p = p1 + 1;
+			var ch = html.charAt(p);
+			if(ch == "$" || ch == "="){
+				var p3 = html.indexOf("}", p);
+				if(p3 != -1){
+					sb.push(html.substring(p2, p1));
+					var k = html.substring(p + 1, p3);
+					if(ch == "$"){
+						sb.push(k in json ? json[k] : "{$" + k + "}");
+					}else{  //ch == "="
+						sb.push(this.getTemplate(k + ".tpl"));
+					}
+					p2 = p3;
+				}else{
+					p2 = p;
+				}
+			}else{
+				p2 = p1;
+			}
+		}
+		//获取最后一个模板变量之后的内容
+		//如果一个模板变量都没有，则获取整个字符串
+		sb.push(html.substr(p2));
+		return sb.join("");
+	};
+	*/
+	this.str2xmldoc = function(str){
+		var xmldoc;
+		if(runtime.ie){
+			xmldoc = runtime.createComObject("Msxml.DOMDocument");
+			xmldoc.async = false;
+			xmldoc.loadXML(str);
 		}else{
-			return this._templates[name].data;
+			xmldoc = (new DOMParser()).parseFromString(str, "text/xml");
+		}
+		return xmldoc;
+	};
+	this.getTemplate = function(name){
+		if(!(name in this._hash)){
+			window.alert("[TemplateManager::getTemplate]请确认模板" + name + "已经存在");
+		}else{
+			if(this._hash[name].type == "xml"){
+				return this.str2xmldoc(this._hash[name].data);
+			}else{
+				return this._hash[name].data;
+			}
 		}
 	};
 	this.invoke = function(name){
+		/*
 		var arr = [];
 		for(var i = 1, len = arguments.length; i < len; i++){
 			arr.push(arguments[i]);
 		}
-		var html, tpl = this._templates[name];
-		if(!tpl){
-			window.alert("请确认模板" + name + "已经存在");
+		var arr = Array.prototype.slice.call(arguments, 1);
+		*/
+		var html;
+		if(!(name in this._hash)){
+			window.alert("[TemplateManager::invoke]请确认模板" + name + "已经存在");
 		}else{
+			var tpl = this._hash[name];
 			switch(tpl.type){  //根据模板的类型，使用不同的方式生成 HTML 代码
 			case "html":  //直接输出
 				html = tpl.data;
 				break;
 			case "tpl":  //使用正则替换
-				html = this.callTpl(tpl.data, arr[0]);
+				html = this.callTpl(tpl.data, arguments[1]);
 				break;
 			case "asp":  //执行函数调用
-				html = this._templates[name].func.apply(null, arr);
+				var arr = Array.prototype.slice.call(arguments, 1);
+				html = this._hash[name].func.apply(null, arr);
 				break;
 			case "tmpl":
-				html = this._trimPath.parseTemplate(this._templates[name].data).process(arguments[1]);
+				html = this._trimPath.parseTemplate(this._hash[name].data).process(arguments[1]);
 				break;
 			case "xml":
 				html = tpl.data;
@@ -299,10 +275,13 @@ _class("TemplateManager", "", function(_super){
 	 * @param tplName {String}
 	 */
 	this.render = function(element, tplName){
+		/*
 		var arr = [];
 		for(var i = 1, len = arguments.length; i < len; i++){
 			arr.push(arguments[i]);
 		}
+		*/
+		var arr = Array.prototype.slice.call(arguments, 1);
 		element.innerHTML = this.invoke.apply(this, arr);  //arr[0] = tplName;
 	};
 	/**
@@ -310,12 +289,15 @@ _class("TemplateManager", "", function(_super){
 	 * 方便的布局的正常工作
 	 */
 	this.render2 = function(element, tplName){
+		/*
 		var arr = [];
 		for(var i = 1, len = arguments.length; i < len; i++){
 			arr.push(arguments[i]);
 		}
+		*/
+		var arr = Array.prototype.slice.call(arguments, 1);
 		var tpl = this.invoke.apply(this, arr);  //arr[0] = tplName;
-		element.appendChild(runtime.createDomElement(tpl));
+		return element.appendChild(runtime.createDomElement(tpl));
 	};
 	/**
 	 * 渲染指定的模板和数据到Pane组件中
@@ -326,6 +308,11 @@ _class("TemplateManager", "", function(_super){
 		this.render.apply(this, arguments);
 		pane.initComponents();
 	};
+	/*
+	this.createTplElement = function(tplName){
+		return runtime.createDomElement(this.invoke(tplName));
+	};
+	*/
 	var TAGS = {
 		"start": [
 			{"tag":"<!--%","len":5,"p":-1},
@@ -336,10 +323,10 @@ _class("TemplateManager", "", function(_super){
 			{"tag":"%)"   ,"len":2,"p":-1}
 		]
 	};
-	function dumpTag(t){
-		alert(t.tag + "," + t.len + "," + t.p);
-	}
-	function findTag(code, t, start){  //indexOf
+	this.dumpTag = function(t){
+		window.alert(t.tag + "," + t.len + "," + t.p);
+	};
+	this.findTag = function(code, t, start){  //indexOf
 		var tags = TAGS[t];
 		var pos = Number.MAX_VALUE;
 		var t = null;
@@ -352,17 +339,17 @@ _class("TemplateManager", "", function(_super){
 			}
 		}
 		if(t == null){
-			return {"tag":"#tag#","len":0,"p":-1};
+			return {"tag": "#tag#", "len": 0, "p": -1};
 		}else{
 			return t;
 		}
-	}
+	};
 	/**
 	 * 将字符串转换成可以被字符串表示符号(",')括起来已表示原来字符串意义的字符串
 	 * @param str {String} 要转换的字符串内容
 	 */
 	this.toJsString = function(str){
-		if(typeof(str) != "string") return "";
+		if(typeof str != "string") return "";
 		return str.replace(/[\\\'\"\r\n]/g, function(_0){
 			switch(_0){
 			case "\\": return "\\\\";
@@ -386,8 +373,8 @@ _class("TemplateManager", "", function(_super){
 		var p0 = code.indexOf(tag0, 0);
 		var t0 = {"tag":tag0,"len":l0,"p":p0};
 		*/
-		var t0 = findTag(code, "start", 0);  //寻找开始标签
-		//dumpTag(t0);
+		var t0 = this.findTag(code, "start", 0);  //寻找开始标签
+		//this.dumpTag(t0);
 		var tag1 = "%--" + ">";
 		var l1 = tag1.length;
 		var p1 = -l1;
@@ -408,8 +395,8 @@ _class("TemplateManager", "", function(_super){
 					sb.push("\n__sb.push(\"" + this.toJsString(code.substring(t1.p + t1.len, t0.p)) + "\");");
 				}
 			}
-			t1 = findTag(code, "end", t0.p + t0.len);  //寻找结束标签
-			//dumpTag(t1);
+			t1 = this.findTag(code, "end", t0.p + t0.len);  //寻找结束标签
+			//this.dumpTag(t1);
 			//t1.p = code.indexOf(t1.tag, t0.p + t0.len);
 			if(t1.p != -1){
 				switch(code.charAt(t0.p + t0.len)){
@@ -442,8 +429,8 @@ _class("TemplateManager", "", function(_super){
 			}else{
 				return "模板中的'" + t0.tag + "'与'" + t1.tag + "'不匹配！";
 			}
-			t0 = findTag(code, "start", t1.p + t1.len);  //寻找开始标签
-			//dumpTag(t0);
+			t0 = this.findTag(code, "start", t1.p + t1.len);  //寻找开始标签
+			//this.dumpTag(t0);
 			//t0.p = code.indexOf(t0.tag, t1.p + t1.len);
 		}
 		if(t1.p + t1.len >= 0 && t1.p + t1.len < code.length){  //保存结束标志之后的代码
@@ -479,13 +466,13 @@ _class("TemplateManager", "", function(_super){
 						print("[error]" + tagName + "不允许存在" + name+ "属性(value=" + value + ")\n");
 					}
 				}else if(name.charAt(0) == "_"){
-					print("[warning]" + tagName + "含有自定义属性" + name+ "=\"" + value + "\"\n");
+					runtime.warning(tagName + "含有自定义属性" + name+ "=\"" + value + "\"\n");
 				}else if(name == "style"){
-					print("[warning]" + tagName + "含有属性" + name+ "=\"" + value + "\"\n");
+					runtime.warning(tagName + "含有属性" + name+ "=\"" + value + "\"\n");
 				}else if(name.substr(0, 2) == "on"){
-					print("[warning]" + tagName + "含有事件代码" + name+ "=\"" + value + "\"\n");
+					runtime.warning(tagName + "含有事件代码" + name+ "=\"" + value + "\"\n");
 				}else if(!(name in this._att)){
-					print("[error]" + tagName + "含有未知属性" + name+ "=\"" + value + "\"\n");
+					runtime.error(tagName + "含有未知属性" + name+ "=\"" + value + "\"\n");
 				}
 				*/
 				sb.push(" " + name + "=\"" + value + "\"");
@@ -502,7 +489,7 @@ _class("TemplateManager", "", function(_super){
 				if(tagName in this._hashTag){
 					sb.push(" />");
 				}else{
-					//print("[warning]" + tagName + "是空标签\n");
+					//runtime.warning(tagName + "是空标签\n");
 					sb.push("></" + tagName + ">");
 				}
 			}
@@ -517,7 +504,7 @@ _class("TemplateManager", "", function(_super){
 			//sb.push("<!--" + node.data + "-->");
 			break;
 		default:
-			//print("[warning]无法处理的nodeType" + node.nodeType + "\n");
+			//runtime.warning("无法处理的nodeType" + node.nodeType + "\n");
 			break;
 		}
 		return sb.join("");
@@ -573,7 +560,7 @@ _class("TrimPath", "", function(_super){
 		var element = optDocument.getElementById(elementId);
 		var content = element.value;  // Like textarea.value.
 		if(content == null){
-			content = element.innerHTML; // Like textarea.innerHTML.
+			content = element.innerHTML;  // Like textarea.innerHTML.
 		}
 		content = content.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
 		return this.parseTemplate(content, elementId, optEtc);
@@ -585,7 +572,7 @@ _class("TrimPath", "", function(_super){
 		//this.Template = Template;
 		//this.ParseError = ParseError;
 		this.statementTag = "forelse|for|if|elseif|else";
-		this.statementDef = { // Lookup table for statement tags.
+		this.statementDef = {  // Lookup table for statement tags.
 			"if"     : {delta:  1, prefix: "if(", suffix: "){", paramMin: 1 },
 			"else"   : {delta:  0, prefix: "}else{" },
 			"elseif" : {delta:  0, prefix: "}else if(", suffix: "){", paramDefault: "true" },
@@ -693,14 +680,14 @@ _class("Template", "", function(_super){
 			while(begStmt >= 0){
 				var endStmt = this._source.indexOf('}', begStmt + 1);
 				var stmt = this._source.substring(begStmt, endStmt);
-				var blockrx = stmt.match(/^\{(cdata|minify|eval)/); // From B. Bittman, minify/eval/cdata implementation.
+				var blockrx = stmt.match(/^\{(cdata|minify|eval)/);  // From B. Bittman, minify/eval/cdata implementation.
 				if(blockrx){
 					var blockType = blockrx[1];
 					var blockMarkerBeg = begStmt + blockType.length + 1;
 					var blockMarkerEnd = this._source.indexOf('}', blockMarkerBeg);
 					if(blockMarkerEnd >= 0){
 						var blockMarker;
-						if( blockMarkerEnd - blockMarkerBeg <= 0 ){
+						if(blockMarkerEnd - blockMarkerBeg <= 0){
 							blockMarker = "{/" + blockType + "}";
 						}else{
 							blockMarker = this._source.substring(blockMarkerBeg + 1, blockMarkerEnd);
@@ -734,7 +721,7 @@ _class("Template", "", function(_super){
 			if(begStmt < 0){  // In "a{for}c", begStmt will be 1.
 				break;
 			}
-			var endStmt = this._source.indexOf("}", begStmt + 1); // In "a{for}c", endStmt will be 5.
+			var endStmt = this._source.indexOf("}", begStmt + 1);  // In "a{for}c", endStmt will be 5.
 			if(endStmt < 0){
 				break;
 			}
@@ -763,7 +750,7 @@ _class("Template", "", function(_super){
 	};
 	this._emitStatement = function(stmtStr, state){
 		var parts = stmtStr.slice(1, -1).split(' ');
-		var stmt = this._etc.statementDef[parts[0]]; // Here, parts[0] == for/if/else/...
+		var stmt = this._etc.statementDef[parts[0]];  // Here, parts[0] == for/if/else/...
 		if(stmt == null){  // Not a real statement.
 			this._emitSectionText(stmtStr);
 			return;
@@ -816,7 +803,7 @@ _class("Template", "", function(_super){
 		}
 		if(nlPrefix > 0){
 			this._buffer.push('if(_FLAGS.keepWhitespace == true) _OUT.write("');
-			var s = text.substring(0, nlPrefix).replace('\n', '\\n'); // A macro IE fix from BJessen.
+			var s = text.substring(0, nlPrefix).replace('\n', '\\n');  // A macro IE fix from BJessen.
 			if(s.charAt(s.length - 1) == '\n'){
 				s = s.substring(0, s.length - 1);
 			}
@@ -845,7 +832,7 @@ _class("Template", "", function(_super){
 		var endExprPrev = -1;
 		while(endExprPrev + endMarkPrev.length < line.length){
 			var begMark = "${", endMark = "}";
-			var begExpr = line.indexOf(begMark, endExprPrev + endMarkPrev.length); // In "a${b}c", begExpr == 1
+			var begExpr = line.indexOf(begMark, endExprPrev + endMarkPrev.length);  // In "a${b}c", begExpr == 1
 			if(begExpr < 0){
 				break;
 			}
@@ -886,7 +873,7 @@ _class("Template", "", function(_super){
 	};
 	this._emitExpression = function(exprArr, index){
 		// Ex: foo|a:x|b:y1,y2|c:z1,z2 is emitted as c(b(a(foo,x),y1,y2),z1,z2)
-		var expr = exprArr[index]; // Ex: exprArr == [firstName,capitalize,default:"John Doe"]
+		var expr = exprArr[index];  // Ex: exprArr == [firstName,capitalize,default:"John Doe"]
 		if(index <= 0){  // Ex: expr == 'default:"John Doe"'
 			this._buffer.push(expr);
 			return;
@@ -902,7 +889,7 @@ _class("Template", "", function(_super){
 		return str.replace(/^\s+/g, "")
 			.replace(/\s+$/g, "")
 			.replace(/\s+/g, " ")
-			.replace(/^(\s*\S*(\s+\S+)*)\s*$/, "$1"); // Right trim by Igor Poteryaev.
+			.replace(/^(\s*\S*(\s+\S+)*)\s*$/, "$1");  // Right trim by Igor Poteryaev.
 	};
 });
 /*</file>*/
@@ -927,12 +914,15 @@ _package("alz.action");
 
 _import("alz.mui.Component");
 
+/**
+ * 具有action特性的组件的基类
+ */
 _class("ActionElement", Component, function(_super){
 	this._init = function(){
 		_super._init.call(this);
 		this._actionManager = null;
 		this._action = "";
-		this._disabled = false;
+		this._timer = 0;  //计时器，防止用户多次重复点击
 	};
 	this.init = function(obj, actionManager){
 		_super.init.apply(this, arguments);
@@ -961,28 +951,45 @@ _class("ActionElement", Component, function(_super){
 	this.setAction = function(v){
 		this._action = v;
 	};
-	this.getDisabled = function(){
-		return this._disabled;
-	};
 	this.setDisabled = function(v){
-		if(this._disabled == v) return;
-		this._disabled = v;
-		if(this._self){
+		_super.setDisabled.apply(this, arguments);
+		if(!this._disabled && this._self){
 			this._self.disabled = v;
 		}
 	};
 	this.dispatchAction = function(sender, ev){
-		if(this._disabled) return false;
-		//if(this._self.tagName == "INPUT" && this._self.type == "checkbox"){
-		//onDispatchAction可以用来记录用户的完整的行为，并对此进行“用户行为分析”
-		if(typeof this.onDispatchAction == "function"){
-			this.onDispatchAction(action, sender, ev);
-		}
-		if(this._className == "CheckBox"){
-			this._actionManager.dispatchAction(this._action[sender.checked ? 0 : 1], sender, ev);
-		}else{
-			return this._actionManager.dispatchAction(this._action, sender, ev);
-		}
+		//try{
+			if(this._disabled) return false;
+			var d = new Date().getTime();
+			if(this._timer != 0){
+				if(d - this._timer <= 500){  //两次点击间隔必须大于500毫秒
+					runtime.log("cancel");
+					this._timer = d;
+					return false;
+				}
+			}
+			this._timer = d;
+			//if(this._self.tagName == "INPUT" && this._self.type == "checkbox"){
+			//onDispatchAction可以用来记录用户的完整的行为，并对此进行“用户行为分析”
+			if(typeof this.onDispatchAction == "function"){
+				this.onDispatchAction(this._action, sender, ev);
+			}
+			if(this._className == "CheckBox"){
+				this._actionManager.dispatchAction(this._action[sender.checked ? 0 : 1], sender, ev);
+			}else{
+				return this._actionManager.dispatchAction(this._action, sender, ev);
+			}
+		/*}catch(ex){  //对所有action触发的逻辑产生的错误进行容错处理
+			var sb = [];
+			for(var k in ex){
+				sb.push(k + "=" + ex[k]);
+			}
+			window.alert("[ActionElement::dispatchAction]\n" + sb.join("\n"));
+		}*/
+	};
+	this.onDispatchAction = function(action, sender, ev){
+		//[TODO]iframe 模式下_actionCollection 未定义
+		//runtime._actionCollection.onDispatchAction(action, sender);
 	};
 });
 /*</file>*/
@@ -991,16 +998,27 @@ _package("alz.action");
 
 _import("alz.action.ActionElement");
 
+/**
+ * 超链接(a)元素的封装
+ */
 _class("LinkLabel", ActionElement, function(_super){
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
 		var _this = this;
-		this._self.onclick = function(ev){
-			return _this.dispatchAction(this, ev || window.event);
+		this._self.onclick = function(ev, sender){  //sender 代表要替换的伪装的 sender 参数
+			ev = ev || window.event;
+			ev.cancelBubble = true;
+			return _this.dispatchAction(sender || this, ev);
+		};
+		this._self.oncontextmenu = function(ev){
+			ev = ev || window.event;
+			ev.cancelBubble = true;
+			return false;
 		};
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
+		this._self.oncontextmenu = null;
 		this._self.onclick = null;
 		_super.dispose.apply(this);
 	};
@@ -1011,6 +1029,9 @@ _package("alz.action");
 
 _import("alz.action.ActionElement");
 
+/**
+ * input:button元素的封装
+ */
 _class("Button", ActionElement, function(_super){
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
@@ -1018,6 +1039,12 @@ _class("Button", ActionElement, function(_super){
 		this._self.onclick = function(ev){
 			return _this.dispatchAction(this, ev || window.event);
 		};
+		//[TODO]因为setDisabled中的优化考虑，这里目前只能使用如此笨拙的方式驱动
+		//setDisabled工作，其他地方相对成熟的方式是添加强制更新的参数。
+		var v = this._disabled;
+		this._disabled = null;
+		this.setDisabled(v);
+		v = null;
 		/*
 		var rows = this._self.rows;
 		for(var i = 0, len = rows.length; i < len; i++){
@@ -1033,9 +1060,8 @@ _class("Button", ActionElement, function(_super){
 		_super.dispose.apply(this);
 	};
 	this.setDisabled = function(v){
-		if(this._disabled == v) return;
-		this._disabled = v;
-		if(this._self){
+		_super.setDisabled.apply(this, arguments);
+		if(!this._disabled && this._self){
 			this._self.disabled = v;
 			this._self.style.color = v ? "gray" : "";
 			//this._self.rows[0].className = v ? "OnDisable" : "normal";
@@ -1064,6 +1090,9 @@ _package("alz.action");
 
 _import("alz.action.ActionElement");
 
+/**
+ * input:checkbox元素的封装
+ */
 _class("CheckBox", ActionElement, function(_super){
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
@@ -1085,6 +1114,9 @@ _package("alz.action");
 
 _import("alz.action.ActionElement");
 
+/**
+ * select元素的封装
+ */
 _class("ComboBox", ActionElement, function(_super){
 	this._init = function(obj){
 		_super._init.call(this);
@@ -1108,7 +1140,13 @@ _package("alz.action");
 
 _import("alz.action.ActionElement");
 
+/**
+ * form元素的封装
+ */
 _class("FormElement", ActionElement, function(_super){
+	this._init = function(){
+		_super._init.call(this);
+	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
 		var _this = this;
@@ -1129,6 +1167,8 @@ _class("FormElement", ActionElement, function(_super){
 //import alz.mui.Pane;
 /*<file name="alz/core/Application_action.js">*/
 _package("alz.core");
+
+_import("alz.core.ActionManager");
 
 _extension("Application", function(){  //注册 Application 扩展(action)
 	this._init = function(){

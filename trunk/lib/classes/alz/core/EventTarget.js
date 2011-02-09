@@ -5,7 +5,7 @@ _package("alz.core");
  * ¡¶Document Object Model (DOM) Level 2 Events Specification¡·
  * http://www.w3.org/TR/2000/REC-DOM-Level-2-Events-20001113
  */
-_class("EventTarget", "", function(_super){
+_class("EventTarget", "", function(){
 	this._init = function(){
 		_super._init.call(this);
 		/**
@@ -38,6 +38,7 @@ _class("EventTarget", "", function(_super){
 		return this._disabled;
 	};
 	this.setDisabled = function(v){
+		if(this._disabled == v) return;
 		this._disabled = v;
 	};
 	this.addEventListener1 = function(eventMap, listener){

@@ -2,7 +2,7 @@ _package("alz.mui");
 
 _import("alz.mui.Component");
 
-_class("TextItem", Component, function(_super){
+_class("TextItem", Component, function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._type = "sys";  //当前文本的类型
@@ -74,18 +74,10 @@ _class("TextItem", Component, function(_super){
 			if(this._active && this._type == "in"){
 				var type = this._parent.getCursorType();
 				var cursor = type ? 'cursor ' + type : 'cursor';
-
-				var text = this._createTextNode(this._text.substr(0, this._cursor));
-				this._self.appendChild(text);
-
-				text = this._createTextNode(this._text.charAt(this._cursor) || " ");
-				var span = this._createElement("span");
-				span.className = cursor;
-				span.appendChild(text);
-				this._self.appendChild(span);
-
-				text = this._createTextNode(this._text.substr(this._cursor + 1));
-				this._self.appendChild(text);
+				this._self.appendChild(this._createTextNode(this._text.substr(0, this._cursor)));
+				var span = this._createElement2(this._self, "span", cursor);
+				span.appendChild(this._createTextNode(this._text.charAt(this._cursor) || " "));
+				this._self.appendChild(this._createTextNode(this._text.substr(this._cursor + 1)));
 			}else{
 				this._self.appendChild(this._createTextNode(this._text));
 			}

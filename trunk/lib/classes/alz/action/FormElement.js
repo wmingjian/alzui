@@ -2,7 +2,13 @@ _package("alz.action");
 
 _import("alz.action.ActionElement");
 
-_class("FormElement", ActionElement, function(_super){
+/**
+ * formԪ�صķ�װ
+ */
+_class("FormElement", ActionElement, function(){
+	this._init = function(){
+		_super._init.call(this);
+	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
 		var _this = this;
