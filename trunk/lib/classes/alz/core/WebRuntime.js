@@ -201,6 +201,16 @@ _class("WebRuntime", "", function(){
 		var libs = this._config["lib"];  //.replace(/^core,ui,/, "");  //忽略core,ui库代码
 		this._libLoader = new LibLoader();
 		this._libLoader.init(libs.split(","), this._config["codeprovider"], this, "onLibLoad");
+		//依次调用绑定的函数
+		for(var i = 0, len = this._funs.length; i < len; i++){
+			var agent = this._funs[i].agent;
+			var func = this._funs[i].func;
+			if(typeof agent == "object"){
+				func.call(agent);
+			}else if(typeof agent == "function"){
+				agent();
+			}
+		}
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
@@ -654,8 +664,11 @@ _class("WebRuntime", "", function(){
 		}
 		_p = null;
 	};
-	this.addOnLoad = function(fun){
-		this._funs.push(fun);
+	this.addOnLoad = function(agent, func){
+		this._funs.push({
+			"agent": agent,
+			"func" : func
+		});
 	};
 	this.addEventListener = function(obj, type, eventHandle){
 		if(obj.attachEvent){
@@ -788,7 +801,7 @@ _class("WebRuntime", "", function(){
 		return cxt;
 	};
 	this.regLib = function(name, lib){
-		if(name == "__init__"){
+		if(name == "aui" || name == "__init__"){
 			this._contextList[name] = __context__;
 			this.setLibContext(__context__);
 			this.init();
@@ -830,9 +843,18 @@ _class("WebRuntime", "", function(){
 				if(typeof this.onLoad == "function"){
 					this.onLoad();
 				}
+				/*
+				//依次调用绑定的函数
 				for(var i = 0, len = this._funs.length; i < len; i++){
-					this._funs[i]();  //依次调用绑定的函数
+					var agent = this._funs[i].agent;
+					var func = this._funs[i].func;
+					if(typeof agent == "object"){
+						func.call(agent);
+					}else if(typeof agent == "function"){
+						agent();
+					}
 				}
+				*/
 				if(this._appManager){
 					this._appManager.init();  //初始化所有应用
 				}

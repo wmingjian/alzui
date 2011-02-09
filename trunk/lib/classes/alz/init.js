@@ -398,7 +398,15 @@ _class("Context", null, function(){
 		//如果是扩展的WebRuntime类，保证全局唯一对象runtime能够被扩展
 		//[TO-DO]onContentLoad之后再执行WebRuntime的类扩展
 		if(className == "WebRuntime"){
-			if(o._init) o._init.call(this.runtime);
+			var rt = this.runtime;
+			if(typeof o._init == "function"){
+				if(rt._inited){
+					o._init.call(rt);
+				}else{
+					rt.addOnLoad(rt, o._init);
+				}
+			}
+			rt = null;
 		}
 		o = null;
 		exts = null;
