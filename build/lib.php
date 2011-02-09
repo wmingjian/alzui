@@ -34,6 +34,7 @@ function do_import($matches){
 	global $path_classes;
 	$name = preg_replace('/\./', "/", $matches[1]) . '.js';
 	$fdata = file_get_contents($path_classes . $name);
+	$fdata = preg_replace('/_class\(\"(\w+)\", (\w+|\"\"), function\(\)\{/', '_class("\1", \2, function(_super){', $fdata);
 	return "\n/*<file name=\"" . $name . "\">*/"
 		. "\n" . $fdata
 		. "\n/*</file>*/";
