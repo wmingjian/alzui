@@ -3,16 +3,14 @@ require_once('_inc.php');
 
 $path_classes = $path_root . '/' . $install_dir . '/lib/classes/';
 $map = array(
+	'aui.lib.js'          => array(),  //单文件框架
 	'__init__mini.lib.js' => array(),
-	'aui.lib.js' => array(
-		'/apps/citylife/lib/',          //lib目录
-		'/apps/citylife/lib/classes/',  //app目录
-		'aui.lib.js'                    //合并标识文件
-	),
-	'citylife.lib.js' => array(
-		'/apps/citylife/lib/',
-		'/apps/citylife/lib/classes/',
-		'citylife.lib.js'
+	'core.lib.js'         => array(),
+	'ui.lib.js'           => array(),
+	'ui_action.lib.js'    => array(),
+	'test_win.lib.js'     => array(
+		'/apps/citylife/lib/',         //lib目录
+		'/apps/citylife/lib/classes/'  //app目录
 	)
 );
 
