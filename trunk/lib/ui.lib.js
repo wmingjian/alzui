@@ -3690,7 +3690,9 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 		if(typeof app_onResize != "undefined"){  //提前触发应用的resize事件
 			app_onResize(rect.w, rect.h);
 		}
-		this._appManager.onResize(rect.w, rect.h);  //调整所有应用的大小
+		if(this._appManager){
+			this._appManager.onResize(rect.w, rect.h);  //调整所有应用的大小
+		}
 	};
 	/**
 	 * 根据DOM元素的ID，并且使用该DOM元素创建一个脚本组件
