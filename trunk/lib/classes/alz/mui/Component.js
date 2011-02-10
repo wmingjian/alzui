@@ -43,6 +43,8 @@ _class("Component", EventTarget, function(){
 		"filter"          : 2,
 		"font"            : 2,
 		"fontWeight"      : 2,
+		"fontFamily"      : 2,
+		"fontSize"        : 2,
 		"height"          : 2,
 		"left"            : 2,
 		"lineHeight"      : 2,
@@ -65,8 +67,8 @@ _class("Component", EventTarget, function(){
 		this._tag = "Component";
 		this._domCreate = false;
 		this._domBuildType = 0;  //0=create,1=bind
-		this._win = runtime.getWindow();
-		this._doc = runtime.getDocument();  //this._win.document
+		this._win = null;  //runtime.getWindow();
+		this._doc = null;  //runtime.getDocument();  //this._win.document
 		this._dom = runtime.getDom();
 		//this._parent = null;
 		this._owner = null;
@@ -107,6 +109,24 @@ _class("Component", EventTarget, function(){
 	};
 	this.toString = function(){
 		return "{tag:'" + this._className + "',align:'" + this._align + "'}";
+	};
+	/**
+	 * 初始化window,document等环境
+	 */
+	this.setParent2 = function(parent){
+		if(parent){
+			this._parent = parent;
+			if(parent.ownerDocument){
+				this._doc = parent.ownerDocument;
+			}else if(parent._self){
+				this._doc = parent._self.ownerDocument;
+			}
+		}
+		if(!this._doc){
+			window.alert("[Component::setParent2]未能正确识别DocEnv环境，默认使用runtime.getDocument()");
+			this._doc = runtime.getDocument();  //this._win.document
+		}
+		this._win = this._doc.parentWindow || this._doc.defaultView;  //runtime.getWindow();
 	};
 	this.getDoc = function(){
 		if(!this._doc){
@@ -153,6 +173,7 @@ _class("Component", EventTarget, function(){
 	 */
 	//this.build = function(data){};
 	this.bind = function(obj){
+		this.setParent2(obj.parentNode);
 		/*
 		var props = "color,cursor,display,visibility,opacity,zIndex,"
 			+ "overflow,position,"
@@ -228,10 +249,8 @@ _class("Component", EventTarget, function(){
 		}
 		this.__init(obj, 1);
 	};
-	//this.create = function(parent){
-	//	this._parent = parent;
-	//};
 	this.create = function(parent){
+		this.setParent2(parent);
 		var obj = this._createElement(this._tagName || "div");
 		//obj.style.border = "1px solid #000000";
 		if(parent) this.setParent(parent, obj);
@@ -282,6 +301,8 @@ _class("Component", EventTarget, function(){
 		this._doc = null;
 		this._win = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.getElement = function(){
 		return this._self;
@@ -457,12 +478,14 @@ _class("Component", EventTarget, function(){
 			}
 		}
 	};
-	/*this.resizeTo = function(w, h){
+	/*
+	this.resizeTo = function(w, h){
 		if(this._self){
 			this._self.style.width = Math.max(w, 0) + "px";
 			this._self.style.height = Math.max(h, 0) + "px";
 		}
-	};*/
+	};
+	*/
 	this.getViewPort = function(){
 		return {
 			"x": this._self.scrollLeft,

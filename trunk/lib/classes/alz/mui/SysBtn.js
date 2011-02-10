@@ -71,6 +71,8 @@ _class("SysBtn", Component, function(){
 		this._self.onclick = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	this.onMouseDown = function(ev){
 		this.setCapture(true);
 		/*

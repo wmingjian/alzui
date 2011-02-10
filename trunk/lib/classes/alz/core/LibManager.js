@@ -28,6 +28,8 @@ _class("LibManager", "", function(){
 		}
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	this.getLib = function(name){
 		return this._hash[name];
 	};

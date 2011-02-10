@@ -12,7 +12,7 @@ _class("TextItem", Component, function(){
 		//this.create(parent, type, text);
 	};
 	this.create = function(parent, type, text){
-		this._parent = parent;
+		this.setParent2(parent);
 		this._type = type;
 		this._text = text;
 		var obj = window.document.createElement("span");
@@ -27,6 +27,8 @@ _class("TextItem", Component, function(){
 	};
 	this.dispose = function(){
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.getTextLength = function(){
 		return this._text.length;

@@ -32,6 +32,8 @@ _class("Button", ActionElement, function(){
 		this._self.onclick = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	this.setDisabled = function(v){
 		_super.setDisabled.apply(this, arguments);
 		if(!this._disabled && this._self){

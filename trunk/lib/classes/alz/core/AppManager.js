@@ -36,6 +36,8 @@ _class("AppManager", "", function(){
 		}
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	//调整所有应用的大小
 	this.onResize = function(w, h){
 		for(var i = 0, len = this._list.length; i < len; i++){
@@ -65,9 +67,9 @@ _class("AppManager", "", function(){
 	};
 	/**
 	 * 创建并注册一个应用的实例
-	 * @param appClassName {String} 要创建的应用的类名
-	 * @param parentApp {Application} 可选，所属的父类
-	 * @param len {Number} 在历史记录中的位置
+	 * @param {String} appClassName 要创建的应用的类名
+	 * @param {Application} parentApp 可选，所属的父类
+	 * @param {Number} len 在历史记录中的位置
 	 */
 	this.createApp = function(appClassName, parentApp, len){
 		var conf = this.getAppConfByClassName(appClassName);

@@ -49,6 +49,8 @@ _class("SilverButton", Component, function(){
 		this._self.onmouseout = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	this.setState = function(v){
 		runtime.dom.applyCssStyle(this, _css, v);
 	};

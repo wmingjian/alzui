@@ -19,7 +19,6 @@ _extension("Application", function(){  //×¢²á Application À©Õ¹(action)
 		element = element || (this._contentPane ? this._contentPane._self : window.document);
 		owner = owner || this;
 		function onAction(ev){
-			alert(123);
 			ev = ev || window.event;
 			var ret = owner.doAction(this.getAttribute("_action"), this);
 			ev.cancelBubble = true;
@@ -29,29 +28,36 @@ _extension("Application", function(){  //×¢²á Application À©Õ¹(action)
 		for(var i = 0, len = tags.length; i < len; i++){
 			var nodes = element.getElementsByTagName(tags[i]);
 			for(var j = 0, len1 = nodes.length; j < len1; j++){
-				var action = nodes[j].getAttribute("_action");
-				if(action){
+				var node = nodes[j];
+				var act = node.getAttribute("_action");
+				if(act){
 					switch(tags[i]){
 					case "a":
-						nodes[j].onclick = onAction;
+						node.onclick = onAction;
 						break;
 					case "input":
-						if(nodes[j].type == "button" || nodes[j].type == "submit" || nodes[j].type == "reset" || nodes[j].type == "checkbox"){
-							nodes[j].onclick = onAction;
+						switch(node.type){
+						case "button":
+						case "submit":
+						case "reset":
+						case "checkbox":
+							node.onclick = onAction;
+							break;
 						}
 						break;
 					case "form":
-						nodes[j].onsubmit = onAction;
+						node.onsubmit = onAction;
 						break;
 					case "select":
-						nodes[j].onchange = onAction;
+						node.onchange = onAction;
 						break;
 					}
 				}
+				node = null;
 			}
 			nodes = null;
 		}
 	};
-	this.doAction = function(action, sender){
+	this.doAction = function(act, sender){
 	};
 });

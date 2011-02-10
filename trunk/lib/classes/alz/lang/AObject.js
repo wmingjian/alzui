@@ -17,6 +17,12 @@ _class("AObject", null, function(){
 		//[memleak]delete AObject.__hash__[this.__hashid__];
 		this._disposed = true;
 	};
+	this.destroy = function(){
+	};
+	/**
+	 * 获取对象的字符串表示
+	 * @return {String}
+	 */
 	this.toString = function(){
 		if(this._className){
 			return "[object " + this._className + "]";
@@ -24,6 +30,10 @@ _class("AObject", null, function(){
 		return "[object Object]";
 	};
 	//运行时方法，可以在定制框架时，适当的缩减掉一些方法
+	/**
+	 * 获取对象对应的类
+	 * @return {Class}
+	 */
 	this.getClass = function(){
 		//return this._class;
 		//return eval(this._className);
@@ -31,35 +41,58 @@ _class("AObject", null, function(){
 		return __classes__[this._className];  //避免使用eval方法
 		//return runtime._classManager.getClassByName(this._className).getClazz();
 	};
+	/**
+	 * 获取对象对应的父类
+	 * @return {Class}
+	 */
 	this.getSuperClass = function(){
 		return this.getClass()._super.getClass();
 	};
+	/**
+	 * 获取对象的类名
+	 * @return {String}
+	 */
 	this.getClassName = function(){
 		return this._className;
 	};
+	/**
+	 * 设置对象的类名
+	 * @param {Object} v 类名
+	 */
 	this.setClassName = function(v){
 		this._className = v;
 	};
-	this.getProperty = function(sPropertyName){
-		var getterName = "get" + sPropertyName.capitalize();
-		if(typeof this[getterName] == "function"){
-			return this[getterName]();
+	/**
+	 * 获取对象的属性
+	 * @param {String} name 属性名
+	 * @return {Object}
+	 */
+	this.getProperty = function(name){
+		var key = "get" + name.capitalize();
+		if(typeof this[key] == "function"){
+			return this[key]();
 		}
-		throw new Error("No such property, " + sPropertyName);
+		throw new Error("No such property, " + name);
 	};
-	this.setProperty = function(sPropertyName, oValue){
-		var setterName = "set" + sPropertyName.capitalize();
-		if(typeof this[setterName] == "function"){
-			this[setterName](oValue);
+	/**
+	 * 设置对象的属性
+	 * @param {String} name 属性名
+	 * @param {Object} value 属性值
+	 */
+	this.setProperty = function(name, value){
+		var key = "set" + name.capitalize();
+		if(typeof this[key] == "function"){
+			this[key](value);
 		}else{
-			throw new Error("No such property, " + sPropertyName);
+			throw new Error("No such property, " + name);
 		}
 	};
 	//模拟 instanceof, typeof 操作符
 	/**
 	 * 判断当前对象是否某个类的实例
 	 * 根据 prototype 链工作
-	 * @param clazz {Class|String} 类或者类的名称
+	 * @param {Class|String} clazz 类或者类的名称
+	 * @return {Boolean}
 	 */
 	this.instanceOf = function(clazz){
 		/*

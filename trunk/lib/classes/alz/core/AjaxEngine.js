@@ -105,6 +105,8 @@ _class("AjaxEngine", "", function(){
 		this._queue = [];
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	this.getTestCase = function(){
 		return this._testCase;
 	};
@@ -145,12 +147,12 @@ _class("AjaxEngine", "", function(){
 		return http;
 	};
 	/**
-	 * @param method {String} 提交方法(GET|POST)
-	 * @param url {String} 网络调用的url
-	 * @param postData {String|Object} 请求数据
-	 * @param type {String} 返回只类型(text|xml)
-	 * @param callback {Function} 回调函数
-	 * @param cbAgrs {Array} 传给回调方法的参数
+	 * @param {String} method 提交方法(GET|POST)
+	 * @param {String} url 网络调用的url
+	 * @param {String|Object} postData 请求数据
+	 * @param {String} type 返回只类型(text|xml)
+	 * @param {Function} callback 回调函数
+	 * @param {Array} cbAgrs 传给回调方法的参数
 	 * @return {String|XmlDocument}
 	 */
 	this.netInvoke1 = function(method, url, postData, type, callback){
@@ -226,13 +228,13 @@ _class("AjaxEngine", "", function(){
 	};
 	/**
 	 * 可以复用HTTP组件的网络调用
-	 * @param method {String} 提交方法(GET|POST)
-	 * @param url {String} 网络调用的url
-	 * @param postData {String|Object} 请求数据
-	 * @param type {String} 返回只类型(text|xml)
-	 * @param agent {Object|Function} 回调代理对象或者函数对象
-	 * @param funName {String} 回调代理对象的回调方法名称
-	 * @param cbAgrs {Array} 传给回调方法的参数
+	 * @param {String} method 提交方法(GET|POST)
+	 * @param {String} url 网络调用的url
+	 * @param {String|Object} postData 请求数据
+	 * @param {String} type 返回只类型(text|xml)
+	 * @param {Object|Function} agent 回调代理对象或者函数对象
+	 * @param {String} funName 回调代理对象的回调方法名称
+	 * @param {Array} cbAgrs 传给回调方法的参数
 	 * @return {String|XmlDocument}
 	 * [TODO]
 	 *   1)检查 agent 和 agent[funName] 必须有一个是 Function 对象
@@ -290,7 +292,7 @@ _class("AjaxEngine", "", function(){
 	};
 	/**
 	 * 暂停异步请求的工作线程
-	 * @param abort {boolean} 是否中断当前的请求
+	 * @param {Boolean} abort 是否中断当前的请求
 	 */
 	this.pauseAjaxThread = function(abort){
 		if(abort){
@@ -303,10 +305,9 @@ _class("AjaxEngine", "", function(){
 	 * 开始异步请求的工作线程
 	 */
 	this._startAjaxThread = function(msec){
-		var _this = this;
-		this._timer = runtime.getWindow().setTimeout(function(){
-			_this._ajaxThread();
-		}, msec || this._msec);
+		this._timer = runtime.startTimer(msec || this._msec, this, function(){
+			this._ajaxThread();
+		});
 	};
 	this._checkAjaxThread = function(retry){
 		if(this._queue.length != 0){
@@ -603,9 +604,9 @@ _class("AjaxEngine", "", function(){
 	*/
 	/**
 	 * 调用一个请求队列
-	 * @param queue {Array} 请求队列数组
-	 * @param agent {Object} 回调代理对象
-	 * @param callback {Function} 回调函数
+	 * @param {Array} queue 请求队列数组
+	 * @param {Object} agent 回调代理对象
+	 * @param {Function} callback 回调函数
 	 */
 	this.netInvokeQueue = function(queue, agent, callback){
 		var i = 0;
@@ -629,7 +630,7 @@ _class("AjaxEngine", "", function(){
 					agent = null;
 					req = null;
 					i++;
-					runtime.getWindow().setTimeout(cb, 0);  //调用下一个
+					runtime.startTimer(0, this, cb);  //调用下一个
 				});
 			}else{  //队列完成
 				callback.apply(agent);
@@ -647,7 +648,7 @@ _class("AjaxEngine", "", function(){
 	};
 	/**
 	 * 终止指定的 uniqueid 的某个请求，队列正常运转
-	 * @param uniqueid {number} 每个请求的全局唯一编号
+	 * @param {Number} uniqueid 每个请求的全局唯一编号
 	 */
 	this.abort = function(uniqueid){
 		var n = this.getReqIndex(uniqueid);

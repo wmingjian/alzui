@@ -31,7 +31,6 @@ import alz.layout.BorderLayout;
 import alz.core.AjaxEngine;
 import alz.core.Ajax;
 import alz.template.TemplateManager;
-import alz.core.EventTarget;
 import alz.core.Application;
 import alz.core.AppManager;
 import alz.core.Plugin;
@@ -42,6 +41,14 @@ import alz.core.ActionManager;
 import alz.mui.ToggleGroup;
 import alz.mui.ToggleManager;
 import alz.mui.Component;
+
+import alz.action.ActionElement;
+import alz.action.LinkLabel;
+import alz.action.Button;
+import alz.action.CheckBox;
+import alz.action.ComboBox;
+import alz.action.FormElement;
+
 import alz.mui.TextHistory;
 import alz.mui.TextItem;
 import alz.mui.LineEdit;

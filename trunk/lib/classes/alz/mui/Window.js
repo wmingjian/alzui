@@ -56,12 +56,17 @@ _class("Window", Component, function(){
 		this._height = 0;
 	};
 	this.create = function(parent){
+		this.setParent2(parent);
 		var obj = runtime.createDomElement(TPL_WIN);
 		if(parent){
 			parent.appendChild(obj);
 		}
 		this.init(obj);
 		return obj;
+	};
+	this.bind = function(obj){
+		this.setParent2(obj.parentNode);
+		this.init(obj);
 	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
@@ -116,6 +121,8 @@ _class("Window", Component, function(){
 		this._head.onselectstart = null;
 		this._head._dlg = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	/*this.xquery = function(xpath){
 		return runtime.selector.query(xpath, this._self);

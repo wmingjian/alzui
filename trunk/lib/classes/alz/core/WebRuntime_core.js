@@ -5,13 +5,26 @@ _import("alz.core.DOMUtil");
 //_import("alz.core.DOMUtil2");
 _import("alz.core.AjaxEngine");
 _import("alz.core.AppManager");
+//_import("alz.core.ProductManager");
+//_import("alz.core.ActionCollection");
 
 _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
+	var properties = ["_ajax"];
 	this._init = function(){  //加载之后的初始化工作
 		//this.selector = new XPathQuery();
 		this.dom = new DOMUtil();
 		//this.domutil = new DomUtil2();
-		this._ajax = this.getParentRuntime() ? this._parentRuntime.getAjax() : new AjaxEngine();
+		if(!this.getParentRuntime()){
+			this._ajax = new AjaxEngine();  //异步交互引擎
+		}else{
+			for(var i = 0, len = properties.length; i < len; i++){
+				var k = properties[i];
+				this[k] = this._parentRuntime["get" + k.charAt(1).toUpperCase() + k.substr(2)]();
+			}
+			/*
+			this._ajax = this._parentRuntime.getAjax();
+			*/
+		}
 		//this._ajax._userinfo = true;
 		//设置测试用例
 		/*
@@ -51,11 +64,14 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 		if(this._debug){
 			window.document.onmousedown = null;
 		}
-		if(this._ajax){
-			if(!this._parentRuntime){
-				this._ajax.dispose();
+		for(var i = 0, len = properties.length; i < len; i++){
+			var k = properties[i];
+			if(this[k]){
+				if(!this._parentRuntime){
+					this[k].dispose();
+				}
+				this[k] = null;
 			}
-			this._ajax = null;
 		}
 		//this.domutil.dispose();
 		//this.domutil = null;
@@ -83,7 +99,7 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	};
 	/**
 	 * 去除字符串前后的空白字符
-	 * @param str {String} 要处理的字符串
+	 * @param {String} str 要处理的字符串
 	 */
 	this.trim = function(str){
 		return str.replace(/(^\s*)|(\s*$)/g, "");
@@ -101,7 +117,7 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	};
 	/**
 	 * HTML 代码编码方法
-	 * @param html {String} 要编码的 HTML 代码字符串
+	 * @param {String} html 要编码的 HTML 代码字符串
 	 */
 	this.encodeHTML = function(html){
 		if(!html){
@@ -120,7 +136,7 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	};
 	/**
 	 * HTML 代码解码方法
-	 * @param html {String} 要解码的 HTML 代码字符串
+	 * @param {String} html 要解码的 HTML 代码字符串
 	 */
 	this.decodeHTML = function(html){
 		if(!html){
@@ -141,7 +157,7 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	};
 	/**
 	 * 根据参数 progid 创建一个 ActiveXObject，成功返回对象，失败返回 null
-	 * @param progid {String} ActiveXObject 控件的 PROGID
+	 * @param {String} progid ActiveXObject 控件的 PROGID
 	 */
 	this.createComObject = function(progid){
 		try{
@@ -178,20 +194,22 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	 */
 	this.getElementsByClassName = function(className){
 		var a = [];
-		var els = this._doc.getElementsByTagName("*");
-		for(var i = 0, len = els.length; i < len; i++){
-			if(els[i].className.indexOf(className) != -1){
-				a.push(els[i]);
+		var nodes = this._doc.getElementsByTagName("*");
+		for(var i = 0, len = nodes.length; i < len; i++){
+			var node = nodes[i];
+			if(node.className.indexOf(className) != -1){
+				a.push(node);
 			}
 		}
 		return a;
 	};
 	this.openDialog = function(url, width, height){
 		var screen = {
-			w: this._win.screen.availWidth,
-			h: this._win.screen.availHeight
+			"w": this._win.screen.availWidth,
+			"h": this._win.screen.availHeight
 		};
-		var features = "fullscreen=0,channelmode=0,toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=0,resizable=1"
+		var features = "fullscreen=0,channelmode=0,toolbar=0,location=0,"
+			+ "directories=0,status=0,menubar=0,scrollbars=0,resizable=1"
 			+ ",left=" + Math.round((screen.w - width) / 2)
 			+ ",top=" + Math.round((screen.h - height) / 2)
 			+ ",width=" + width

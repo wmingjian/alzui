@@ -95,7 +95,11 @@ function createContext(name/*, libs*/){  //bootstrap
 		for(var k in hash){
 			_classes["alz.native." + k] = hash[k];
 		}
-		var _p = Array[__proto];
+		var _p = String[__proto];
+		_p.capitalize = function(){
+			return this.charAt(0).toUpperCase() + this.substr(1);
+		};
+		_p = Array[__proto];
 		/**
 		 * 移除数组中的第i个对象
 		 */
@@ -237,9 +241,9 @@ function createContext(name/*, libs*/){  //bootstrap
 	}
 	/**
 	 * 模拟类的定义
-	 * @param className {String} 类的名字
-	 * @param superClass {Class} 父类对象
-	 * @param classImp {Function} 类的实现代码
+	 * @param {String} className 类的名字
+	 * @param {Class} superClass 父类对象
+	 * @param {Function} classImp 类的实现代码
 	 */
 	function _class(className, superClass, classImp){
 		var _s;
@@ -325,9 +329,9 @@ _class("Context", null, function(_super){
 	this._class = _class;  //前面已经定义，只需引入
 	/**
 	 * 模拟接口的定义
-	 * @param name {String} 接口的名字
-	 * @param superInterface {Interface} 父接口
-	 * @param interfaceImp {Function} 接口的实现，可以是虚实现
+	 * @param {String} name 接口的名字
+	 * @param {Interface} superInterface 父接口
+	 * @param {Function} interfaceImp 接口的实现，可以是虚实现
 	 */
 	this._interface = function(name, superInterface, interfaceImp){
 		interfaceImp.__name__ = name;
@@ -366,8 +370,8 @@ _class("Context", null, function(_super){
 	}
 	/**
 	 * 为类提供一个扩展机制
-	 * @param className {String} 被扩展的类的名字
-	 * @param extImp {Function} 扩展的实现代码
+	 * @param {String} className 被扩展的类的名字
+	 * @param {Function} extImp 扩展的实现代码
 	 * [TODO]可以按照这个扩展的工作原理，并且通过替换原型上相关的方法，为每一个类
 	 * 设计扩展一种机制。
 	 * WebRuntime.regExt = function(clazz){};
@@ -509,6 +513,12 @@ _class("AObject", null, function(_super){
 		//[memleak]delete AObject.__hash__[this.__hashid__];
 		this._disposed = true;
 	};
+	this.destroy = function(){
+	};
+	/**
+	 * 获取对象的字符串表示
+	 * @return {String}
+	 */
 	this.toString = function(){
 		if(this._className){
 			return "[object " + this._className + "]";
@@ -516,6 +526,10 @@ _class("AObject", null, function(_super){
 		return "[object Object]";
 	};
 	//运行时方法，可以在定制框架时，适当的缩减掉一些方法
+	/**
+	 * 获取对象对应的类
+	 * @return {Class}
+	 */
 	this.getClass = function(){
 		//return this._class;
 		//return eval(this._className);
@@ -523,35 +537,58 @@ _class("AObject", null, function(_super){
 		return __classes__[this._className];  //避免使用eval方法
 		//return runtime._classManager.getClassByName(this._className).getClazz();
 	};
+	/**
+	 * 获取对象对应的父类
+	 * @return {Class}
+	 */
 	this.getSuperClass = function(){
 		return this.getClass()._super.getClass();
 	};
+	/**
+	 * 获取对象的类名
+	 * @return {String}
+	 */
 	this.getClassName = function(){
 		return this._className;
 	};
+	/**
+	 * 设置对象的类名
+	 * @param {Object} v 类名
+	 */
 	this.setClassName = function(v){
 		this._className = v;
 	};
-	this.getProperty = function(sPropertyName){
-		var getterName = "get" + sPropertyName.capitalize();
-		if(typeof this[getterName] == "function"){
-			return this[getterName]();
+	/**
+	 * 获取对象的属性
+	 * @param {String} name 属性名
+	 * @return {Object}
+	 */
+	this.getProperty = function(name){
+		var key = "get" + name.capitalize();
+		if(typeof this[key] == "function"){
+			return this[key]();
 		}
-		throw new Error("No such property, " + sPropertyName);
+		throw new Error("No such property, " + name);
 	};
-	this.setProperty = function(sPropertyName, oValue){
-		var setterName = "set" + sPropertyName.capitalize();
-		if(typeof this[setterName] == "function"){
-			this[setterName](oValue);
+	/**
+	 * 设置对象的属性
+	 * @param {String} name 属性名
+	 * @param {Object} value 属性值
+	 */
+	this.setProperty = function(name, value){
+		var key = "set" + name.capitalize();
+		if(typeof this[key] == "function"){
+			this[key](value);
 		}else{
-			throw new Error("No such property, " + sPropertyName);
+			throw new Error("No such property, " + name);
 		}
 	};
 	//模拟 instanceof, typeof 操作符
 	/**
 	 * 判断当前对象是否某个类的实例
 	 * 根据 prototype 链工作
-	 * @param clazz {Class|String} 类或者类的名称
+	 * @param {Class|String} clazz 类或者类的名称
+	 * @return {Boolean}
 	 */
 	this.instanceOf = function(clazz){
 		/*
@@ -584,9 +621,12 @@ _class("AObject", null, function(_super){
 /*<file name="alz/lang/Exception.js">*/
 _package("alz.lang");
 
+//import alz.native.Error;
+
 /**
  * 异常基类
  */
+//class Exception(Error){
 _class("Exception", "", function(_super){
 	this._init = function(msg){
 		_super._init.call(this);
@@ -594,6 +634,8 @@ _class("Exception", "", function(_super){
 	};
 	this.dispose = function(){
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.toString = function(){
 		return this._message;
@@ -633,6 +675,8 @@ _class("EventTarget", "", function(_super){
 		this._listener = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	this.setEnableEvent = function(v){
 		this._enableEvent = v;
 	};
@@ -649,7 +693,7 @@ _class("EventTarget", "", function(_super){
 		if(this._disabled == v) return;
 		this._disabled = v;
 	};
-	this.addEventListener1 = function(eventMap, listener){
+	this.addEventGroupListener = function(eventMap, listener){
 		this._listener = listener;
 		if(eventMap == "mouseevent"){
 			eventMap = "mousedown,mouseup,mousemove,mouseover,mouseout,click,dblclick";
@@ -672,7 +716,7 @@ _class("EventTarget", "", function(_super){
 		}
 		maps = null;
 	};
-	this.removeEventListener1 = function(eventMap){
+	this.removeEventGroupListener = function(eventMap){
 		if(eventMap == "mouseevent"){
 			eventMap = "mousedown,mouseup,mousemove,mouseover,mouseout,click,dblclick";
 		}else if(eventMap == "keyevent"){
@@ -716,8 +760,8 @@ _class("EventTarget", "", function(_super){
 	};
 	this.dispatchEvent = function(ev){
 		var ret = true;
-		for(var obj = this; obj; obj = obj._parent){  //默认事件传递顺序为有内向外
-			if(obj._disabled){
+		for(var obj = this; obj; obj = obj.getParent()){  //默认事件传递顺序为有内向外
+			if(obj.getDisabled()){
 				ev.cancelBubble = true;
 				ret = false;
 				break;  //continue;
@@ -750,6 +794,21 @@ _class("EventTarget", "", function(_super){
 			}
 		}
 		return ret;
+	};
+	this.fireEvent = function(ev, argv){
+		var name = "on" + ev.type.capitalize();
+		if(typeof this[name] == "function"){
+			try{
+				switch(arguments.length){
+				case 1: return this[name](ev);
+				case 2: return this[name].apply(this, [ev].concat(argv));
+				case 3: return this[name].apply(this, arguments);
+				}
+			}catch(ex){  //屏蔽事件中的错误
+				//runtime.showException(ex, "[" + this._className + "::onInit]");
+				return false;
+			}
+		}
 	};
 });
 /*</file>*/
@@ -836,8 +895,8 @@ _class("WebRuntime", "", function(_super){
 		//探测是否 Gadget 运行环境
 		this.inGadget = !!(this._win.System && this._win.System.Gadget);  //typeof System != "undefined"
 		this.option = {  //Gadget相关属性
-			timer:2000,  //检查新邮件的时间间隔
-			newMailNum:0  //新邮件数量
+			timer     : 2000,  //检查新邮件的时间间隔
+			newMailNum: 0      //新邮件数量
 		};
 		this._files = {};  //已经加载的js或css文件
 		this._boxModel = this.ie ? 0 : 1;
@@ -869,11 +928,7 @@ _class("WebRuntime", "", function(_super){
 
 		if(this._config["skin"]){
 			var url = this.pathLib + "skin/" + this._config["skin"] + "/skin.css";
-			this._doc.write("<link"
-				+ " rel=\"stylesheet\""
-				+ " type=\"text/css\""
-				+ " href=\"" + url + "\""
-				+ " />");
+			this._doc.write('<link type="text/css" rel="stylesheet" href="' + url + '" />');
 		}
 		this._preLoadFile("css", this._pathCss, this._config["css"].split(","), this._pathSkin);
 		if(this._config["plugin"]){  //如果有插件，加载插件的CSS文件
@@ -1008,9 +1063,11 @@ _class("WebRuntime", "", function(_super){
 		this._parentRuntime = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	/**
 	 * 利用正则匹配 window.navigator.userAgent 来获取浏览器的类型
-	 * @param nav {Navigator}
+	 * @param {Navigator} nav
 	 * Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; en) Opera 8.00
 	 * Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9b4pre) Gecko/2008022005 Minefield/3.0b4pre (.NET CLR 3.5.30729)
 	 * Mozilla/5.0 (iPhone; U; CPU iPhone OS 2_2_1 like Mac OS X; zh-cn) AppleWebKit/525.18.1 (KHTML, like Gecko) Version/3.1.1 Mobile/5H11 Safari/525.20
@@ -1532,8 +1589,8 @@ _class("WebRuntime", "", function(_super){
 	};
 	/**
 	 * 创建一个上下文环境对象
-	 * @param name {String} 库名
-	 * @param libs {String} 当前库依赖的库列表
+	 * @param {String} name 库名
+	 * @param {String} libs 当前库依赖的库列表
 	 * 每一个lib文件必然依赖于__init__.lib，所以libs参数中忽略了这个lib
 	 */
 	this.createContext = function(name, libs){
@@ -1580,7 +1637,7 @@ _class("WebRuntime", "", function(_super){
 	};
 	/**
 	 * 每个lib文件加载完成时的回调方法
-	 * @param {String} libName core|ui|...
+	 * @-param {String} libName core|ui|...
 	 * @param {Lib} lib {type:"",name:"",inApp:false}
 	 * @param {LibConf} libConf lib配置信息
 	 */
@@ -1773,7 +1830,7 @@ _class("WebRuntime", "", function(_super){
 	};
 	/**
 	 * 加载一个插件
-	 * @param url {String} 插件JS的URL地址
+	 * @param {String} url 插件JS的URL地址
 	 */
 	this.loadPlugin = function(url){
 	};
@@ -1802,7 +1859,7 @@ _class("WebRuntime", "", function(_super){
 	};
 	/**
 	 * 把一个JSON字符串解析为 json 对象，成功返回 json 对象，失败返回 null
-	 * @param data {String} [JsonCode]符合 JSON 协议的 js 代码
+	 * @param {String} data [JsonCode]符合 JSON 协议的 js 代码
 	 */
 	this.parseJson = function(data){
 		if(data == "") return null;  //防止空数据报错
@@ -1817,7 +1874,7 @@ _class("WebRuntime", "", function(_super){
 	};
 	/**
 	 * 将字符串转换成可以被字符串表示符号(",')括起来已表示原来字符串意义的字符串
-	 * @param str {String} 要转换的字符串内容
+	 * @param {String} str 要转换的字符串内容
 	 */
 	this.toJsString = function(str){
 		if(typeof str != "string") return "";
@@ -1833,7 +1890,7 @@ _class("WebRuntime", "", function(_super){
 	};
 	/**
 	 * 将模板解析为一个 JS 函数的代码形式
-	 * @param code {String} 模板的内容
+	 * @param {String} code 模板的内容
 	 */
 	this.parseTemplate = function(code){
 		var sBegin = "<" + "%", sEnd = "%" + ">";
@@ -1887,17 +1944,17 @@ _class("WebRuntime", "", function(_super){
 	};
 	this.startTimer = function(msec, agent, fun){
 		var f = typeof fun == "string" ? agent[fun] : fun;
-		var timer = runtime.addThread(msec, this, function(){
+		var timer = this.addThread(msec, this, function(){
 			try{
 				var ret = f.apply(agent);
 				if(ret === true){
-					timer = runtime.addThread(msec, this, arguments.callee);
+					timer = this.addThread(msec, this, arguments.callee);
 				}else{
 					window.clearTimeout(timer);
 					timer = 0;
 				}
 			}catch(ex){
-				runtime.log("[WebRuntime::startTimer]" + ex.message);
+				this.log("[WebRuntime::startTimer]" + ex.message);
 			}
 		});
 		return timer;
@@ -1934,6 +1991,8 @@ _class("LibManager", "", function(_super){
 			delete this._hash[k];
 		}
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.getLib = function(name){
 		return this._hash[name];
@@ -1979,17 +2038,38 @@ _class("LibManager", "", function(_super){
 /*<file name="alz/core/ScriptLoader.js">*/
 _package("alz.core");
 
-_class("ScriptLoader", "", function(_super){
+_import("alz.core.EventTarget");
+
+/**
+ * JS文件加载器
+ */
+_class("ScriptLoader", EventTarget, function(_super){
 	this._init = function(){
 		_super._init.call(this);
 		this._event = runtime.ie ? "onreadystatechange" : "onload";
-		this._script = null;
+		this._scripts = [];
 		this._agent = null;
 		this._fun = null;
+		this._urls = null;
+		this._index = 0;
 	};
 	this.create = function(agent, fun){
 		this._agent = agent;
 		this._fun = fun;
+	};
+	this.dispose = function(){
+		this._fun = null;
+		this._agent = null;
+		for(var i = 0, len = this._scripts.length; i < len; i++){
+			this._scripts[i][this._event] = null;
+			this._scripts[i] = null;
+		}
+		this._scripts = [];
+		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
+	};
+	this.createScript = function(parent, url){
 		var _this = this;
 		var obj = runtime.getDocument().createElement("script");
 		obj.type = "text/javascript";
@@ -1999,29 +2079,34 @@ _class("ScriptLoader", "", function(_super){
 			if(runtime.ie && !(this.readyState == "loaded" || this.readyState == "complete")){
 				return;
 			}
-			_this._fun.apply(_this._agent);
-			_this.dispose();
+			_this.fireEvent({type: "load"});
 		};
-		this._script = obj;
-		obj = null;
+		obj.src = url;
+		this._scripts.push(obj);
+		parent.appendChild(obj);
+		return obj;
 	};
-	this.dispose = function(){
-		this._fun = null;
-		this._agent = null;
-		this._script[this._event] = null;
-		this._script = null;
-		_super.dispose.apply(this);
-	};
-	this.load = function(url, data, skipcb){
+	/**
+	 * 一次加载一个或多个脚本
+	 */
+	this.load = function(urls, data, skipcb){
 		if(!skipcb){
-			url = url + "?"
-				+ "_cb_=0,runtime._ajax._data"  //0=(变量赋值，n=v),1=(函数回调，f(v))
-				+ "&ts=" + new Date().getTime()
-				+ (data ? "&" + data : "");
+			for(var i = 0, len = urls.length; i < len; i++){
+				urls[i] += "?"
+					+ "_cb_=0,runtime._ajax._data"  //0=(变量赋值，n=v),1=(函数回调，f(v))
+					+ "&ts=" + new Date().getTime()
+					+ (data ? "&" + data : "");
+			}
 		}
-		this._script.src = url;
-		if(!this._script.parentNode){
-			runtime._domScript.parentNode.appendChild(this._script/*, runtime._domScript*/);
+		this._urls = urls;
+		this.onLoad();
+	};
+	this.onLoad = function(ev){
+		if(this._index >= this._urls.length){  //完成
+			this._fun.apply(this._agent);
+			this.dispose();
+		}else{
+			this.createScript(runtime._domScript.parentNode, this._urls[this._index++]);
 		}
 	};
 });
@@ -2051,10 +2136,12 @@ _class("LibLoader", "", function(_super){
 		this._libs = [];
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	/**
-	 * @param libs {String} 逗号分割的库名列表
-	 * @param agent {WebRuntime}
-	 * @param funName {String}
+	 * @param {String} libs 逗号分割的库名列表
+	 * @param {WebRuntime} agent
+	 * @param {String} funName
 	 * 回调函数参数格式：fun(lib, libConf, loaded)
 	 * lib     = 库文件名信息
 	 * libConf = 库配置信息
@@ -2166,7 +2253,7 @@ _class("LibLoader", "", function(_super){
 					this._onLoad();
 				}
 			});
-			loader.load(this.getUrlByName(lib), "", true);
+			loader.load([this.getUrlByName(lib)], "", true);
 			loader = null;
 		}
 	};
@@ -2184,7 +2271,7 @@ _class("LibLoader", "", function(_super){
 					this._start();  //加载完毕，再开始加载剩余的库文件
 					loader = null;
 				});
-				loader.load(runtime.getConfigData("pathlib") + runtime.getConfData("product"), "", true);
+				loader.load([runtime.getConfigData("pathlib") + runtime.getConfData("product")], "", true);
 			}else{
 				this._start();
 			}
@@ -2233,6 +2320,8 @@ _class("DOMUtil", "", function(_super){
 		}
 		this._components = [];
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.createDomElement = function(html, parent){
 		if(!this._domTemp){
@@ -2766,9 +2855,9 @@ _class("DOMUtil", "", function(_super){
 	};
 	/**
 	 * 应用json格式的css样式控制DOM元素的外观
-	 * @param el {HTMLELement} 要控制的DOM元素
-	 * @param css {JsonCssData} json格式的CSS数据
-	 * @param className {String} 样式名称
+	 * @param {HTMLELement} el 要控制的DOM元素
+	 * @param {JsonCssData} css json格式的CSS数据
+	 * @param {String} className 样式名称
 	 */
 	this.applyCssStyle = function(el, css, className){
 		var style = css[(el.className == "error" ? "error-" : "") + className];
@@ -2941,6 +3030,7 @@ _class("BoxElement", "", function(_super){
 					var node = new BoxElement();
 					node.create(this, data[k][i]);
 					this.appendNode(node);
+					node = null;
 				}
 			}else{
 				this.setattr(k, data[k]);
@@ -2987,9 +3077,12 @@ _class("BoxElement", "", function(_super){
 			this.__layout.dispose();
 			this.__layout = null;
 		}
+		this.__style = null;
 		this._self.__ptr__ = null;
 		this._self = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.appendNode = function(node){
 		if(node._self && node._self.parentNode == null){
@@ -3261,6 +3354,8 @@ _class("AbstractLayout", "", function(_super){
 		this._component = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	/**
 	 * 使用当前布局，布置一个元素的内部子元素
 	 */
@@ -3294,7 +3389,7 @@ _class("BorderLayout", AbstractLayout, function(_super){
 			//this._self.style.position = "absolute";
 			this._self.style.overflow = "hidden";
 		}
-		//this._self.style.backgroundColor = getColor();
+		//this._self.style.backgroundColor = runtime.getColor();
 		var nodes = obj.childNodes;
 		for(var i = 0, len = nodes.length; i < len; i++){
 			if(nodes[i].nodeType != 1) continue;  //NODE_ELEMENT
@@ -3312,7 +3407,7 @@ _class("BorderLayout", AbstractLayout, function(_super){
 					runtime.log("[WARNING]使用布局的结点只能有一个_align=client的子结点");
 				}
 				this._clientNode = nodes[i];
-				this._clientNode.style.position = "relative";
+				this._clientNode.style.position = "relative";  //[TODO]
 				//this._clientNode.style.overflowX = "hidden";
 				//this._clientNode.style.overflowY = "auto";
 			}else{
@@ -3362,6 +3457,8 @@ _class("BorderLayout", AbstractLayout, function(_super){
 		this._self = null;
 		this._component = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	/*
 	this.layoutElement = function(w, h){
@@ -3467,7 +3564,28 @@ _class("BorderLayout", AbstractLayout, function(_super){
 		this._nodes.push(node);
 	};
 	*/
-	//获取参与布局的结点
+	/*
+	this._getNodes = function(){
+		for(var i = 0, len = this._nodes.length; i < len; i++){
+			this._nodes[i] = null;
+		}
+		this._nodes.splice(0, len);
+		var nodes0 = this._self.childNodes;
+		for(var i = 0, len = nodes0.length; i < len; i++){
+			var node = nodes0[i];
+			if(node.nodeType != 1) continue;  //NODE_ELEMENT
+			if(node.tagName in TAGS) continue;
+			if(node.className in CLASSES) continue;
+			if(node.style.display == "none") continue;
+			this._nodes.push(node);
+			node = null;
+		}
+		return this._nodes;
+	};
+	*/
+	/**
+	 * 获取参与布局的结点
+	 */
 	this._getAlignNodes = function(){
 		var nodes = [];
 		for(var i = 0, len = this._nodes.length; i < len; i++){
@@ -3557,7 +3675,7 @@ _class("BorderLayout", AbstractLayout, function(_super){
 				}
 				//node.setTop(nn);
 				if(node._self == this._clientNode){
-					//var b = this._self.className == "ff_cntas_list" ? 2 : 0;
+					//var b = this._self.className == "wui-PaneContactTable" ? 2 : 0;
 					node.setHeight(n_client/* - b*/);
 				}
 				nn += node._self == this._clientNode ? n_client : node.getHeight();
@@ -3603,6 +3721,12 @@ _class("BorderLayout", AbstractLayout, function(_super){
 				node = null;
 			}
 		}
+		/*
+		for(var i = 0, len = nodes.length; i < len; i++){
+			nodes[i].dispose();
+			nodes[i] = null;
+		}
+		*/
 		nodes = null;
 	};
 });
@@ -3716,6 +3840,8 @@ _class("AjaxEngine", "", function(_super){
 		this._queue = [];
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	this.getTestCase = function(){
 		return this._testCase;
 	};
@@ -3756,12 +3882,12 @@ _class("AjaxEngine", "", function(_super){
 		return http;
 	};
 	/**
-	 * @param method {String} 提交方法(GET|POST)
-	 * @param url {String} 网络调用的url
-	 * @param postData {String|Object} 请求数据
-	 * @param type {String} 返回只类型(text|xml)
-	 * @param callback {Function} 回调函数
-	 * @param cbAgrs {Array} 传给回调方法的参数
+	 * @param {String} method 提交方法(GET|POST)
+	 * @param {String} url 网络调用的url
+	 * @param {String|Object} postData 请求数据
+	 * @param {String} type 返回只类型(text|xml)
+	 * @param {Function} callback 回调函数
+	 * @param {Array} cbAgrs 传给回调方法的参数
 	 * @return {String|XmlDocument}
 	 */
 	this.netInvoke1 = function(method, url, postData, type, callback){
@@ -3837,13 +3963,13 @@ _class("AjaxEngine", "", function(_super){
 	};
 	/**
 	 * 可以复用HTTP组件的网络调用
-	 * @param method {String} 提交方法(GET|POST)
-	 * @param url {String} 网络调用的url
-	 * @param postData {String|Object} 请求数据
-	 * @param type {String} 返回只类型(text|xml)
-	 * @param agent {Object|Function} 回调代理对象或者函数对象
-	 * @param funName {String} 回调代理对象的回调方法名称
-	 * @param cbAgrs {Array} 传给回调方法的参数
+	 * @param {String} method 提交方法(GET|POST)
+	 * @param {String} url 网络调用的url
+	 * @param {String|Object} postData 请求数据
+	 * @param {String} type 返回只类型(text|xml)
+	 * @param {Object|Function} agent 回调代理对象或者函数对象
+	 * @param {String} funName 回调代理对象的回调方法名称
+	 * @param {Array} cbAgrs 传给回调方法的参数
 	 * @return {String|XmlDocument}
 	 * [TODO]
 	 *   1)检查 agent 和 agent[funName] 必须有一个是 Function 对象
@@ -3901,7 +4027,7 @@ _class("AjaxEngine", "", function(_super){
 	};
 	/**
 	 * 暂停异步请求的工作线程
-	 * @param abort {boolean} 是否中断当前的请求
+	 * @param {Boolean} abort 是否中断当前的请求
 	 */
 	this.pauseAjaxThread = function(abort){
 		if(abort){
@@ -3914,10 +4040,9 @@ _class("AjaxEngine", "", function(_super){
 	 * 开始异步请求的工作线程
 	 */
 	this._startAjaxThread = function(msec){
-		var _this = this;
-		this._timer = runtime.getWindow().setTimeout(function(){
-			_this._ajaxThread();
-		}, msec || this._msec);
+		this._timer = runtime.startTimer(msec || this._msec, this, function(){
+			this._ajaxThread();
+		});
 	};
 	this._checkAjaxThread = function(retry){
 		if(this._queue.length != 0){
@@ -4214,9 +4339,9 @@ _class("AjaxEngine", "", function(_super){
 	*/
 	/**
 	 * 调用一个请求队列
-	 * @param queue {Array} 请求队列数组
-	 * @param agent {Object} 回调代理对象
-	 * @param callback {Function} 回调函数
+	 * @param {Array} queue 请求队列数组
+	 * @param {Object} agent 回调代理对象
+	 * @param {Function} callback 回调函数
 	 */
 	this.netInvokeQueue = function(queue, agent, callback){
 		var i = 0;
@@ -4240,7 +4365,7 @@ _class("AjaxEngine", "", function(_super){
 					agent = null;
 					req = null;
 					i++;
-					runtime.getWindow().setTimeout(cb, 0);  //调用下一个
+					runtime.startTimer(0, this, cb);  //调用下一个
 				});
 			}else{  //队列完成
 				callback.apply(agent);
@@ -4258,7 +4383,7 @@ _class("AjaxEngine", "", function(_super){
 	};
 	/**
 	 * 终止指定的 uniqueid 的某个请求，队列正常运转
-	 * @param uniqueid {number} 每个请求的全局唯一编号
+	 * @param {Number} uniqueid 每个请求的全局唯一编号
 	 */
 	this.abort = function(uniqueid){
 		var n = this.getReqIndex(uniqueid);
@@ -4292,6 +4417,8 @@ _class("Ajax", "", function(_super){
 		this._ajax = null;
 		//[memleak]this.__caller__ = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	//具体参数含义参考AjaxEngine对应的方法
 	this.netInvoke = function(method, url, postData, type, agent, funName, cbArgs){
@@ -4359,6 +4486,8 @@ _class("TemplateManager", "", function(_super){
 		}
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	/*
 	this.load1 = function(tpls, callback){
 		var i = 0;
@@ -4404,9 +4533,9 @@ _class("TemplateManager", "", function(_super){
 		callback();
 	};
 	/ **
-	 * @param data {Array} 数组类型的模板列表
-	 * @param agent {Object} 回调代理对象
-	 * @param fun {Function} 回调函数
+	 * @param {Array} data 数组类型的模板列表
+	 * @param {Object} agent 回调代理对象
+	 * @param {Function} fun 回调函数
 	 * /
 	this.load = function(data, agent, fun){
 		this.appendItems(data);
@@ -4422,9 +4551,9 @@ _class("TemplateManager", "", function(_super){
 	*/
 	/**
 	 * 添加一个模板到模板管理类中
-	 * @param name {String} 必选，要添加的模板的名称
-	 * @param type {String} 必选，模板的类型，参见说明
-	 * @param data {String} 必选，模板内容
+	 * @param {String} name 必选，要添加的模板的名称
+	 * @param {String} type 必选，模板的类型，参见说明
+	 * @param {String} data 必选，模板内容
 	 * @return {void} 原始的模板内容
 	 */
 	this._appendItem = function(data){
@@ -4578,8 +4707,8 @@ _class("TemplateManager", "", function(_super){
 	};
 	/**
 	 * 在指定的DOM元素中渲染一个模板的内容
-	 * @param element {HTMLElement}
-	 * @param tplName {String}
+	 * @param {HTMLElement} element
+	 * @param {String} tplName
 	 */
 	this.render = function(element, tplName){
 		/*
@@ -4608,8 +4737,8 @@ _class("TemplateManager", "", function(_super){
 	};
 	/**
 	 * 渲染指定的模板和数据到Pane组件中
-	 * @param pane {Pane} Pane 类型组件
-	 * @param tplName 模板名字
+	 * @param {Pane} pane Pane 类型组件
+	 * @param {String} tplName 模板名字
 	 */
 	this.renderPane = function(pane, tplName){
 		this.render.apply(this, arguments);
@@ -4653,7 +4782,7 @@ _class("TemplateManager", "", function(_super){
 	};
 	/**
 	 * 将字符串转换成可以被字符串表示符号(",')括起来已表示原来字符串意义的字符串
-	 * @param str {String} 要转换的字符串内容
+	 * @param {String} str 要转换的字符串内容
 	 */
 	this.toJsString = function(str){
 		if(typeof str != "string") return "";
@@ -4670,8 +4799,8 @@ _class("TemplateManager", "", function(_super){
 	};
 	/**
 	 * 将类似 ASP 代码的模板解析为一个 JS 函数的代码形式
-	 * @param code {String} 模板的内容
-	 * @param params {String} 模板编译“目标函数”参数列表的字符串形式表示
+	 * @param {String} code 模板的内容
+	 * @param {String} params 模板编译“目标函数”参数列表的字符串形式表示
 	 */
 	this.parse = function(code, params){
 		/*
@@ -4818,154 +4947,6 @@ _class("TemplateManager", "", function(_super){
 	};
 });
 /*</file>*/
-/*<file name="alz/core/EventTarget.js">*/
-_package("alz.core");
-
-/**
- * DOM Event Model
- * 《Document Object Model (DOM) Level 2 Events Specification》
- * http://www.w3.org/TR/2000/REC-DOM-Level-2-Events-20001113
- */
-_class("EventTarget", "", function(_super){
-	this._init = function(){
-		_super._init.call(this);
-		/**
-		 * 所有的事件响应函数都不与组件对象绑定，而是存储在这个映射表中
-		 * [注意]不能将该属性放到原型属性里面去，不然两个对象会共享之
-		 */
-		this._eventMaps = {};  //事件映射表
-		//this._listeners = {};
-		this._listener = null;
-		this._enableEvent = true;
-		this._parent = null;  //组件所属的父组件
-		this._disabled = false;
-	};
-	this.dispose = function(){
-		if(this._disposed) return;
-		this._parent = null;
-		this._listener = null;
-		_super.dispose.apply(this);
-	};
-	this.setEnableEvent = function(v){
-		this._enableEvent = v;
-	};
-	this.getParent = function(){
-		return this._parent;
-	};
-	this.setParent = function(v){
-		this._parent = v;
-	};
-	this.getDisabled = function(){
-		return this._disabled;
-	};
-	this.setDisabled = function(v){
-		if(this._disabled == v) return;
-		this._disabled = v;
-	};
-	this.addEventListener1 = function(eventMap, listener){
-		this._listener = listener;
-		if(eventMap == "mouseevent"){
-			eventMap = "mousedown,mouseup,mousemove,mouseover,mouseout,click,dblclick";
-		}else if(eventMap == "keyevent"){
-			eventMap = "keydown,keypress,keypressup";
-		}
-		var maps = eventMap.split(",");
-		for(var i = 0, len = maps.length; i < len; i++){
-			if(this._self){
-				this._self["on" + maps[i]] = function(ev){
-					ev = ev || runtime.getWindow().event;
-					//if(ev.type == "mousedown") window.alert(121);
-					if(this._ptr._enableEvent){  //如果启用了事件相应机制，则触发事件
-						if(ev.type in this._ptr._listener){
-							this._ptr._listener[ev.type].call(this._ptr, ev);
-						}
-					}
-				};
-			}
-		}
-		maps = null;
-	};
-	this.removeEventListener1 = function(eventMap){
-		if(eventMap == "mouseevent"){
-			eventMap = "mousedown,mouseup,mousemove,mouseover,mouseout,click,dblclick";
-		}else if(eventMap == "keyevent"){
-			eventMap = "keydown,keypress,keypressup";
-		}
-		var maps = eventMap.split(",");
-		for(var i = 0, len = maps.length; i < len; i++){
-			if(this._self){
-				this._self["on" + maps[i]] = null;
-			}
-		}
-		maps = null;
-		this._listener = null;
-	};
-	/**
-	 * 此方法允许在事件目标上注册事件侦听器。
-	 * @java void addEventListener(String type, EventListener listener, boolean useCapture);
-	 * [TODO]检查type的合法值
-	 * [TODO]同一个事件响应函数不应该被绑定两次
-	 */
-	this.addEventListener = function(type, eventHandle, useCapture){
-		if(!this._eventMaps[type]){
-			this._eventMaps[type] = [];  //[TODO]使用{}来模拟多个事件执行顺序的无关性
-		}
-		this._eventMaps[type].push(eventHandle);
-	};
-	this.removeEventListener = function(type, eventHandle, useCapture){
-		if(this._eventMaps[type]){
-			var arr = this._eventMaps[type];
-			for(var i = 0, len = arr.length; i < len; i++){
-				if(eventHandle == null){  //移除所有事件
-					arr[i] = null;
-					arr.removeAt(i, 1);
-				}else if(arr[i] == eventHandle){
-					arr[i] = null;
-					arr.removeAt(i, 1);  //移除元素
-					break;
-				}
-			}
-		}
-	};
-	this.dispatchEvent = function(ev){
-		var ret = true;
-		for(var obj = this; obj; obj = obj._parent){  //默认事件传递顺序为有内向外
-			if(obj._disabled){
-				ev.cancelBubble = true;
-				ret = false;
-				break;  //continue;
-			}
-			if(obj["on" + ev.type]){  //如果组件的时间响应方法存在
-				ret = obj["on" + ev.type](ev);  //应该判断事件响应函数的返回值并做些工作
-				if(ev.cancelBubble){
-					return ret;  //如果禁止冒泡，则退出
-				}
-			}else{
-				var map = obj._eventMaps[ev.type];
-				if(map){  //检查事件映射表中是否有对应的事件
-					var bCancel = false;
-					ev.cancelBubble = false;  //还原
-					for(var i = 0, len = map.length; i < len; i++){
-						ret = map[i].call(obj, ev);
-						bCancel = bCancel || ev.cancelBubble;  //有一个为真，则停止冒泡
-					}
-					ev.cancelBubble = false;  //还原
-					if(bCancel){
-						return ret;  //如果禁止冒泡，则退出
-					}
-				}
-			}
-			//[TODO]事件变更发送者的时候，offsetX,offsetY属性也要随着发生遍化
-			ev.sender = obj;
-			if(obj._self){  //[TODO] obj 有可能是designBox，而它没有_self属性
-				ev.offsetX += obj._self.offsetLeft;
-				ev.offsetY += obj._self.offsetTop;
-			}
-		}
-		return ret;
-	};
-});
-/*</file>*/
 /*<file name="alz/core/Application.js">*/
 _package("alz.core");
 
@@ -4984,19 +4965,19 @@ _class("Application", EventTarget, function(_super){
 		for(var k in o){
 			if(k == "_init") continue;  //[TODO]
 			if(k == "init" || k == "dispose") continue;  //忽略构造或析构函数
-				Application.prototype[k] = o[k];  //绑定到原型上
+			Application.prototype[k] = o[k];  //绑定到原型上
 		}
 		o = null;
 	};
 	*/
 	this._init = function(){
-		__context__.application = this;
+		__context__.application = this;  //绑定到lib上下文环境上
 		_super._init.call(this);
 		this._appconf = null;  //应用配置信息
-		this._parentApp = null;
+		this._parentApp = null;  //父应用
 		this._historyIndex = -1;
-		this.params = null;
-		this._workspace = null;
+		this._params = null;  //传递给应用的参数
+		this._workspace = null;  //工作区组件
 		this._hotkey = {};  //热键
 		this._domTemp = null;
 		/*
@@ -5019,8 +5000,8 @@ _class("Application", EventTarget, function(_super){
 		//注册系统热键
 		runtime.getDom().addEventListener(runtime.getDocument(), "keydown", function(ev){
 			ev = ev || runtime.getWindow().event;
-			if("_" + ev.keyCode in this._hotkey){  //如果存在热键，则执行回掉函数
-				var ret, o = this._hotkey["_" + ev.keyCode];
+			if(ev.keyCode in this._hotkey){  //如果存在热键，则执行回掉函数
+				var ret, o = this._hotkey[ev.keyCode];
 				switch(o.type){
 				case 0: ret = o.agent(ev);break;
 				case 1: ret = o.agent[o.cb](ev);break;
@@ -5047,32 +5028,38 @@ _class("Application", EventTarget, function(_super){
 			delete this._hotkey[k];
 		}
 		this._workspace = null;
-		this.params = null;
+		this._params = null;
 		this._parentApp = null;
 		this._appconf = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.onContentLoad = function(){
 	};
 	/**
 	 * 注册系统热键
-	 * @param keyCode {Number} 热键编码
-	 * @param callback {Function} 回调函数
+	 * @param {Number} keyCode 热键编码
+	 * @param {Function} callback 回调函数
 	 */
 	this.regHotKey = function(keyCode, agent, callback){
 		var type;
-		if(typeof(agent) == "function"){
+		if(typeof agent == "function"){
 			type = 0;
-		}else if(typeof(agent) == "object" && typeof(callback) == "string"){
+		}else if(typeof agent == "object" && typeof callback == "string"){
 			type = 1;
-		}else if(typeof(agent) == "object" && typeof(callback) == "function"){
+		}else if(typeof agent == "object" && typeof callback == "function"){
 			type = 2;
 		}else{
 			runtime.showException("回调参数错误");
 			return;
 		}
-		if(!this._hotkey["_" + keyCode]){
-			this._hotkey["_" + keyCode] = {type: type, agent: agent, cb: callback};
+		if(!this._hotkey[keyCode]){
+			this._hotkey[keyCode] = {
+				"type" : type,
+				"agent": agent,
+				"cb"   : callback
+			};
 		}
 	};
 	this.createDomElement = function(html){
@@ -5087,6 +5074,9 @@ _class("Application", EventTarget, function(_super){
 	};
 	this.setHistoryIndex = function(v){
 		this._historyIndex = v;
+	};
+	this.getParams = function(){
+		return this._params;
 	};
 });
 /*</file>*/
@@ -5129,6 +5119,8 @@ _class("AppManager", "", function(_super){
 		}
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	//调整所有应用的大小
 	this.onResize = function(w, h){
 		for(var i = 0, len = this._list.length; i < len; i++){
@@ -5158,9 +5150,9 @@ _class("AppManager", "", function(_super){
 	};
 	/**
 	 * 创建并注册一个应用的实例
-	 * @param appClassName {String} 要创建的应用的类名
-	 * @param parentApp {Application} 可选，所属的父类
-	 * @param len {Number} 在历史记录中的位置
+	 * @param {String} appClassName 要创建的应用的类名
+	 * @param {Application} parentApp 可选，所属的父类
+	 * @param {Number} len 在历史记录中的位置
 	 */
 	this.createApp = function(appClassName, parentApp, len){
 		var conf = this.getAppConfByClassName(appClassName);
@@ -5252,10 +5244,12 @@ _class("AppManager", "", function(_super){
 /*<file name="alz/core/Plugin.js">*/
 _package("alz.core");
 
+_import("alz.core.EventTarget");
+
 /**
  * 针对Application的插件基类
  */
-_class("Plugin", "", function(_super){
+_class("Plugin", EventTarget, function(_super){
 	this._init = function(){
 		_super._init.call(this);
 		this._app = null;  //插件所属的应用
@@ -5271,6 +5265,8 @@ _class("Plugin", "", function(_super){
 		if(this._disposed) return;
 		this._app = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.getName = function(){
 		return this._name;
@@ -5290,6 +5286,11 @@ _class("PluginManager", "", function(_super){
 		_super._init.call(this);
 		this._plugins = {};
 	};
+	/*
+	this.create = function(context){
+		_super.create.apply(this, arguments);
+	};
+	*/
 	this.dispose = function(){
 		if(this._disposed) return;
 		//[TODO]多个应用的插件注册到同一个地方，则跨窗口应用的插件卸载时会报错
@@ -5298,6 +5299,8 @@ _class("PluginManager", "", function(_super){
 			delete this._plugins[k];
 		}
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	/**
 	 * 判断一个插件是否已经存在
@@ -5322,11 +5325,9 @@ _class("PluginManager", "", function(_super){
 	 * 调用插件的onResize事件
 	 * 给所有插件一个调整自身布局的机会
 	 */
-	this.onResize = function(w, h){
+	this.onResize = function(ev){
 		for(var k in this._plugins){
-			if(this._plugins[k].onResize){
-				this._plugins[k].onResize(w, h);
-			}
+			this._plugins[k].fireEvent(ev);
 		}
 	};
 });
@@ -5362,6 +5363,8 @@ _class("ActionManager", "", function(_super){
 		}
 		this._actionEngine = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.add = function(component){
 		//var act = component._self.getAttribute("_action");
@@ -5527,6 +5530,8 @@ _class("Component", EventTarget, function(_super){
 		"filter"          : 2,
 		"font"            : 2,
 		"fontWeight"      : 2,
+		"fontFamily"      : 2,
+		"fontSize"        : 2,
 		"height"          : 2,
 		"left"            : 2,
 		"lineHeight"      : 2,
@@ -5549,8 +5554,8 @@ _class("Component", EventTarget, function(_super){
 		this._tag = "Component";
 		this._domCreate = false;
 		this._domBuildType = 0;  //0=create,1=bind
-		this._win = runtime.getWindow();
-		this._doc = runtime.getDocument();  //this._win.document
+		this._win = null;  //runtime.getWindow();
+		this._doc = null;  //runtime.getDocument();  //this._win.document
 		this._dom = runtime.getDom();
 		//this._parent = null;
 		this._owner = null;
@@ -5591,6 +5596,24 @@ _class("Component", EventTarget, function(_super){
 	};
 	this.toString = function(){
 		return "{tag:'" + this._className + "',align:'" + this._align + "'}";
+	};
+	/**
+	 * 初始化window,document等环境
+	 */
+	this.setParent2 = function(parent){
+		if(parent){
+			this._parent = parent;
+			if(parent.ownerDocument){
+				this._doc = parent.ownerDocument;
+			}else if(parent._self){
+				this._doc = parent._self.ownerDocument;
+			}
+		}
+		if(!this._doc){
+			window.alert("[Component::setParent2]未能正确识别DocEnv环境，默认使用runtime.getDocument()");
+			this._doc = runtime.getDocument();  //this._win.document
+		}
+		this._win = this._doc.parentWindow || this._doc.defaultView;  //runtime.getWindow();
 	};
 	this.getDoc = function(){
 		if(!this._doc){
@@ -5637,6 +5660,7 @@ _class("Component", EventTarget, function(_super){
 	 */
 	//this.build = function(data){};
 	this.bind = function(obj){
+		this.setParent2(obj.parentNode);
 		/*
 		var props = "color,cursor,display,visibility,opacity,zIndex,"
 			+ "overflow,position,"
@@ -5712,10 +5736,8 @@ _class("Component", EventTarget, function(_super){
 		}
 		this.__init(obj, 1);
 	};
-	//this.create = function(parent){
-	//	this._parent = parent;
-	//};
 	this.create = function(parent){
+		this.setParent2(parent);
 		var obj = this._createElement(this._tagName || "div");
 		//obj.style.border = "1px solid #000000";
 		if(parent) this.setParent(parent, obj);
@@ -5766,6 +5788,8 @@ _class("Component", EventTarget, function(_super){
 		this._doc = null;
 		this._win = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.getElement = function(){
 		return this._self;
@@ -5941,12 +5965,14 @@ _class("Component", EventTarget, function(_super){
 			}
 		}
 	};
-	/*this.resizeTo = function(w, h){
+	/*
+	this.resizeTo = function(w, h){
 		if(this._self){
 			this._self.style.width = Math.max(w, 0) + "px";
 			this._self.style.height = Math.max(h, 0) + "px";
 		}
-	};*/
+	};
+	*/
 	this.getViewPort = function(){
 		return {
 			"x": this._self.scrollLeft,
@@ -6062,6 +6088,280 @@ _class("Component", EventTarget, function(_super){
 	};
 });
 /*</file>*/
+
+/*<file name="alz/action/ActionElement.js">*/
+_package("alz.action");
+
+_import("alz.mui.Component");
+
+/**
+ * 具有action特性的组件的基类
+ */
+_class("ActionElement", Component, function(_super){
+	this._init = function(){
+		_super._init.call(this);
+		this._actionManager = null;
+		this._action = "";
+		this._timer = 0;  //计时器，防止用户多次重复点击
+	};
+	this.create = function(parent, obj, actionManager){
+		this.setParent2(parent);
+		this._actionManager = actionManager;
+		obj.style.position = "";
+		this.init(obj);
+		return obj;
+	};
+	this.init = function(obj){
+		_super.init.apply(this, arguments);
+		this._disabled = this._self.getAttribute("_disabled") == "true";
+		this._action = this._self.getAttribute("_action");
+		if(this._className == "ActionElement"){
+			var _this = this;
+			this._self.onclick = function(ev){
+				return _this.dispatchAction(this, ev || window.event);
+			};
+		}
+	};
+	this.dispose = function(){
+		if(this._disposed) return;
+		if(this._className == "ActionElement"){
+			this._self.onclick = null;
+		}
+		this._actionManager = null;
+		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
+	};
+	this.getAction = function(){
+		return this._action;
+	};
+	this.setAction = function(v){
+		this._action = v;
+	};
+	this.setDisabled = function(v){
+		_super.setDisabled.apply(this, arguments);
+		if(!this._disabled && this._self){
+			this._self.disabled = v;
+		}
+	};
+	this.dispatchAction = function(sender, ev){
+		//try{
+			if(this._disabled) return false;
+			var d = new Date().getTime();
+			if(this._timer != 0){
+				if(d - this._timer <= 500){  //两次点击间隔必须大于500毫秒
+					runtime.log("cancel");
+					this._timer = d;
+					return false;
+				}
+			}
+			this._timer = d;
+			//if(this._self.tagName == "INPUT" && this._self.type == "checkbox"){
+			//onDispatchAction可以用来记录用户的完整的行为，并对此进行“用户行为分析”
+			if(typeof this.onDispatchAction == "function"){
+				this.onDispatchAction(this._action, sender, ev);
+			}
+			if(this._className == "CheckBox"){
+				this._actionManager.dispatchAction(this._action[sender.checked ? 0 : 1], sender, ev);
+			}else{
+				return this._actionManager.dispatchAction(this._action, sender, ev);
+			}
+		/*}catch(ex){  //对所有action触发的逻辑产生的错误进行容错处理
+			var sb = [];
+			for(var k in ex){
+				sb.push(k + "=" + ex[k]);
+			}
+			window.alert("[ActionElement::dispatchAction]\n" + sb.join("\n"));
+		}*/
+	};
+	this.onDispatchAction = function(action, sender, ev){
+		//[TODO]iframe 模式下_actionCollection 未定义
+		//runtime._actionCollection.onDispatchAction(action, sender);
+	};
+});
+/*</file>*/
+/*<file name="alz/action/LinkLabel.js">*/
+_package("alz.action");
+
+_import("alz.action.ActionElement");
+
+/**
+ * 超链接(a)元素的封装
+ */
+_class("LinkLabel", ActionElement, function(_super){
+	this.init = function(obj){
+		_super.init.apply(this, arguments);
+		var _this = this;
+		this._self.onclick = function(ev, sender){  //sender 代表要替换的伪装的 sender 参数
+			ev = ev || window.event;
+			ev.cancelBubble = true;
+			return _this.dispatchAction(sender || this, ev);
+		};
+		this._self.oncontextmenu = function(ev){
+			ev = ev || window.event;
+			ev.cancelBubble = true;
+			return false;
+		};
+	};
+	this.dispose = function(){
+		if(this._disposed) return;
+		this._self.oncontextmenu = null;
+		this._self.onclick = null;
+		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
+	};
+});
+/*</file>*/
+/*<file name="alz/action/Button.js">*/
+_package("alz.action");
+
+_import("alz.action.ActionElement");
+
+/**
+ * input:button元素的封装
+ */
+_class("Button", ActionElement, function(_super){
+	this.init = function(obj){
+		_super.init.apply(this, arguments);
+		var _this = this;
+		this._self.onclick = function(ev){
+			return _this.dispatchAction(this, ev || window.event);
+		};
+		//[TODO]因为setDisabled中的优化考虑，这里目前只能使用如此笨拙的方式驱动
+		//setDisabled工作，其他地方相对成熟的方式是添加强制更新的参数。
+		var v = this._disabled;
+		this._disabled = null;
+		this.setDisabled(v);
+		v = null;
+		/*
+		var rows = this._self.rows;
+		for(var i = 0, len = rows.length; i < len; i++){
+			rows[i].onmouseover = function(){if(_this._disabled) return; this.className = "onHover";};
+			rows[i].onmouseout = function(){if(_this._disabled) return; this.className = "normal";};
+		}
+		rows = null;
+		*/
+	};
+	this.dispose = function(){
+		if(this._disposed) return;
+		this._self.onclick = null;
+		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
+	};
+	this.setDisabled = function(v){
+		_super.setDisabled.apply(this, arguments);
+		if(!this._disabled && this._self){
+			this._self.disabled = v;
+			this._self.style.color = v ? "gray" : "";
+			//this._self.rows[0].className = v ? "OnDisable" : "normal";
+			/*if(v){
+				var btn = this._self.getElementsByTagName("div")[0];
+				if(btn) btn.style.backgroundImage = "url(http://www.sinaimg.cn/rny/sinamail421/images/comm/icon_btn.gif)";
+				btn = null;
+			}*/
+		}
+	};
+	this.setVisible = function(v){
+		if(this._visible == v) return;
+		this._visible = v;
+		if(v){
+			this.setStyleProperty("visibility", "visible");
+			this.setStyleProperty("display", "");
+		}else{
+			this.setStyleProperty("visibility", "hidden");
+			this.setStyleProperty("display", "none");
+		}
+	};
+});
+/*</file>*/
+/*<file name="alz/action/CheckBox.js">*/
+_package("alz.action");
+
+_import("alz.action.ActionElement");
+
+/**
+ * input:checkbox元素的封装
+ */
+_class("CheckBox", ActionElement, function(_super){
+	this.init = function(obj){
+		_super.init.apply(this, arguments);
+		this._action = this._action.split("|");
+		var _this = this;
+		this._self.onclick = function(ev){
+			return _this.dispatchAction(this, ev || window.event);
+		};
+	};
+	this.dispose = function(){
+		if(this._disposed) return;
+		this._self.onclick = null;
+		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
+	};
+});
+/*</file>*/
+/*<file name="alz/action/ComboBox.js">*/
+_package("alz.action");
+
+_import("alz.action.ActionElement");
+
+/**
+ * select元素的封装
+ */
+_class("ComboBox", ActionElement, function(_super){
+	this._init = function(obj){
+		_super._init.call(this);
+	};
+	this.init = function(obj){
+		_super.init.apply(this, arguments);
+		var _this = this;
+		this._self.onchange = function(ev){
+			return _this.dispatchAction(this, ev || window.event);
+		};
+	};
+	this.dispose = function(){
+		if(this._disposed) return;
+		this._self.onchange = null;
+		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
+	};
+});
+/*</file>*/
+/*<file name="alz/action/FormElement.js">*/
+_package("alz.action");
+
+_import("alz.action.ActionElement");
+
+/**
+ * form元素的封装
+ */
+_class("FormElement", ActionElement, function(_super){
+	this._init = function(){
+		_super._init.call(this);
+	};
+	this.init = function(obj){
+		_super.init.apply(this, arguments);
+		var _this = this;
+		this._self.onsubmit = function(ev){
+			return _this.dispatchAction(this, ev || window.event);
+		};
+	};
+	this.dispose = function(){
+		if(this._disposed) return;
+		this._self.onsubmit = null;
+		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
+	};
+	this.resetSelf = function(){
+		this._self.reset();
+	};
+});
+/*</file>*/
+
 /*<file name="alz/mui/TextHistory.js">*/
 _package("alz.mui");
 
@@ -6080,6 +6380,8 @@ _class("TextHistory", "", function(_super){
 		}
 		this._historys = [];
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.getText = function(num){
 		if(num == -1 && this._historys.length - 1 == 0){  //特殊处理这种情况
@@ -6113,7 +6415,7 @@ _class("TextItem", Component, function(_super){
 		//this.create(parent, type, text);
 	};
 	this.create = function(parent, type, text){
-		this._parent = parent;
+		this.setParent2(parent);
 		this._type = type;
 		this._text = text;
 		var obj = window.document.createElement("span");
@@ -6128,6 +6430,8 @@ _class("TextItem", Component, function(_super){
 	};
 	this.dispose = function(){
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.getTextLength = function(){
 		return this._text.length;
@@ -6320,7 +6624,7 @@ _class("LineEdit", Component, function(_super){
 		this._iomode = "";  //in|out
 	};
 	this.create = function(parent, app){
-		this._parent = parent;
+		this.setParent2(parent);
 		if(app) this._app = app;
 		var obj = this._createElement2(parent ? parent._self : null, "div", "aui-LineEdit");
 		this.init(obj);
@@ -6403,6 +6707,8 @@ _class("LineEdit", Component, function(_super){
 			this._self.onkeydown = null;
 		}
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.setCursorType = function(v){
 		this._cursorType = v;
@@ -6572,8 +6878,8 @@ _class("LineEdit", Component, function(_super){
 	};
 	/**
 	 * 往行编辑器里面打印一段文本
-	 * @param str {String} 要打印的文件内容
-	 * @param type {String} 文本的类型
+	 * @param {String} str 要打印的文件内容
+	 * @param {String} type 文本的类型
 	 *             sys 系统信息
 	 *             dbg 调试信息
 	 *             in  标准输入
@@ -6909,6 +7215,7 @@ _class("Console", Component, function(_super){
 	};
 	//this.build = function(parent, node){_super.build.apply(this, arguments);};
 	this.create = function(parent, app){
+		this.setParent2(parent);
 		this._app = app;
 		var obj = this._createElement2(parent, "div", "aui-Console");
 		this.init(obj);
@@ -6971,6 +7278,8 @@ _class("Console", Component, function(_super){
 		this._self.onfocus = null;
 		this._self.onclick = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.resize = function(w, h){
 		//this._lineEdit.setWidth(this._input.parentNode.offsetWidth) + "px";
@@ -7056,8 +7365,8 @@ _class("Console", Component, function(_super){
 	};
 	/**
 	 * 往shell文本屏幕上打印一段文本
-	 * @param str {String} 要打印的文件内容
-	 * @param type {String} 文本的类型
+	 * @param {String} str 要打印的文件内容
+	 * @param {String} type 文本的类型
 	 */
 	this.print = function(str, type){
 		type = type || "sys";
@@ -7100,7 +7409,7 @@ _class("BitButton", Component, function(_super){
 		if(this._tip != ""){
 			this._self.title = this._tip;
 		}
-		this.addEventListener1("mouseevent", {
+		this.addEventGroupListener("mouseevent", {
 			mouseover: function(ev){
 				this._self.style.borderLeft = "1px solid buttonhighlight";
 				this._self.style.borderTop = "1px solid buttonhighlight";
@@ -7139,6 +7448,8 @@ _class("BitButton", Component, function(_super){
 		this._label = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	this.setDisabled = function(v){
 		_super.setDisabled.apply(this, arguments);
 		this.setEnableEvent(!v);
@@ -7170,8 +7481,8 @@ _class("ToggleButton", BitButton, function(_super){
 		this._groupid = this._self.getAttribute("_groupid");
 		if(!this._groupid) throw "ToggleButton 组件缺少 _groupid 属性";
 		runtime.toggleMgr.add(this);
-		this.removeEventListener1("mouseevent");  //[TODO]
-		this.addEventListener1("mouseevent", {
+		this.removeEventGroupListener("mouseevent");  //[TODO]
+		this.addEventGroupListener("mouseevent", {
 			mouseover: function(ev){
 				if(this._toggled) return;
 				this._self.style.borderLeft = "1px solid buttonhighlight";
@@ -7196,6 +7507,8 @@ _class("ToggleButton", BitButton, function(_super){
 	};
 	this.dispose = function(){
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.setToggled = function(v){
 		if(this._toggled == v) return;
@@ -7257,6 +7570,8 @@ _class("ToolBar", Component, function(_super){
 		this._app = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 });
 /*</file>*/
 /*<file name="alz/mui/ModalPanel.js">*/
@@ -7309,6 +7624,8 @@ _class("ModalPanel", Component, function(_super){
 		}
 		this._targetList = [];
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.setVisible = function(v){
 		_super.setVisible.apply(this, arguments);
@@ -7383,6 +7700,8 @@ _class("Container", Component, function(_super){
 		}
 		this._nodes = [];
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.resize = function(w, h){
 		_super.resize.apply(this, arguments);
@@ -7488,6 +7807,8 @@ _class("Panel", Container, function(_super){
 		if(this._disposed) return;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 });
 /*</file>*/
 /*<file name="alz/mui/Pane.js">*/
@@ -7518,6 +7839,8 @@ _class("Pane", Container, function(_super){
 		}
 		this._components = [];
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	/**
 	 * 初始化组件中的 Action 动作组件
@@ -7658,6 +7981,8 @@ _class("Workspace", Container, function(_super){
 		//this._self.onselectstart = null;
 		//this._self.ondragstart = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.setStyleProperty = function(name, value){
 		if(this._self.tagName == "BODY" && (name == "width" || name == "height")){
@@ -7901,6 +8226,8 @@ _class("DropDown", Component, function(_super){
 		}
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	this._bindDrop = function(){
 		if(!this._drop){
 			var id = this._dropid;  //this._self.getAttribute("dropid")
@@ -7957,6 +8284,8 @@ _class("Popup", Component, function(_super){
 		//this._self.onmousedown = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 });
 /*</file>*/
 /*<file name="alz/mui/ListItem.js">*/
@@ -8005,6 +8334,8 @@ _class("ListItem", Component, function(_super){
 		this._self.onselectstart = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 });
 /*</file>*/
 /*<file name="alz/mui/Dialog.js">*/
@@ -8023,6 +8354,7 @@ _class("Dialog", Component, function(_super){
 		this._borders = null;
 	};
 	this.create = function(parent, caption){
+		this.setParent2(parent);
 		this._caption = caption;
 		return _super.create.apply(this, arguments);
 	};
@@ -8120,6 +8452,8 @@ _class("Dialog", Component, function(_super){
 		this._head = null;
 		this._app = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.setApp = function(v){
 		this._app = v;
@@ -8320,6 +8654,8 @@ _class("TabPage", Component, function(_super){
 		this._tabs = [];
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	this.resize = function(w, h){
 		this._self.style.width = w + "px";
 		this._self.style.height = h + "px";
@@ -8436,8 +8772,8 @@ _class("WindowSkinWINXP", Component, function(_super){
 		};
 	};
 	this.create = function(parent){
+		this.setParent2(parent);
 		if(parent){
-			this._parent = parent;
 			for(var k in this._cssHash){
 				this._parent[k]._cssData = this._cssHash[k];
 			}
@@ -8492,6 +8828,8 @@ _class("WindowSkinWINXP", Component, function(_super){
 		this._title1._dlg = null;
 		this._title2._dlg = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.resize = function(w, h){
 		//if(_super.resize.apply(this, arguments)) return true;
@@ -8593,8 +8931,8 @@ _class("WindowSkinWIN2K", Component, function(_super){
 		};
 	};
 	this.create = function(parent){
+		this.setParent2(parent);
 		if(parent){
-			this._parent = parent;
 			for(var k in this._cssHash){
 				this._parent[k]._cssData = this._cssHash[k];
 			}
@@ -8631,6 +8969,8 @@ _class("WindowSkinWIN2K", Component, function(_super){
 		this._title.ondragstart = null;
 		this._title._dlg = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.resize = function(w, h){
 		//if(_super.resize.apply(this, arguments)) return true;
@@ -8743,6 +9083,8 @@ _class("SysBtn", Component, function(_super){
 		this._self.onclick = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	this.onMouseDown = function(ev){
 		this.setCapture(true);
 		/*
@@ -8837,12 +9179,17 @@ _class("Window", Component, function(_super){
 		this._height = 0;
 	};
 	this.create = function(parent){
+		this.setParent2(parent);
 		var obj = runtime.createDomElement(TPL_WIN);
 		if(parent){
 			parent.appendChild(obj);
 		}
 		this.init(obj);
 		return obj;
+	};
+	this.bind = function(obj){
+		this.setParent2(obj.parentNode);
+		this.init(obj);
 	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
@@ -8897,6 +9244,8 @@ _class("Window", Component, function(_super){
 		this._head.onselectstart = null;
 		this._head._dlg = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	/*this.xquery = function(xpath){
 		return runtime.selector.query(xpath, this._self);
@@ -9020,13 +9369,17 @@ runtime = new WebRuntime();
 _package("alz.core");
 
 _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
-	//this._init = function(){};
-	//this.dispose = function(){};
-	this.addMethods = function(destination, source){
-		for(var property in source){
-			destination[property] = source[property];
+	/*
+	this._init = function(){
+	};
+	this.dispose = function(){
+	};
+	*/
+	this.addMethods = function(dest, src){
+		for(var key in src){
+			dest[key] = src[key];
 		}
-		return destination;
+		return dest;
 	};
 	this.toArray = function(iterable){  //prototype $A 的实现代码
 		if(!iterable) return [];
@@ -9053,7 +9406,9 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	};
 	this.showException = function(e, info){
 		var a = this.forIn(e);
-		if(info) a.push(info);
+		if(info){
+			a.push(info);
+		}
 		this._win.alert(a.join("\n"));
 	};
 	/**
@@ -9093,13 +9448,26 @@ _import("alz.core.DOMUtil");
 //_import("alz.core.DOMUtil2");
 _import("alz.core.AjaxEngine");
 _import("alz.core.AppManager");
+//_import("alz.core.ProductManager");
+//_import("alz.core.ActionCollection");
 
 _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
+	var properties = ["_ajax"];
 	this._init = function(){  //加载之后的初始化工作
 		//this.selector = new XPathQuery();
 		this.dom = new DOMUtil();
 		//this.domutil = new DomUtil2();
-		this._ajax = this.getParentRuntime() ? this._parentRuntime.getAjax() : new AjaxEngine();
+		if(!this.getParentRuntime()){
+			this._ajax = new AjaxEngine();  //异步交互引擎
+		}else{
+			for(var i = 0, len = properties.length; i < len; i++){
+				var k = properties[i];
+				this[k] = this._parentRuntime["get" + k.charAt(1).toUpperCase() + k.substr(2)]();
+			}
+			/*
+			this._ajax = this._parentRuntime.getAjax();
+			*/
+		}
 		//this._ajax._userinfo = true;
 		//设置测试用例
 		/*
@@ -9139,11 +9507,14 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 		if(this._debug){
 			window.document.onmousedown = null;
 		}
-		if(this._ajax){
-			if(!this._parentRuntime){
-				this._ajax.dispose();
+		for(var i = 0, len = properties.length; i < len; i++){
+			var k = properties[i];
+			if(this[k]){
+				if(!this._parentRuntime){
+					this[k].dispose();
+				}
+				this[k] = null;
 			}
-			this._ajax = null;
 		}
 		//this.domutil.dispose();
 		//this.domutil = null;
@@ -9171,7 +9542,7 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	};
 	/**
 	 * 去除字符串前后的空白字符
-	 * @param str {String} 要处理的字符串
+	 * @param {String} str 要处理的字符串
 	 */
 	this.trim = function(str){
 		return str.replace(/(^\s*)|(\s*$)/g, "");
@@ -9189,7 +9560,7 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	};
 	/**
 	 * HTML 代码编码方法
-	 * @param html {String} 要编码的 HTML 代码字符串
+	 * @param {String} html 要编码的 HTML 代码字符串
 	 */
 	this.encodeHTML = function(html){
 		if(!html){
@@ -9208,7 +9579,7 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	};
 	/**
 	 * HTML 代码解码方法
-	 * @param html {String} 要解码的 HTML 代码字符串
+	 * @param {String} html 要解码的 HTML 代码字符串
 	 */
 	this.decodeHTML = function(html){
 		if(!html){
@@ -9229,7 +9600,7 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	};
 	/**
 	 * 根据参数 progid 创建一个 ActiveXObject，成功返回对象，失败返回 null
-	 * @param progid {String} ActiveXObject 控件的 PROGID
+	 * @param {String} progid ActiveXObject 控件的 PROGID
 	 */
 	this.createComObject = function(progid){
 		try{
@@ -9266,20 +9637,22 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	 */
 	this.getElementsByClassName = function(className){
 		var a = [];
-		var els = this._doc.getElementsByTagName("*");
-		for(var i = 0, len = els.length; i < len; i++){
-			if(els[i].className.indexOf(className) != -1){
-				a.push(els[i]);
+		var nodes = this._doc.getElementsByTagName("*");
+		for(var i = 0, len = nodes.length; i < len; i++){
+			var node = nodes[i];
+			if(node.className.indexOf(className) != -1){
+				a.push(node);
 			}
 		}
 		return a;
 	};
 	this.openDialog = function(url, width, height){
 		var screen = {
-			w: this._win.screen.availWidth,
-			h: this._win.screen.availHeight
+			"w": this._win.screen.availWidth,
+			"h": this._win.screen.availHeight
 		};
-		var features = "fullscreen=0,channelmode=0,toolbar=0,location=0,directories=0,status=0,menubar=0,scrollbars=0,resizable=1"
+		var features = "fullscreen=0,channelmode=0,toolbar=0,location=0,"
+			+ "directories=0,status=0,menubar=0,scrollbars=0,resizable=1"
 			+ ",left=" + Math.round((screen.w - width) / 2)
 			+ ",top=" + Math.round((screen.h - height) / 2)
 			+ ",width=" + width
@@ -9426,7 +9799,7 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 		rect.h = Math.max(element.clientHeight, element.parentNode.clientHeight);
 		return rect;
 	};
-	this.onResize = function(){
+	this.onResize = function(ev){
 		var rect = this.getViewPort(this.getBody());  //this._workspace.getViewPort()
 		if(this._workspace){
 			this._workspace.resize(rect.w, rect.h);
@@ -9440,7 +9813,7 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	};
 	/**
 	 * 根据DOM元素的ID，并且使用该DOM元素创建一个脚本组件
-	 * @param id {String} 脚本组件所绑定的DOM元素的ID
+	 * @param {String} id 脚本组件所绑定的DOM元素的ID
 	 */
 	this.getComponentById = function(id){
 		return this.initComponent(null, id);
@@ -9448,9 +9821,9 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	/**
 	 * 所有通过该函数操作过的DOM元素都会绑定一个脚本组件对象，并通过该脚本组件可以
 	 * 方便的操作DOM元素的属性。
-	 * @param parent {Component} 父组件
-	 * @param id {String|Component} 组件要绑定的DOM元素的id
-	 * -@param initChild {Boolean} 是否初始化子DOM元素
+	 * @param {Component} parent 父组件
+	 * @param {String|Component} id 组件要绑定的DOM元素的id
+	 * -@param {Boolean} initChild 是否初始化子DOM元素
 	 */
 	this.initComponent = function(parent, id){
 		var obj = typeof id == "string" ? this.getElement(id) : id;
@@ -9499,13 +9872,13 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 		return obj._ptr;
 	};
 	/**
-	 * @param id {String} DOM元素的ID列表，逗号分隔
+	 * @param {String} id DOM元素的ID列表，逗号分隔
 	 * @return {undefined}
 	 */
 	this.initComponents = function(id){
 		var arr = id.split(",");
 		for(var i = 0, len = arr.length; i < len; i++){
-			var c = this.initComponent(runtime._workspace, arr[i]);
+			var c = this.initComponent(this._workspace, arr[i]);
 			var nodes = c._self.childNodes;
 			for(var j = 0, len1 = nodes.length; j < len1; j++){
 				var node = nodes[j];
@@ -9521,8 +9894,8 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	};
 	/**
 	 * 显示一个模态对话框
-	 * @param id {String} 对话框的ID
-	 * @param ownerId {String} 该对话框的所有者的编号
+	 * @param {String} id 对话框的ID
+	 * @param {String} ownerId 该对话框的所有者的编号
 	 * @return {undefined}
 	 */
 	this.showModalDialog = function(id, ownerId){

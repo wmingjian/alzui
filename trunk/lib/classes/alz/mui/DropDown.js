@@ -25,6 +25,8 @@ _class("DropDown", Component, function(){
 		}
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	this._bindDrop = function(){
 		if(!this._drop){
 			var id = this._dropid;  //this._self.getAttribute("dropid")

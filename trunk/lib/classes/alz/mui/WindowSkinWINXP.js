@@ -80,8 +80,8 @@ _class("WindowSkinWINXP", Component, function(){
 		};
 	};
 	this.create = function(parent){
+		this.setParent2(parent);
 		if(parent){
-			this._parent = parent;
 			for(var k in this._cssHash){
 				this._parent[k]._cssData = this._cssHash[k];
 			}
@@ -136,6 +136,8 @@ _class("WindowSkinWINXP", Component, function(){
 		this._title1._dlg = null;
 		this._title2._dlg = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.resize = function(w, h){
 		//if(_super.resize.apply(this, arguments)) return true;

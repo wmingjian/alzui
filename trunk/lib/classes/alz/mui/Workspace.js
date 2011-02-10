@@ -74,6 +74,8 @@ _class("Workspace", Container, function(){
 		//this._self.ondragstart = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	this.setStyleProperty = function(name, value){
 		if(this._self.tagName == "BODY" && (name == "width" || name == "height")){
 			return;  //忽略对 style 属性 width,height 的设置

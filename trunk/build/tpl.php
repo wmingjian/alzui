@@ -2,8 +2,7 @@
 require_once('_inc.php');
 
 $tpls = array(
-	"aui.tpl.js"      => array("aui"     , "/apps/citylife/res/tpl/"),
-	"citylife.tpl.js" => array("citylife", "/apps/citylife/res/tpl/"),
+	"aui.tpl.js"      => array("aui"     , "/alzui-X201/res/tpl/"),
 	"test_win.tpl.js" => array("test_win", "/alzui-X201/res/tpl/")
 );
 
@@ -23,6 +22,7 @@ $code = "__runtime__.regTpl(\"" . $tpls[$f][0] . "\", {\n"
 	. "\n});";
 */
 $code = file_get_contents($path_root . preg_replace('/\/lib\//', "/lib/lib/", $f));
+$code = mb_convert_encoding($code, 'utf-8', 'gb2312');
 $code = preg_replace_callback('/\n(\w+\.xml)/', "do_import", $code);
 
 header("Content-Type: text/javascript; charset=utf-8");

@@ -19,4 +19,6 @@ _class("CheckBox", ActionElement, function(){
 		this._self.onclick = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 });

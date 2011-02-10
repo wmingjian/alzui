@@ -7,14 +7,6 @@
  */
 (function(){with(runtime.createContext("ui", "core")){
 
-var _tmpl = {
-	"dialog": "<div html=\"true\" aui=\"{align:'top',height:18;}\" style=\"width:100%;height:18px;background-color:activecaption;border:0px;padding:0px;\">"
-		+ "<label style=\"position:absolute;height:14px;background-color:gray;left:4px;top:4px;font:bold 12px 宋体;line-height:100%;color:white;text-align:left;cursor:default;padding-top:2px;\">{$caption}</label>"
-		+ "<img style=\"position:absolute;width:16px;height:14px;top:4px;right:4px;vertical-align:middle;background-color:buttonface;\" src=\"{$pathAui}lib/images/AWindow_closeup.gif\" />"
-		+ "</div>"
-		+ "<div id=\"dlgBody\" aui=\"{align:'client'}\" style=\"position:absolute;top:21px;width:100%;height:300px;background-color:#666666;border:0px;padding:0px;\"></div>"
-};
-
 /*<file name="alz/mui/ToggleGroup.js">*/
 _package("alz.mui");
 
@@ -110,6 +102,8 @@ _class("Component", EventTarget, function(_super){
 		"filter"          : 2,
 		"font"            : 2,
 		"fontWeight"      : 2,
+		"fontFamily"      : 2,
+		"fontSize"        : 2,
 		"height"          : 2,
 		"left"            : 2,
 		"lineHeight"      : 2,
@@ -132,8 +126,8 @@ _class("Component", EventTarget, function(_super){
 		this._tag = "Component";
 		this._domCreate = false;
 		this._domBuildType = 0;  //0=create,1=bind
-		this._win = runtime.getWindow();
-		this._doc = runtime.getDocument();  //this._win.document
+		this._win = null;  //runtime.getWindow();
+		this._doc = null;  //runtime.getDocument();  //this._win.document
 		this._dom = runtime.getDom();
 		//this._parent = null;
 		this._owner = null;
@@ -174,6 +168,24 @@ _class("Component", EventTarget, function(_super){
 	};
 	this.toString = function(){
 		return "{tag:'" + this._className + "',align:'" + this._align + "'}";
+	};
+	/**
+	 * 初始化window,document等环境
+	 */
+	this.setParent2 = function(parent){
+		if(parent){
+			this._parent = parent;
+			if(parent.ownerDocument){
+				this._doc = parent.ownerDocument;
+			}else if(parent._self){
+				this._doc = parent._self.ownerDocument;
+			}
+		}
+		if(!this._doc){
+			window.alert("[Component::setParent2]未能正确识别DocEnv环境，默认使用runtime.getDocument()");
+			this._doc = runtime.getDocument();  //this._win.document
+		}
+		this._win = this._doc.parentWindow || this._doc.defaultView;  //runtime.getWindow();
 	};
 	this.getDoc = function(){
 		if(!this._doc){
@@ -220,6 +232,7 @@ _class("Component", EventTarget, function(_super){
 	 */
 	//this.build = function(data){};
 	this.bind = function(obj){
+		this.setParent2(obj.parentNode);
 		/*
 		var props = "color,cursor,display,visibility,opacity,zIndex,"
 			+ "overflow,position,"
@@ -295,10 +308,8 @@ _class("Component", EventTarget, function(_super){
 		}
 		this.__init(obj, 1);
 	};
-	//this.create = function(parent){
-	//	this._parent = parent;
-	//};
 	this.create = function(parent){
+		this.setParent2(parent);
 		var obj = this._createElement(this._tagName || "div");
 		//obj.style.border = "1px solid #000000";
 		if(parent) this.setParent(parent, obj);
@@ -349,6 +360,8 @@ _class("Component", EventTarget, function(_super){
 		this._doc = null;
 		this._win = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.getElement = function(){
 		return this._self;
@@ -524,12 +537,14 @@ _class("Component", EventTarget, function(_super){
 			}
 		}
 	};
-	/*this.resizeTo = function(w, h){
+	/*
+	this.resizeTo = function(w, h){
 		if(this._self){
 			this._self.style.width = Math.max(w, 0) + "px";
 			this._self.style.height = Math.max(h, 0) + "px";
 		}
-	};*/
+	};
+	*/
 	this.getViewPort = function(){
 		return {
 			"x": this._self.scrollLeft,
@@ -645,6 +660,280 @@ _class("Component", EventTarget, function(_super){
 	};
 });
 /*</file>*/
+
+/*<file name="alz/action/ActionElement.js">*/
+_package("alz.action");
+
+_import("alz.mui.Component");
+
+/**
+ * 具有action特性的组件的基类
+ */
+_class("ActionElement", Component, function(_super){
+	this._init = function(){
+		_super._init.call(this);
+		this._actionManager = null;
+		this._action = "";
+		this._timer = 0;  //计时器，防止用户多次重复点击
+	};
+	this.create = function(parent, obj, actionManager){
+		this.setParent2(parent);
+		this._actionManager = actionManager;
+		obj.style.position = "";
+		this.init(obj);
+		return obj;
+	};
+	this.init = function(obj){
+		_super.init.apply(this, arguments);
+		this._disabled = this._self.getAttribute("_disabled") == "true";
+		this._action = this._self.getAttribute("_action");
+		if(this._className == "ActionElement"){
+			var _this = this;
+			this._self.onclick = function(ev){
+				return _this.dispatchAction(this, ev || window.event);
+			};
+		}
+	};
+	this.dispose = function(){
+		if(this._disposed) return;
+		if(this._className == "ActionElement"){
+			this._self.onclick = null;
+		}
+		this._actionManager = null;
+		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
+	};
+	this.getAction = function(){
+		return this._action;
+	};
+	this.setAction = function(v){
+		this._action = v;
+	};
+	this.setDisabled = function(v){
+		_super.setDisabled.apply(this, arguments);
+		if(!this._disabled && this._self){
+			this._self.disabled = v;
+		}
+	};
+	this.dispatchAction = function(sender, ev){
+		//try{
+			if(this._disabled) return false;
+			var d = new Date().getTime();
+			if(this._timer != 0){
+				if(d - this._timer <= 500){  //两次点击间隔必须大于500毫秒
+					runtime.log("cancel");
+					this._timer = d;
+					return false;
+				}
+			}
+			this._timer = d;
+			//if(this._self.tagName == "INPUT" && this._self.type == "checkbox"){
+			//onDispatchAction可以用来记录用户的完整的行为，并对此进行“用户行为分析”
+			if(typeof this.onDispatchAction == "function"){
+				this.onDispatchAction(this._action, sender, ev);
+			}
+			if(this._className == "CheckBox"){
+				this._actionManager.dispatchAction(this._action[sender.checked ? 0 : 1], sender, ev);
+			}else{
+				return this._actionManager.dispatchAction(this._action, sender, ev);
+			}
+		/*}catch(ex){  //对所有action触发的逻辑产生的错误进行容错处理
+			var sb = [];
+			for(var k in ex){
+				sb.push(k + "=" + ex[k]);
+			}
+			window.alert("[ActionElement::dispatchAction]\n" + sb.join("\n"));
+		}*/
+	};
+	this.onDispatchAction = function(action, sender, ev){
+		//[TODO]iframe 模式下_actionCollection 未定义
+		//runtime._actionCollection.onDispatchAction(action, sender);
+	};
+});
+/*</file>*/
+/*<file name="alz/action/LinkLabel.js">*/
+_package("alz.action");
+
+_import("alz.action.ActionElement");
+
+/**
+ * 超链接(a)元素的封装
+ */
+_class("LinkLabel", ActionElement, function(_super){
+	this.init = function(obj){
+		_super.init.apply(this, arguments);
+		var _this = this;
+		this._self.onclick = function(ev, sender){  //sender 代表要替换的伪装的 sender 参数
+			ev = ev || window.event;
+			ev.cancelBubble = true;
+			return _this.dispatchAction(sender || this, ev);
+		};
+		this._self.oncontextmenu = function(ev){
+			ev = ev || window.event;
+			ev.cancelBubble = true;
+			return false;
+		};
+	};
+	this.dispose = function(){
+		if(this._disposed) return;
+		this._self.oncontextmenu = null;
+		this._self.onclick = null;
+		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
+	};
+});
+/*</file>*/
+/*<file name="alz/action/Button.js">*/
+_package("alz.action");
+
+_import("alz.action.ActionElement");
+
+/**
+ * input:button元素的封装
+ */
+_class("Button", ActionElement, function(_super){
+	this.init = function(obj){
+		_super.init.apply(this, arguments);
+		var _this = this;
+		this._self.onclick = function(ev){
+			return _this.dispatchAction(this, ev || window.event);
+		};
+		//[TODO]因为setDisabled中的优化考虑，这里目前只能使用如此笨拙的方式驱动
+		//setDisabled工作，其他地方相对成熟的方式是添加强制更新的参数。
+		var v = this._disabled;
+		this._disabled = null;
+		this.setDisabled(v);
+		v = null;
+		/*
+		var rows = this._self.rows;
+		for(var i = 0, len = rows.length; i < len; i++){
+			rows[i].onmouseover = function(){if(_this._disabled) return; this.className = "onHover";};
+			rows[i].onmouseout = function(){if(_this._disabled) return; this.className = "normal";};
+		}
+		rows = null;
+		*/
+	};
+	this.dispose = function(){
+		if(this._disposed) return;
+		this._self.onclick = null;
+		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
+	};
+	this.setDisabled = function(v){
+		_super.setDisabled.apply(this, arguments);
+		if(!this._disabled && this._self){
+			this._self.disabled = v;
+			this._self.style.color = v ? "gray" : "";
+			//this._self.rows[0].className = v ? "OnDisable" : "normal";
+			/*if(v){
+				var btn = this._self.getElementsByTagName("div")[0];
+				if(btn) btn.style.backgroundImage = "url(http://www.sinaimg.cn/rny/sinamail421/images/comm/icon_btn.gif)";
+				btn = null;
+			}*/
+		}
+	};
+	this.setVisible = function(v){
+		if(this._visible == v) return;
+		this._visible = v;
+		if(v){
+			this.setStyleProperty("visibility", "visible");
+			this.setStyleProperty("display", "");
+		}else{
+			this.setStyleProperty("visibility", "hidden");
+			this.setStyleProperty("display", "none");
+		}
+	};
+});
+/*</file>*/
+/*<file name="alz/action/CheckBox.js">*/
+_package("alz.action");
+
+_import("alz.action.ActionElement");
+
+/**
+ * input:checkbox元素的封装
+ */
+_class("CheckBox", ActionElement, function(_super){
+	this.init = function(obj){
+		_super.init.apply(this, arguments);
+		this._action = this._action.split("|");
+		var _this = this;
+		this._self.onclick = function(ev){
+			return _this.dispatchAction(this, ev || window.event);
+		};
+	};
+	this.dispose = function(){
+		if(this._disposed) return;
+		this._self.onclick = null;
+		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
+	};
+});
+/*</file>*/
+/*<file name="alz/action/ComboBox.js">*/
+_package("alz.action");
+
+_import("alz.action.ActionElement");
+
+/**
+ * select元素的封装
+ */
+_class("ComboBox", ActionElement, function(_super){
+	this._init = function(obj){
+		_super._init.call(this);
+	};
+	this.init = function(obj){
+		_super.init.apply(this, arguments);
+		var _this = this;
+		this._self.onchange = function(ev){
+			return _this.dispatchAction(this, ev || window.event);
+		};
+	};
+	this.dispose = function(){
+		if(this._disposed) return;
+		this._self.onchange = null;
+		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
+	};
+});
+/*</file>*/
+/*<file name="alz/action/FormElement.js">*/
+_package("alz.action");
+
+_import("alz.action.ActionElement");
+
+/**
+ * form元素的封装
+ */
+_class("FormElement", ActionElement, function(_super){
+	this._init = function(){
+		_super._init.call(this);
+	};
+	this.init = function(obj){
+		_super.init.apply(this, arguments);
+		var _this = this;
+		this._self.onsubmit = function(ev){
+			return _this.dispatchAction(this, ev || window.event);
+		};
+	};
+	this.dispose = function(){
+		if(this._disposed) return;
+		this._self.onsubmit = null;
+		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
+	};
+	this.resetSelf = function(){
+		this._self.reset();
+	};
+});
+/*</file>*/
+
 /*<file name="alz/mui/TextHistory.js">*/
 _package("alz.mui");
 
@@ -663,6 +952,8 @@ _class("TextHistory", "", function(_super){
 		}
 		this._historys = [];
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.getText = function(num){
 		if(num == -1 && this._historys.length - 1 == 0){  //特殊处理这种情况
@@ -696,7 +987,7 @@ _class("TextItem", Component, function(_super){
 		//this.create(parent, type, text);
 	};
 	this.create = function(parent, type, text){
-		this._parent = parent;
+		this.setParent2(parent);
 		this._type = type;
 		this._text = text;
 		var obj = window.document.createElement("span");
@@ -711,6 +1002,8 @@ _class("TextItem", Component, function(_super){
 	};
 	this.dispose = function(){
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.getTextLength = function(){
 		return this._text.length;
@@ -903,7 +1196,7 @@ _class("LineEdit", Component, function(_super){
 		this._iomode = "";  //in|out
 	};
 	this.create = function(parent, app){
-		this._parent = parent;
+		this.setParent2(parent);
 		if(app) this._app = app;
 		var obj = this._createElement2(parent ? parent._self : null, "div", "aui-LineEdit");
 		this.init(obj);
@@ -986,6 +1279,8 @@ _class("LineEdit", Component, function(_super){
 			this._self.onkeydown = null;
 		}
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.setCursorType = function(v){
 		this._cursorType = v;
@@ -1155,8 +1450,8 @@ _class("LineEdit", Component, function(_super){
 	};
 	/**
 	 * 往行编辑器里面打印一段文本
-	 * @param str {String} 要打印的文件内容
-	 * @param type {String} 文本的类型
+	 * @param {String} str 要打印的文件内容
+	 * @param {String} type 文本的类型
 	 *             sys 系统信息
 	 *             dbg 调试信息
 	 *             in  标准输入
@@ -1492,6 +1787,7 @@ _class("Console", Component, function(_super){
 	};
 	//this.build = function(parent, node){_super.build.apply(this, arguments);};
 	this.create = function(parent, app){
+		this.setParent2(parent);
 		this._app = app;
 		var obj = this._createElement2(parent, "div", "aui-Console");
 		this.init(obj);
@@ -1554,6 +1850,8 @@ _class("Console", Component, function(_super){
 		this._self.onfocus = null;
 		this._self.onclick = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.resize = function(w, h){
 		//this._lineEdit.setWidth(this._input.parentNode.offsetWidth) + "px";
@@ -1639,8 +1937,8 @@ _class("Console", Component, function(_super){
 	};
 	/**
 	 * 往shell文本屏幕上打印一段文本
-	 * @param str {String} 要打印的文件内容
-	 * @param type {String} 文本的类型
+	 * @param {String} str 要打印的文件内容
+	 * @param {String} type 文本的类型
 	 */
 	this.print = function(str, type){
 		type = type || "sys";
@@ -1683,7 +1981,7 @@ _class("BitButton", Component, function(_super){
 		if(this._tip != ""){
 			this._self.title = this._tip;
 		}
-		this.addEventListener1("mouseevent", {
+		this.addEventGroupListener("mouseevent", {
 			mouseover: function(ev){
 				this._self.style.borderLeft = "1px solid buttonhighlight";
 				this._self.style.borderTop = "1px solid buttonhighlight";
@@ -1722,6 +2020,8 @@ _class("BitButton", Component, function(_super){
 		this._label = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	this.setDisabled = function(v){
 		_super.setDisabled.apply(this, arguments);
 		this.setEnableEvent(!v);
@@ -1753,8 +2053,8 @@ _class("ToggleButton", BitButton, function(_super){
 		this._groupid = this._self.getAttribute("_groupid");
 		if(!this._groupid) throw "ToggleButton 组件缺少 _groupid 属性";
 		runtime.toggleMgr.add(this);
-		this.removeEventListener1("mouseevent");  //[TODO]
-		this.addEventListener1("mouseevent", {
+		this.removeEventGroupListener("mouseevent");  //[TODO]
+		this.addEventGroupListener("mouseevent", {
 			mouseover: function(ev){
 				if(this._toggled) return;
 				this._self.style.borderLeft = "1px solid buttonhighlight";
@@ -1779,6 +2079,8 @@ _class("ToggleButton", BitButton, function(_super){
 	};
 	this.dispose = function(){
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.setToggled = function(v){
 		if(this._toggled == v) return;
@@ -1840,6 +2142,8 @@ _class("ToolBar", Component, function(_super){
 		this._app = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 });
 /*</file>*/
 /*<file name="alz/mui/ModalPanel.js">*/
@@ -1892,6 +2196,8 @@ _class("ModalPanel", Component, function(_super){
 		}
 		this._targetList = [];
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.setVisible = function(v){
 		_super.setVisible.apply(this, arguments);
@@ -1966,6 +2272,8 @@ _class("Container", Component, function(_super){
 		}
 		this._nodes = [];
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.resize = function(w, h){
 		_super.resize.apply(this, arguments);
@@ -2071,6 +2379,8 @@ _class("Panel", Container, function(_super){
 		if(this._disposed) return;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 });
 /*</file>*/
 /*<file name="alz/mui/Pane.js">*/
@@ -2101,6 +2411,8 @@ _class("Pane", Container, function(_super){
 		}
 		this._components = [];
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	/**
 	 * 初始化组件中的 Action 动作组件
@@ -2241,6 +2553,8 @@ _class("Workspace", Container, function(_super){
 		//this._self.onselectstart = null;
 		//this._self.ondragstart = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.setStyleProperty = function(name, value){
 		if(this._self.tagName == "BODY" && (name == "width" || name == "height")){
@@ -2484,6 +2798,8 @@ _class("DropDown", Component, function(_super){
 		}
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	this._bindDrop = function(){
 		if(!this._drop){
 			var id = this._dropid;  //this._self.getAttribute("dropid")
@@ -2540,6 +2856,8 @@ _class("Popup", Component, function(_super){
 		//this._self.onmousedown = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 });
 /*</file>*/
 /*<file name="alz/mui/ListItem.js">*/
@@ -2588,6 +2906,8 @@ _class("ListItem", Component, function(_super){
 		this._self.onselectstart = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 });
 /*</file>*/
 /*<file name="alz/mui/Dialog.js">*/
@@ -2606,6 +2926,7 @@ _class("Dialog", Component, function(_super){
 		this._borders = null;
 	};
 	this.create = function(parent, caption){
+		this.setParent2(parent);
 		this._caption = caption;
 		return _super.create.apply(this, arguments);
 	};
@@ -2703,6 +3024,8 @@ _class("Dialog", Component, function(_super){
 		this._head = null;
 		this._app = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.setApp = function(v){
 		this._app = v;
@@ -2903,6 +3226,8 @@ _class("TabPage", Component, function(_super){
 		this._tabs = [];
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	this.resize = function(w, h){
 		this._self.style.width = w + "px";
 		this._self.style.height = h + "px";
@@ -3019,8 +3344,8 @@ _class("WindowSkinWINXP", Component, function(_super){
 		};
 	};
 	this.create = function(parent){
+		this.setParent2(parent);
 		if(parent){
-			this._parent = parent;
 			for(var k in this._cssHash){
 				this._parent[k]._cssData = this._cssHash[k];
 			}
@@ -3075,6 +3400,8 @@ _class("WindowSkinWINXP", Component, function(_super){
 		this._title1._dlg = null;
 		this._title2._dlg = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.resize = function(w, h){
 		//if(_super.resize.apply(this, arguments)) return true;
@@ -3176,8 +3503,8 @@ _class("WindowSkinWIN2K", Component, function(_super){
 		};
 	};
 	this.create = function(parent){
+		this.setParent2(parent);
 		if(parent){
-			this._parent = parent;
 			for(var k in this._cssHash){
 				this._parent[k]._cssData = this._cssHash[k];
 			}
@@ -3214,6 +3541,8 @@ _class("WindowSkinWIN2K", Component, function(_super){
 		this._title.ondragstart = null;
 		this._title._dlg = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.resize = function(w, h){
 		//if(_super.resize.apply(this, arguments)) return true;
@@ -3326,6 +3655,8 @@ _class("SysBtn", Component, function(_super){
 		this._self.onclick = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	this.onMouseDown = function(ev){
 		this.setCapture(true);
 		/*
@@ -3420,12 +3751,17 @@ _class("Window", Component, function(_super){
 		this._height = 0;
 	};
 	this.create = function(parent){
+		this.setParent2(parent);
 		var obj = runtime.createDomElement(TPL_WIN);
 		if(parent){
 			parent.appendChild(obj);
 		}
 		this.init(obj);
 		return obj;
+	};
+	this.bind = function(obj){
+		this.setParent2(obj.parentNode);
+		this.init(obj);
 	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
@@ -3480,6 +3816,8 @@ _class("Window", Component, function(_super){
 		this._head.onselectstart = null;
 		this._head._dlg = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	/*this.xquery = function(xpath){
 		return runtime.selector.query(xpath, this._self);
@@ -3682,7 +4020,7 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 		rect.h = Math.max(element.clientHeight, element.parentNode.clientHeight);
 		return rect;
 	};
-	this.onResize = function(){
+	this.onResize = function(ev){
 		var rect = this.getViewPort(this.getBody());  //this._workspace.getViewPort()
 		if(this._workspace){
 			this._workspace.resize(rect.w, rect.h);
@@ -3696,7 +4034,7 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	};
 	/**
 	 * 根据DOM元素的ID，并且使用该DOM元素创建一个脚本组件
-	 * @param id {String} 脚本组件所绑定的DOM元素的ID
+	 * @param {String} id 脚本组件所绑定的DOM元素的ID
 	 */
 	this.getComponentById = function(id){
 		return this.initComponent(null, id);
@@ -3704,9 +4042,9 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	/**
 	 * 所有通过该函数操作过的DOM元素都会绑定一个脚本组件对象，并通过该脚本组件可以
 	 * 方便的操作DOM元素的属性。
-	 * @param parent {Component} 父组件
-	 * @param id {String|Component} 组件要绑定的DOM元素的id
-	 * -@param initChild {Boolean} 是否初始化子DOM元素
+	 * @param {Component} parent 父组件
+	 * @param {String|Component} id 组件要绑定的DOM元素的id
+	 * -@param {Boolean} initChild 是否初始化子DOM元素
 	 */
 	this.initComponent = function(parent, id){
 		var obj = typeof id == "string" ? this.getElement(id) : id;
@@ -3755,13 +4093,13 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 		return obj._ptr;
 	};
 	/**
-	 * @param id {String} DOM元素的ID列表，逗号分隔
+	 * @param {String} id DOM元素的ID列表，逗号分隔
 	 * @return {undefined}
 	 */
 	this.initComponents = function(id){
 		var arr = id.split(",");
 		for(var i = 0, len = arr.length; i < len; i++){
-			var c = this.initComponent(runtime._workspace, arr[i]);
+			var c = this.initComponent(this._workspace, arr[i]);
 			var nodes = c._self.childNodes;
 			for(var j = 0, len1 = nodes.length; j < len1; j++){
 				var node = nodes[j];
@@ -3777,8 +4115,8 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	};
 	/**
 	 * 显示一个模态对话框
-	 * @param id {String} 对话框的ID
-	 * @param ownerId {String} 该对话框的所有者的编号
+	 * @param {String} id 对话框的ID
+	 * @param {String} ownerId 该对话框的所有者的编号
 	 * @return {undefined}
 	 */
 	this.showModalDialog = function(id, ownerId){

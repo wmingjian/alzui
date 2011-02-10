@@ -16,7 +16,6 @@ import alz.layout.BorderLayout;
 import alz.core.AjaxEngine;
 import alz.core.Ajax;
 import alz.template.TemplateManager;
-import alz.core.EventTarget;
 import alz.core.Application;
 import alz.core.AppManager;
 import alz.core.Plugin;

@@ -41,6 +41,8 @@ _class("TemplateManager", "", function(){
 		}
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	/*
 	this.load1 = function(tpls, callback){
 		var i = 0;
@@ -86,9 +88,9 @@ _class("TemplateManager", "", function(){
 		callback();
 	};
 	/ **
-	 * @param data {Array} 数组类型的模板列表
-	 * @param agent {Object} 回调代理对象
-	 * @param fun {Function} 回调函数
+	 * @param {Array} data 数组类型的模板列表
+	 * @param {Object} agent 回调代理对象
+	 * @param {Function} fun 回调函数
 	 * /
 	this.load = function(data, agent, fun){
 		this.appendItems(data);
@@ -104,9 +106,9 @@ _class("TemplateManager", "", function(){
 	*/
 	/**
 	 * 添加一个模板到模板管理类中
-	 * @param name {String} 必选，要添加的模板的名称
-	 * @param type {String} 必选，模板的类型，参见说明
-	 * @param data {String} 必选，模板内容
+	 * @param {String} name 必选，要添加的模板的名称
+	 * @param {String} type 必选，模板的类型，参见说明
+	 * @param {String} data 必选，模板内容
 	 * @return {void} 原始的模板内容
 	 */
 	this._appendItem = function(data){
@@ -260,8 +262,8 @@ _class("TemplateManager", "", function(){
 	};
 	/**
 	 * 在指定的DOM元素中渲染一个模板的内容
-	 * @param element {HTMLElement}
-	 * @param tplName {String}
+	 * @param {HTMLElement} element
+	 * @param {String} tplName
 	 */
 	this.render = function(element, tplName){
 		/*
@@ -290,8 +292,8 @@ _class("TemplateManager", "", function(){
 	};
 	/**
 	 * 渲染指定的模板和数据到Pane组件中
-	 * @param pane {Pane} Pane 类型组件
-	 * @param tplName 模板名字
+	 * @param {Pane} pane Pane 类型组件
+	 * @param {String} tplName 模板名字
 	 */
 	this.renderPane = function(pane, tplName){
 		this.render.apply(this, arguments);
@@ -335,7 +337,7 @@ _class("TemplateManager", "", function(){
 	};
 	/**
 	 * 将字符串转换成可以被字符串表示符号(",')括起来已表示原来字符串意义的字符串
-	 * @param str {String} 要转换的字符串内容
+	 * @param {String} str 要转换的字符串内容
 	 */
 	this.toJsString = function(str){
 		if(typeof str != "string") return "";
@@ -352,8 +354,8 @@ _class("TemplateManager", "", function(){
 	};
 	/**
 	 * 将类似 ASP 代码的模板解析为一个 JS 函数的代码形式
-	 * @param code {String} 模板的内容
-	 * @param params {String} 模板编译“目标函数”参数列表的字符串形式表示
+	 * @param {String} code 模板的内容
+	 * @param {String} params 模板编译“目标函数”参数列表的字符串形式表示
 	 */
 	this.parse = function(code, params){
 		/*

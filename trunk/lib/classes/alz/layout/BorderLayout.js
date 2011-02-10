@@ -23,7 +23,7 @@ _class("BorderLayout", AbstractLayout, function(){
 			//this._self.style.position = "absolute";
 			this._self.style.overflow = "hidden";
 		}
-		//this._self.style.backgroundColor = getColor();
+		//this._self.style.backgroundColor = runtime.getColor();
 		var nodes = obj.childNodes;
 		for(var i = 0, len = nodes.length; i < len; i++){
 			if(nodes[i].nodeType != 1) continue;  //NODE_ELEMENT
@@ -41,7 +41,7 @@ _class("BorderLayout", AbstractLayout, function(){
 					runtime.log("[WARNING]使用布局的结点只能有一个_align=client的子结点");
 				}
 				this._clientNode = nodes[i];
-				this._clientNode.style.position = "relative";
+				this._clientNode.style.position = "relative";  //[TODO]
 				//this._clientNode.style.overflowX = "hidden";
 				//this._clientNode.style.overflowY = "auto";
 			}else{
@@ -91,6 +91,8 @@ _class("BorderLayout", AbstractLayout, function(){
 		this._self = null;
 		this._component = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	/*
 	this.layoutElement = function(w, h){
@@ -196,7 +198,28 @@ _class("BorderLayout", AbstractLayout, function(){
 		this._nodes.push(node);
 	};
 	*/
-	//获取参与布局的结点
+	/*
+	this._getNodes = function(){
+		for(var i = 0, len = this._nodes.length; i < len; i++){
+			this._nodes[i] = null;
+		}
+		this._nodes.splice(0, len);
+		var nodes0 = this._self.childNodes;
+		for(var i = 0, len = nodes0.length; i < len; i++){
+			var node = nodes0[i];
+			if(node.nodeType != 1) continue;  //NODE_ELEMENT
+			if(node.tagName in TAGS) continue;
+			if(node.className in CLASSES) continue;
+			if(node.style.display == "none") continue;
+			this._nodes.push(node);
+			node = null;
+		}
+		return this._nodes;
+	};
+	*/
+	/**
+	 * 获取参与布局的结点
+	 */
 	this._getAlignNodes = function(){
 		var nodes = [];
 		for(var i = 0, len = this._nodes.length; i < len; i++){
@@ -286,7 +309,7 @@ _class("BorderLayout", AbstractLayout, function(){
 				}
 				//node.setTop(nn);
 				if(node._self == this._clientNode){
-					//var b = this._self.className == "ff_cntas_list" ? 2 : 0;
+					//var b = this._self.className == "wui-PaneContactTable" ? 2 : 0;
 					node.setHeight(n_client/* - b*/);
 				}
 				nn += node._self == this._clientNode ? n_client : node.getHeight();
@@ -332,6 +355,12 @@ _class("BorderLayout", AbstractLayout, function(){
 				node = null;
 			}
 		}
+		/*
+		for(var i = 0, len = nodes.length; i < len; i++){
+			nodes[i].dispose();
+			nodes[i] = null;
+		}
+		*/
 		nodes = null;
 	};
 });

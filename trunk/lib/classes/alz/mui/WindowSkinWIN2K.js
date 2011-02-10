@@ -57,8 +57,8 @@ _class("WindowSkinWIN2K", Component, function(){
 		};
 	};
 	this.create = function(parent){
+		this.setParent2(parent);
 		if(parent){
-			this._parent = parent;
 			for(var k in this._cssHash){
 				this._parent[k]._cssData = this._cssHash[k];
 			}
@@ -95,6 +95,8 @@ _class("WindowSkinWIN2K", Component, function(){
 		this._title.ondragstart = null;
 		this._title._dlg = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.resize = function(w, h){
 		//if(_super.resize.apply(this, arguments)) return true;

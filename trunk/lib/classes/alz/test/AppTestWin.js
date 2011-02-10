@@ -57,6 +57,8 @@ _class("AppTestWin", Application, function(){
 		}
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	this.onResize = function(w, h){
 		var mw = Math.max(0, w - $("left1").offsetWidth);
 		$("left1").style.height = h + "px";

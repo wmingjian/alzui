@@ -26,4 +26,6 @@ _class("LinkLabel", ActionElement, function(){
 		this._self.onclick = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 });

@@ -1,8 +1,11 @@
 _package("alz.lang");
 
+//import alz.native.Error;
+
 /**
  * “Ï≥£ª˘¿‡
  */
+//class Exception(Error){
 _class("Exception", "", function(){
 	this._init = function(msg){
 		_super._init.call(this);
@@ -10,6 +13,8 @@ _class("Exception", "", function(){
 	};
 	this.dispose = function(){
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.toString = function(){
 		return this._message;

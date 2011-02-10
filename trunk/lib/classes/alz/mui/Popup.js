@@ -24,4 +24,6 @@ _class("Popup", Component, function(){
 		//this._self.onmousedown = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 });

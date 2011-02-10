@@ -16,6 +16,8 @@ _class("TextHistory", "", function(){
 		this._historys = [];
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	this.getText = function(num){
 		if(num == -1 && this._historys.length - 1 == 0){  //特殊处理这种情况
 			return this._historys[0];

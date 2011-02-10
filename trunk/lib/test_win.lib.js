@@ -36,6 +36,8 @@ _class("Workspace", Component, function(_super){
 		this._self.onmousedown = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	this.resize = function(w, h){
 		if(this._width == w && this._height == h) return true;
 		this._width = w;
@@ -122,6 +124,8 @@ _class("SilverButton", Component, function(_super){
 		this._self.onmouseout = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	this.setState = function(v){
 		runtime.dom.applyCssStyle(this, _css, v);
 	};
@@ -147,6 +151,7 @@ _class("PaneHome", Pane, function(_super){
 		<li><a href="Table.html">Table组件</a></li>
 	*/
 	this.create = function(parent, app){
+		this.setParent2(parent);
 		this._app = app;
 		var obj = runtime.dom.createDomElement(this._app._template.getTpl(this._tpl));
 		parent.appendChild(obj);
@@ -156,6 +161,8 @@ _class("PaneHome", Pane, function(_super){
 	this.dispose = function(){
 		this._app = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 });
 /*</file>*/
@@ -176,6 +183,7 @@ _class("PaneConsole", Pane, function(_super){
 		this._console = null;
 	};
 	this.create = function(parent, app){
+		this.setParent2(parent);
 		this._app = app;
 		var obj = runtime.dom.createDomElement(this._app._template.getTpl(this._tpl));
 		parent.appendChild(obj);
@@ -191,6 +199,8 @@ _class("PaneConsole", Pane, function(_super){
 		this._console = null;
 		this._app = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.getLogTime = function(){
 		return "[" + new Date().toMyString(3) + "]";  //hh:mm:ss
@@ -257,6 +267,7 @@ _class("PaneWindow", Pane, function(_super){
 		this._win2 = null;
 	};
 	this.create = function(parent, app){
+		this.setParent2(parent);
 		this._app = app;
 		var obj = runtime.dom.createDomElement(this._app._template.getTpl(this._tpl));
 		parent.appendChild(obj);
@@ -266,10 +277,10 @@ _class("PaneWindow", Pane, function(_super){
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
 		this._win1 = new Window();
-		this._win1.init($("win1"), $("body1"));
+		this._win1.bind($("win1"));
 		this._win1._self.style.zIndex = runtime.getNextZIndex();
 		this._win2 = new Window();
-		this._win2.init($("win2"), $("body2"));
+		this._win2.bind($("win2"));
 		this._win2._self.style.zIndex = runtime.getNextZIndex();
 		var _this = this;
 		this._win1._self.getElementsByTagName("input")[0].checked = true;
@@ -280,6 +291,7 @@ _class("PaneWindow", Pane, function(_super){
 		this._win2._self.getElementsByTagName("input")[0].onclick = function(){
 			_this._win2.setResizable(this.checked);
 		};
+		this.resize($("main1").clientWidth, $("main1").clientHeight);
 	};
 	this.dispose = function(){
 		this._win2.dispose();
@@ -288,6 +300,8 @@ _class("PaneWindow", Pane, function(_super){
 		this._win1 = null;
 		this._app = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.resize = function(w, h){
 		w -= 220;
@@ -312,6 +326,7 @@ _class("PaneTable", Pane, function(_super){
 		this._tpl = "pane_table.xml";
 	};
 	this.create = function(parent, app){
+		this.setParent2(parent);
 		this._app = app;
 		var obj = runtime.dom.createDomElement(this._app._template.getTpl(this._tpl));
 		parent.appendChild(obj);
@@ -337,6 +352,8 @@ _class("PaneTable", Pane, function(_super){
 		this._app = null;
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 });
 /*</file>*/
 /*<file name="alz/test/PaneForm.js">*/
@@ -354,6 +371,7 @@ _class("PaneForm", Pane, function(_super){
 		this._tpl = "pane_form.xml";
 	};
 	this.create = function(parent, app){
+		this.setParent2(parent);
 		this._app = app;
 		var obj = runtime.dom.createDomElement(this._app._template.getTpl(this._tpl));
 		parent.appendChild(obj);
@@ -366,6 +384,8 @@ _class("PaneForm", Pane, function(_super){
 	this.dispose = function(){
 		this._app = null;
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 });
 /*</file>*/
@@ -428,6 +448,8 @@ _class("AppTestWin", Application, function(_super){
 			delete this._panes[k];
 		}
 		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	this.onResize = function(w, h){
 		var mw = Math.max(0, w - $("left1").offsetWidth);

@@ -1,5 +1,5 @@
 /*
- * alzui-mini æ¼”ç¤ºç¨‹åºæ¨¡æ¿åº“
+ * alzui-mini ÑİÊ¾³ÌĞòÄ£°å¿â
  */
 runtime.regTpl("test_win", {
 pane_main.xml,

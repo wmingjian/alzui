@@ -36,6 +36,8 @@ _class("TabPage", Component, function(){
 		this._tabs = [];
 		_super.dispose.apply(this);
 	};
+	this.destroy = function(){
+	};
 	this.resize = function(w, h){
 		this._self.style.width = w + "px";
 		this._self.style.height = h + "px";

@@ -1,13 +1,17 @@
 _package("alz.core");
 
 _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
-	//this._init = function(){};
-	//this.dispose = function(){};
-	this.addMethods = function(destination, source){
-		for(var property in source){
-			destination[property] = source[property];
+	/*
+	this._init = function(){
+	};
+	this.dispose = function(){
+	};
+	*/
+	this.addMethods = function(dest, src){
+		for(var key in src){
+			dest[key] = src[key];
 		}
-		return destination;
+		return dest;
 	};
 	this.toArray = function(iterable){  //prototype $A 的实现代码
 		if(!iterable) return [];
@@ -34,7 +38,9 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	};
 	this.showException = function(e, info){
 		var a = this.forIn(e);
-		if(info) a.push(info);
+		if(info){
+			a.push(info);
+		}
 		this._win.alert(a.join("\n"));
 	};
 	/**
