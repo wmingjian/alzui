@@ -1,10 +1,11 @@
-_package("alz.test");
+_package("alz.app.demo");
 
 _import("alz.core.Application");
-_import("alz.test.PaneHome");
-_import("alz.test.PaneWindow");
-_import("alz.test.PaneTable");
-_import("alz.test.PaneForm");
+_import("alz.app.demo.pane.PaneHome");
+_import("alz.app.demo.pane.PaneWindow");
+_import("alz.app.demo.pane.PaneTable");
+_import("alz.app.demo.pane.PaneForm");
+_import("alz.app.demo.pane.PaneUrlMan");
 
 _class("AppTestWin", Application, function(){
 	var pane_conf = [

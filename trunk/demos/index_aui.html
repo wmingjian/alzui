@@ -7,18 +7,27 @@
 	pathcss="../res/css/"
 	pathimg="../res/images/"
 	pathlib="../lib/"
-	css="alzui.css,test_win.css"
-	lib="ui_action,test_win,test_win.tpl"
+	css="alzui.css"
+	lib="ui_action"
 	conf="{
 		debug: true,
 		runmode: 0,
 		action: 'home'
 	}"
 	></script>
+<script type="text/javascript">
+runtime.regApp("test_win.app", {
+	"pathcss": "res/css/",
+	"pathimg": "res/images/",
+	"pathlib": "lib/",
+	"css": "test_win.css",
+	"lib": "test_win.tpl,test_win.lib",
+	"conf": {
+		"debug": true
+	}
+});
+</script>
 </head>
 <body>
-<noscript>
-	<p>当前浏览器不支持脚本，无法正常浏览该系统</p>
-</noscript>
 </body>
 </html>
