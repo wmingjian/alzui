@@ -3,7 +3,6 @@ require_once('_inc.php');
 
 $tpls = array(
 	"aui.tpl.js"      => array("aui"     , "/alzui-X201/res/tpl/"),
-	"test_win.tpl.js" => array("test_win", "/alzui-X201/res/tpl/"),
 	"docs.tpl.js"     => array("docs"    , "/alzui-X201/docs/src/tpl/"),
 	"demos.tpl.js"    => array("demos"   , "/alzui-X201/demos/src/tpl/")
 );

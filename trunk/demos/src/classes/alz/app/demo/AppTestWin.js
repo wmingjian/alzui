@@ -21,7 +21,7 @@ _class("AppTestWin", Application, function(){
 		_super._init.call(this);
 		this._template = {
 			getTpl: function(name){
-				return runtime.getTplData("test_win")[name];
+				return runtime.getTplData("demos.tpl")[name];
 			}
 		};
 		this._panes = {};
