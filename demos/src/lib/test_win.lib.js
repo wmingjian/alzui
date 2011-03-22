@@ -7,16 +7,16 @@ function $(id){return window.document.getElementById(id);}
 //import alz.mui.Component2;
 import alz.mui.Workspace2;
 import alz.mui.SilverButton;
-import alz.test.PaneHome;
-import alz.test.PaneConsole;
-import alz.test.PaneWindow;
-import alz.test.PaneTable;
-import alz.test.PaneForm;
-import alz.test.PaneUrlMan;
-import alz.test.AppTestWin;
+import alz.app.demo.pane.PaneHome;
+import alz.app.demo.pane.PaneConsole;
+import alz.app.demo.pane.PaneWindow;
+import alz.app.demo.pane.PaneTable;
+import alz.app.demo.pane.PaneForm;
+import alz.app.demo.pane.PaneUrlMan;
+import alz.app.demo.AppTestWin;
 
 runtime.regLib("test_win", function(){
-	application = runtime.createApp("alz.test.AppTestWin");
+	application = runtime.createApp("alz.app.demo.AppTestWin");
 });
 
 }})(this);

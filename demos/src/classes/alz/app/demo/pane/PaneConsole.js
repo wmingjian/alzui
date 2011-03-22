@@ -1,4 +1,4 @@
-_package("alz.test");
+_package("alz.app.demo.pane");
 
 _import("alz.mui.Pane");
 _import("alz.mui.Console");
