@@ -8,10 +8,10 @@ $map = array(
 	'core.lib.js'         => array(),
 	'ui.lib.js'           => array(),
 	'ui_action.lib.js'    => array(),
-	'test_win.lib.js'     => array(
-		'/apps/citylife/lib/',         //lib目录
-		'/apps/citylife/lib/classes/'  //app目录
-	)
+	//                             lib目录            app目录
+	'test_win.lib.js' => array('/apps/test/src/', '/apps/test/src/classes/'),
+	'docs.lib.js'     => array('/docs/src/'     , '/docs/src/classes/'),
+	'demos.lib.js'    => array('/demos/lib/'    , '/demos/lib/classes/')
 );
 
 header("Content-Type: text/javascript; charset=utf-8");

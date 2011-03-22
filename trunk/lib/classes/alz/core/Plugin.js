@@ -8,7 +8,7 @@ _import("alz.core.EventTarget");
 _class("Plugin", EventTarget, function(){
 	this._init = function(){
 		_super._init.call(this);
-		this._app = null;  //插件所属的应用
+		this._app = null;  //插件所属的应用(Application)或管理者{PluginManager}
 		this._name = "";   //插件的名字
 	};
 	this.create = function(name, app){

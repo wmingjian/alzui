@@ -1,0 +1,1 @@
+RewriteRule    ^(\/alzui-X201\/.*\.(lib|tpl)\.js)$  /alzui-X201/build/$2.php\?f=$1

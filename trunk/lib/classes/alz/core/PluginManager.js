@@ -3,7 +3,7 @@ _package("alz.core");
 _import("alz.core.Plugin");
 
 /**
- * Application插件管理者类
+ * 插件管理者
  */
 _class("PluginManager", "", function(){
 	this._init = function(){
@@ -15,6 +15,16 @@ _class("PluginManager", "", function(){
 		_super.create.apply(this, arguments);
 	};
 	*/
+	this.create = function(rt, data){
+		for(var i = 0, len = data.length; i < len; i++){
+			var conf = data[i];
+			var id = conf.id;
+			var plugin = new conf.clazz();
+			plugin.create(id, this);
+			this.register(plugin);  //注册插件
+			rt[id] = plugin;  //默认安装到runtime对象上面
+		}
+	};
 	this.dispose = function(){
 		if(this._disposed) return;
 		//[TODO]多个应用的插件注册到同一个地方，则跨窗口应用的插件卸载时会报错
