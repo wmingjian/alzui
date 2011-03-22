@@ -7,11 +7,9 @@ $map = array(
 	'__init__mini.lib.js' => array(),
 	'core.lib.js'         => array(),
 	'ui.lib.js'           => array(),
-	'ui_action.lib.js'    => array(),
-	//                             lib目录            app目录
-	'test_win.lib.js' => array('/apps/test/src/', '/apps/test/src/classes/'),
-	'docs.lib.js'     => array('/docs/src/'     , '/docs/src/classes/'),
-	'demos.lib.js'    => array('/demos/lib/'    , '/demos/lib/classes/')
+	'ui_action.lib.js'    => array(),   //lib目录 app目录
+	'docs.lib.js'     => array('/docs/src/' , '/docs/src/classes/'),
+	'demos.lib.js'    => array('/demos/src/', '/demos/src/classes/')
 );
 
 header("Content-Type: text/javascript; charset=utf-8");

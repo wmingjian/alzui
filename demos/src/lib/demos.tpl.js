@@ -1,7 +1,7 @@
 /*
  * alzui-mini ÑÝÊ¾³ÌÐòÄ£°å¿â
  */
-runtime.regTpl("test_win", {
+runtime.regTpl("demos.tpl", {
 pane_main.xml,
 pane_home.xml,
 pane_console.xml,
