@@ -3,7 +3,7 @@ _package("alz.mui");
 _import("alz.mui.Component");
 
 /**
- * 窗体组件上的系统按钮组件
+ * 绐椾綋缁勪欢涓婄殑绯荤粺鎸夐挳缁勪欢
  */
 _class("SysBtn", Component, function(){
 	//#_interface("IActionSource");
@@ -64,6 +64,7 @@ _class("SysBtn", Component, function(){
 		*/
 	}
 	this.dispose = function(){
+		if(this._disposed) return;
 		this._self.onmouseout = null;
 		this._self.onmouseover = null;
 		this._self.onmousedown = null;

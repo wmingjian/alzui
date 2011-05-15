@@ -4,18 +4,22 @@ _package("alz.core");
 _import("alz.core.DOMUtil");
 //_import("alz.core.DOMUtil2");
 _import("alz.core.AjaxEngine");
-_import("alz.core.AppManager");
-//_import("alz.core.ProductManager");
-//_import("alz.core.ActionCollection");
+_import("alz.core.ProductManager");
+_import("alz.core.ActionCollection");
 
-_extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
-	var properties = ["_ajax"];
-	this._init = function(){  //¼ÓÔØÖ®ºóµÄ³õÊ¼»¯¹¤×÷
+_extension("WebRuntime", function(){  //æ³¨å†Œ WebRuntime æ‰©å±•
+	var properties = ["_ajax", "_template", "_actionCollection", "_productManager"];
+	this._init = function(){  //åŠ è½½ä¹‹åçš„åˆå§‹åŒ–å·¥ä½œ
 		//this.selector = new XPathQuery();
+		//this.regPlugin("dom", DOMUtil);
 		this.dom = new DOMUtil();
 		//this.domutil = new DomUtil2();
 		if(!this.getParentRuntime()){
-			this._ajax = new AjaxEngine();  //Òì²½½»»¥ÒıÇæ
+			this._ajax = new AjaxEngine();  //å¼‚æ­¥äº¤äº’å¼•æ“
+			this._template = new TemplateManager();  //æ¨¡ç‰ˆå¼•æ“
+			this._actionCollection = new ActionCollection();
+			//[TODO]ä¸€ä¸ªè¿è¡Œæ—¶ç¯å¢ƒéœ€è¦ç®¡ç†å¤šä¸ªäº§å“é…ç½®ä¿¡æ¯ä¹ˆï¼Ÿ
+			this._productManager = new ProductManager();
 		}else{
 			for(var i = 0, len = properties.length; i < len; i++){
 				var k = properties[i];
@@ -23,13 +27,15 @@ _extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
 			}
 			/*
 			this._ajax = this._parentRuntime.getAjax();
+			this._template = this._parentRuntime.getTemplate();
+			this._actionCollection = this._parentRuntime.getActionCollection();
 			*/
 		}
 		//this._ajax._userinfo = true;
-		//ÉèÖÃ²âÊÔÓÃÀı
+		//è®¾ç½®æµ‹è¯•ç”¨ä¾‹
 		/*
 		var win = this.getMainWindow();
-		if(win && typeof win.runtime != "unknown" && typeof win.runtime != "undefined"){  //winxpÏÂĞèÒª¼ì²â win.runtime
+		if(win && typeof win.runtime != "unknown" && typeof win.runtime != "undefined"){  //winxpä¸‹éœ€è¦æ£€æµ‹ win.runtime
 			this._ajax.setTestCase(win.runtime._ajax.getTestCase());
 		}
 		*/
@@ -51,16 +57,13 @@ _extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
 				}
 			};
 		}
-		this._appManager = new AppManager();
-		this._product = null;
-		if(typeof sinamail_data != "undefined"){
-			this.regProduct(sinamail_data);
-		}
+		//if(typeof sinamail_data != "undefined"){
+		//	this.regProduct(sinamail_data);
+		//}
 	};
 	this.dispose = function(){
-		this._product = null;
-		this._appManager.dispose();
-		this._appManager = null;
+		this._productManager.dispose();
+		this._productManager = null;
 		if(this._debug){
 			window.document.onmousedown = null;
 		}
@@ -75,49 +78,57 @@ _extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
 		}
 		//this.domutil.dispose();
 		//this.domutil = null;
+		/*
 		if(this.dom){
 			this.dom.dispose();
 			this.dom = null;
 		}
+		*/
 		//this.selector.dispose();
 		//this.selector = null;
 	};
 	/**
-	 * ·µ»ØÓÃÓÚ²Ù×÷DOMÔªËØµÄ¹¤¾ßÀà¶ÔÏó
+	 * è¿”å›ç”¨äºæ“ä½œDOMå…ƒç´ çš„å·¥å…·ç±»å¯¹è±¡
 	 */
 	this.getDom = function(){
 		return this.dom;
 	};
 	/**
-	 * ·µ»ØÓÃÓÚÒì²½½»»¥µÄÒì²½½»»¥ÒıÇæ
+	 * è¿”å›ç”¨äºå¼‚æ­¥äº¤äº’çš„å¼‚æ­¥äº¤äº’å¼•æ“
 	 */
 	this.getAjax = function(){
 		return this._ajax;
 	};
-	this.getAppManager = function(){
-		return this._appManager;
+	this.getTemplate = function(){
+		return this._template;
+	};
+	this.getActionCollection = function(){
+		return this._actionCollection;
+	};
+	this.getProductManager = function(){
+		return this._productManager;
 	};
 	/**
-	 * È¥³ı×Ö·û´®Ç°ºóµÄ¿Õ°××Ö·û
-	 * @param {String} str Òª´¦ÀíµÄ×Ö·û´®
+	 * å»é™¤å­—ç¬¦ä¸²å‰åçš„ç©ºç™½å­—ç¬¦
+	 * @param {String} str è¦å¤„ç†çš„å­—ç¬¦ä¸²
 	 */
 	this.trim = function(str){
 		return str.replace(/(^\s*)|(\s*$)/g, "");
 	};
-	this.closure = function(o, fun, p1, p2){
+	this.closure = function(o, func, p1, p2){
 		return function(){
-			if(typeof o == "object" && typeof fun == "string" && typeof o[fun] == "function"){
-				return o[fun](p1, p2);
+			if(typeof o == "object" && typeof func == "string" && typeof o[func] == "function"){
+				return o[func](p1, p2);
 			}else if(typeof o == "function"){
-				return o(fun, p1, p2);
+				return o(func, p1, p2);
 			}else{
-				runtime.log("[ERROR]±Õ°üÊ¹ÓÃ´íÎó£¡");
+				runtime.log("[ERROR]é—­åŒ…ä½¿ç”¨é”™è¯¯ï¼");
 			}
 		};
 	};
 	/**
-	 * HTML ´úÂë±àÂë·½·¨
-	 * @param {String} html Òª±àÂëµÄ HTML ´úÂë×Ö·û´®
+	 * HTML ä»£ç ç¼–ç æ–¹æ³•
+	 * @param {String} html è¦ç¼–ç çš„ HTML ä»£ç å­—ç¬¦ä¸²
 	 */
 	this.encodeHTML = function(html){
 		if(!html){
@@ -135,8 +146,8 @@ _extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
 		}
 	};
 	/**
-	 * HTML ´úÂë½âÂë·½·¨
-	 * @param {String} html Òª½âÂëµÄ HTML ´úÂë×Ö·û´®
+	 * HTML ä»£ç è§£ç æ–¹æ³•
+	 * @param {String} html è¦è§£ç çš„ HTML ä»£ç å­—ç¬¦ä¸²
 	 */
 	this.decodeHTML = function(html){
 		if(!html){
@@ -156,8 +167,8 @@ _extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
 		}
 	};
 	/**
-	 * ¸ù¾İ²ÎÊı progid ´´½¨Ò»¸ö ActiveXObject£¬³É¹¦·µ»Ø¶ÔÏó£¬Ê§°Ü·µ»Ø null
-	 * @param {String} progid ActiveXObject ¿Ø¼şµÄ PROGID
+	 * æ ¹æ®å‚æ•° progid åˆ›å»ºä¸€ä¸ª ActiveXObjectï¼ŒæˆåŠŸè¿”å›å¯¹è±¡ï¼Œå¤±è´¥è¿”å› null
+	 * @param {String} progid ActiveXObject æ§ä»¶çš„ PROGID
 	 */
 	this.createComObject = function(progid){
 		try{
@@ -167,7 +178,7 @@ _extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
 				return new ActiveXObject(progid);
 			}
 		}catch(ex){
-			this.showException(ex, "´´½¨ {0} ×é¼şÊ§°Ü".replace(/\{0\}/, progid));
+			this.showException(ex, "åˆ›å»º {0} ç»„ä»¶å¤±è´¥".replace(/\{0\}/, progid));
 			return null;
 		}
 	};
@@ -187,22 +198,6 @@ _extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
 	this.getParentWindow = function(){
 		return this.getMainWindow();
 	};
-	/**
-	 * ¸ù¾İ className »ñÈ¡ÏàÓ¦µÄ DOM ÔªËØ
-	 * @return {Array} ·ûºÏÌõ¼şµÄÔªËØ×é³ÉµÄÊı×é
-	 * [TODO]Ğ§ÂÊ¼«µÍ£¬ÓĞ´ıÓÅ»¯
-	 */
-	this.getElementsByClassName = function(className){
-		var a = [];
-		var nodes = this._doc.getElementsByTagName("*");
-		for(var i = 0, len = nodes.length; i < len; i++){
-			var node = nodes[i];
-			if(node.className.indexOf(className) != -1){
-				a.push(node);
-			}
-		}
-		return a;
-	};
 	this.openDialog = function(url, width, height){
 		var screen = {
 			"w": this._win.screen.availWidth,
@@ -219,9 +214,9 @@ _extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
 	};
 	this.createEvent = function(ev){
 		var o = {};
-		//o.sender = ev.sender || null;  //ÊÂ¼ş·¢ËÍÕß
+		//o.sender = ev.sender || null;  //äº‹ä»¶å‘é€è€…
 		o.type = ev.type;
-		o.target = ev.srcElement || ev.target;  //IEºÍFFµÄ²î±ğ
+		o.target = ev.srcElement || ev.target;  //IEå’ŒFFçš„å·®åˆ«
 		o.reason = ev.reason;
 		o.cancelBubble = ev.cancelBubble;
 		o.returnValue = ev.returnValue;
@@ -245,27 +240,98 @@ _extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
 		o.keyCode = ev.keyCode;
 		return o;
 	};
-	this.createApp = function(appClassName, parentApp, len){
-		return this._appManager.createApp(appClassName, parentApp, len);
-	};
 	/**
-	 * ×¢²á²úÆ·
+	 * æ³¨å†Œäº§å“
 	 */
 	this.regProduct = function(v){
-		this._product = v;
+		this._productManager.regProduct(v);
 		this._appManager.setConfList(v.app);
+		this._template.init("tpl/");  //æ¨¡æ¿
+		this._template.appendItems(v.tpl);
+	};
+	/**
+	 * æ³¨å†Œä¸€ç»„æ¨¡æ¿åˆ—è¡¨æ•°æ®
+	 */
+	/*
+	this.regTpl = function(data){
+		this._template.appendItems(data);
+	};
+	*/
+	/**
+	 * æ³¨å†Œä¸€ä¸ªåŠ¨æ€åˆ›å»ºçš„æ¨¡æ¿
+	 */
+	this.__tpl__ = function(name, type, data){
+		this._template.appendItem(name, type, data);
+	};
+	/*
+	//æ£€æŸ¥ç»„ä»¶ä¸Šçš„DOMå±æ€§åŠå…¶äº‹ä»¶æ˜¯å¦æ¸…ç†å¹²å‡€
+	this.checkDomClean = function(component){
+		//this.checkEvents(component._self);
+		/ *
+		var hash = component;
+		for(var k in hash){
+			if(typeof hash[k] == "obj"){
+			}
+		}
+		* /
+	};
+	this._alert = window.alert;
+	this.checkEvents = function(el){
+		if(el.__checked__) return;
+		var a = [];
+		for(var k in el){
+			a.push(k);
+			if(k == "__checked__") continue;
+			if(k == "_ptr") break;
+			if(k.substr(0, 2) == "on" && typeof el[k] == "function"){
+				if(this._alert){
+					this._alert(el);
+				}
+			}
+			try{
+			if(el.hasChildNodes && el.hasChildNodes()){
+				var nodes = el.childNodes;
+				for(var i = 0, len = nodes.length; i < len; i++){
+					this.checkEvents(nodes[i]);
+				}
+				nodes = null;
+			}
+			}catch(ex){
+				window.alert(ex);
+			}
+		}
+		el.__checked__ = true;
 	};
 	this.getProduct = function(){
 		if(!this._product){
-			runtime.log("[WebRuntime::getProduct]data_xxx.jsÎ´ÄÜÕıÈ·¼ÓÔØ£¬ÏµÍ³ÎŞ·¨Õı³£ÔËĞĞ£¬Çë¼ì²é£¡");
+			runtime.log("[WebRuntime::getProduct]data_xxx.jsæœªèƒ½æ­£ç¡®åŠ è½½ï¼Œç³»ç»Ÿæ— æ³•æ­£å¸¸è¿è¡Œï¼Œè¯·æ£€æŸ¥ï¼");
 			this._product = {
-				"name" : "",  //²úÆ·Ãû³Æ
-				"tpl"  : [],  //Ä£°å
-				"skin" : [],  //Æ¤·ô
-				"paper": [],  //ĞÅÖ½
-				"app"  : []   //APPÅäÖÃ
+				"name" : "",  //äº§å“åç§°
+				"tpl"  : [],  //æ¨¡æ¿
+				"skin" : [],  //çš®è‚¤
+				"paper": [],  //ä¿¡çº¸
+				"app"  : []   //APPé…ç½®
 			};
 		}
 		return this._product;
 	};
+	*/
+	/**
+	 * æ ¹æ® className è·å–ç›¸åº”çš„ DOM å…ƒç´ 
+	 * @return {Array} ç¬¦åˆæ¡ä»¶çš„å…ƒç´ ç»„æˆçš„æ•°ç»„
+	 * [TODO]æ•ˆç‡æä½ï¼Œæœ‰å¾…ä¼˜åŒ–
+	 */
+	/*
+	this.getElementsByClassName = function(className){
+		var a = [];
+		var nodes = this._doc.getElementsByTagName("*");
+		for(var i = 0, len = nodes.length; i < len; i++){
+			var node = nodes[i];
+			if(node.className.indexOf(className) != -1){
+				a.push(node);
+			}
+		}
+		return a;
+	};
+	*/
 });

@@ -3,7 +3,7 @@ _package("alz.lang");
 //import alz.native.Error;
 
 /**
- * 异常基类
+ * 寮傚父鍩虹被
  */
 //class Exception(Error){
 _class("Exception", "", function(){
@@ -12,6 +12,7 @@ _class("Exception", "", function(){
 		this._message = this._formatMsg(msg, arguments);
 	};
 	this.dispose = function(){
+		if(this._disposed) return;
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){

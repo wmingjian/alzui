@@ -5,7 +5,7 @@ _import("alz.mui.BitButton");
 _import("alz.mui.ToggleButton");
 
 /**
- * ¹¤¾ßÀ¸×é¼ş
+ * å·¥å…·æ ç»„ä»¶
  */
 _class("ToolBar", Component, function(){
 	this._init = function(){
@@ -26,7 +26,7 @@ _class("ToolBar", Component, function(){
 			case "wui-ToggleButton": btn = new ToggleButton();break;
 			}
 			if(btn){
-				btn.init(nodes[i], this._app);  //[TODO]¸ÄÓÃbindÊµÏÖ
+				btn.init(nodes[i], this._app);  //[TODO]æ”¹ç”¨bindå®ç°
 				this._buttons.push(btn);
 			}
 			btn = null;
@@ -34,6 +34,7 @@ _class("ToolBar", Component, function(){
 		nodes = null;
 	};
 	this.dispose = function(){
+		if(this._disposed) return;
 		for(var i = 0, len = this._buttons.length; i < len; i++){
 			this._buttons[i].dispose();
 			this._buttons[i] = null;

@@ -3,37 +3,41 @@ _package("alz.core");
 _import("alz.core.ScriptLoader");
 
 /**
- * LibLoader
- * ÎÄ¼ş¼ÓÔØÒıÇæ£¬Ê¹ÓÃscript»òÕßlink¼ÓÔØjsºÍcssÎÄ¼ş
- * ÆäÖĞjsÎÄ¼şµÄÖÖÀà°üÀ¨(conf,lib,tpl)
+ * FileLoader
+ * æ–‡ä»¶åŠ è½½å¼•æ“ï¼Œä½¿ç”¨scriptæˆ–è€…linkåŠ è½½jså’Œcssæ–‡ä»¶
+ * å…¶ä¸­jsæ–‡ä»¶çš„ç§ç±»åŒ…æ‹¬(conf,lib,tpl)
  */
 _class("LibLoader", "", function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._libs = [];
-		this._fileExt = ".js";  //¿âÎÄ¼şÄ¬ÈÏµÄºó×ºÃû
+		this._fileExt = ".js";  //åº“æ–‡ä»¶é»˜è®¤çš„åç¼€å
 		this._codeProvider = "";
+		this._appConf = null;
 		this._index = 0;
 		this._agent = null;
-		this._funName = "";
+		this._func = "";
 	};
 	this.dispose = function(){
+		if(this._disposed) return;
 		this._agent = null;
 		this._libs = [];
+		this._appConf = null;
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){
 	};
 	/**
-	 * @param {String} libs ¶ººÅ·Ö¸îµÄ¿âÃûÁĞ±í
+	 * @param {String} libs é€—å·åˆ†å‰²çš„åº“ååˆ—è¡¨
+	 * @param {String|Object} codeProvider|appConf
 	 * @param {WebRuntime} agent
-	 * @param {String} funName
-	 * »Øµ÷º¯Êı²ÎÊı¸ñÊ½£ºfun(lib, libConf, loaded)
-	 * lib     = ¿âÎÄ¼şÃûĞÅÏ¢
-	 * libConf = ¿âÅäÖÃĞÅÏ¢
-	 * loaded  = ×ÊÔ´ÇëÇó¶ÓÁĞÊÇ·ñ¼ÓÔØÍê±Ï
+	 * @param {String} func
+	 * å›è°ƒå‡½æ•°å‚æ•°æ ¼å¼ï¼šfunc(lib, libConf, loaded)
+	 * lib     = åº“æ–‡ä»¶åä¿¡æ¯
+	 * libConf = åº“é…ç½®ä¿¡æ¯
+	 * loaded  = èµ„æºè¯·æ±‚é˜Ÿåˆ—æ˜¯å¦åŠ è½½å®Œæ¯•
 	 */
-	this.init = function(libs, codeProvider, agent, funName){  //¼ÓÔØ¿â´úÂë
+	this.init = function(libs, codeProvider, agent, func){  //åŠ è½½åº“ä»£ç 
 		for(var i = 0, len = libs.length; i < len; i++){
 			var lib = libs[i];
 			if(typeof lib == "string"){
@@ -41,7 +45,7 @@ _class("LibLoader", "", function(){
 				var name = lib;
 				var inApp = name.charAt(0) == "#";
 				if(inApp){
-					name = name.substr(1);  //¹ıÂËµôÃû×Ö¿ªÍ·µÄ"#"
+					name = name.substr(1);  //è¿‡æ»¤æ‰åå­—å¼€å¤´çš„"#"
 				}
 				var p = name.lastIndexOf(".");
 				if(p == -1){
@@ -55,17 +59,21 @@ _class("LibLoader", "", function(){
 				this._libs.push(lib);
 			}
 		}
-		this._codeProvider = codeProvider;
+		if(typeof codeProvider == "string"){
+			this._codeProvider = codeProvider;
+		}else{
+			this._appConf = codeProvider;
+		}
 		this._agent = agent;
-		this._funName = funName;
+		this._func = func;
 		this._start();
 	};
 	this._start = function(){
 		runtime.addThread(10, this, "_loadLib");
 	};
 	/**
-	 * ¸ù¾İ¿âÃû¼ÆËã¶ÔÓ¦µÄurlµØÖ·
-	 * @param {String} name lib»òtpl¿âÃû³Æ
+	 * æ ¹æ®åº“åè®¡ç®—å¯¹åº”çš„urlåœ°å€
+	 * @param {String} name libæˆ–tplåº“åç§°
 	 */
 	this.getUrlByName = function(lib){
 		/*
@@ -82,29 +90,24 @@ _class("LibLoader", "", function(){
 		}else{
 			var path;
 			if(!lib.inApp){  //lib.name.charAt(0) != "#"
-				path = runtime.pathLib;  //ÄÚºËÀ©Õ¹¿â
-			}else{  //´ÓÓ¦ÓÃÄ¿Â¼ÏÂ¼ÓÔØ¿âÎÄ¼ş
-				path = runtime.getConfigData("pathapp") || runtime.pathLib;  //¾ßÌåÓ¦ÓÃ¿â
+				path = runtime._pathLib;  //å†…æ ¸æ‰©å±•åº“
+			}else{  //ä»åº”ç”¨ç›®å½•ä¸‹åŠ è½½åº“æ–‡ä»¶
+				path = this._appConf ? this._appConf.pathlib : (runtime.getConfigData("pathapp") || runtime._pathLib);  //å…·ä½“åº”ç”¨åº“
 			}
 			src = path + lib.name + "." + lib.type + this._fileExt;
 		}
 		return src;
 	};
 	this._loadLib = function(){
-		if(this._index >= this._libs.length){  //Èç¹ûÃ»ÓĞ¿â´úÂë£¬ÔòÖ±½ÓÖ´ĞĞ»Øµ÷
-			this._agent[this._funName]();  //×¢ÒâÃ»ÓĞ¿âÃû
+		if(this._index >= this._libs.length){  //å¦‚æœæ²¡æœ‰åº“ä»£ç ï¼Œåˆ™ç›´æ¥æ‰§è¡Œå›è°ƒ
+			this._agent[this._func]();  //æ³¨æ„æ²¡æœ‰åº“å
 			return;
 		}
-		/*
-		this._doc.write("<sc" + "ript"
-			+ " type=\"text/javascript\""
-			+ " src=\"" + this.pathLib + libs[i] + ".lib.js\""
-			+ " charset=\"utf-8\""
-			+ "></sc"+"ript>");
-		*/
+		//var url = runtime._pathLib + libs[i] + ".lib.js";
+		//this._doc.write('<script type="text/javascript" src="' + url + '" charset="utf-8"></script>');
 		this.loadLibScript(this._libs[this._index]);
 	};
-	this.loadLibScript = function(lib, agent, fun){
+	this.loadLibScript = function(lib, agent, func){
 		var name = lib.name;
 		var _this = this;
 		if(runtime._host.xul){
@@ -122,19 +125,19 @@ _class("LibLoader", "", function(){
 					var code = http.responseText;
 					eval(code);
 					if(agent){
-						fun.apply(agent, [lib, _this.getLibConf(lib), false]);
+						func.apply(agent, [lib, _this.getLibConf(lib), false]);
 					}else{
 						_this._onLoad();
 					}
 				}
 				http.onreadystatechange = null;
 			};
-			http.send("");  //FFÏÂÃæ²ÎÊınull²»ÄÜÊ¡ÂÔ
-		}else{  //¼ÓÔØ(lib.js,tpl.js)ÎÄ¼ş
+			http.send("");  //FFä¸‹é¢å‚æ•°nullä¸èƒ½çœç•¥
+		}else{  //åŠ è½½(lib.js,tpl.js)æ–‡ä»¶
 			var loader = new ScriptLoader();
 			loader.create(this, function(){
 				if(agent){
-					fun.apply(agent, [lib, this.getLibConf(lib), false]);
+					func.apply(agent, [lib, this.getLibConf(lib), false]);
 				}else{
 					this._onLoad();
 				}
@@ -147,25 +150,25 @@ _class("LibLoader", "", function(){
 		var lib = this._libs[this._index];
 		//var name = lib.name.replace(/#/g, "");
 		var argv = [lib, this.getLibConf(lib), false];
-		var fun = typeof this._funName == "function" ? this._funName : this._agent[this._funName];
-		fun.apply(this._agent, argv);
+		var func = typeof this._func == "function" ? this._func : this._agent[this._func];
+		func.apply(this._agent, argv);
 		this._index++;
 		if(this._index < this._libs.length){
-			if(this._index == 1 && (lib.name == "core" && runtime.getConfData("product"))){  //ÓĞ²úÆ·ÅäÖÃµÄ»°£¬¼ÓÔØ²úÆ·ÅäÖÃÊı¾İ
+			if(this._index == 1 && (lib.name == "core" && runtime.getConfData("product"))){  //æœ‰äº§å“é…ç½®çš„è¯ï¼ŒåŠ è½½äº§å“é…ç½®æ•°æ®
 				var loader = new ScriptLoader();
 				loader.create(this, function(){
-					this._start();  //¼ÓÔØÍê±Ï£¬ÔÙ¿ªÊ¼¼ÓÔØÊ£ÓàµÄ¿âÎÄ¼ş
+					this._start();  //åŠ è½½å®Œæ¯•ï¼Œå†å¼€å§‹åŠ è½½å‰©ä½™çš„åº“æ–‡ä»¶
 					loader = null;
 				});
 				loader.load([runtime.getConfigData("pathlib") + runtime.getConfData("product")], "", true);
 			}else{
 				this._start();
 			}
-		}else{  //¼ÓÔØÍê±Ï
-			argv[2] = true;  //±íÊ¾¼ÓÔØÍê±Ï
-			fun.apply(this._agent, argv);
+		}else{  //åŠ è½½å®Œæ¯•
+			argv[2] = true;  //è¡¨ç¤ºåŠ è½½å®Œæ¯•
+			func.apply(this._agent, argv);
 		}
-		fun = null;
+		func = null;
 	};
 	this.getLibConf = function(lib){
 		if(lib.type == "tpl"){

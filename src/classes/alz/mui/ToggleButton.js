@@ -11,7 +11,7 @@ _class("ToggleButton", BitButton, function(){
 	this.init = function(obj, app){
 		_super.init.apply(this, arguments);
 		this._groupid = this._self.getAttribute("_groupid");
-		if(!this._groupid) throw "ToggleButton ×é¼þÈ±ÉÙ _groupid ÊôÐÔ";
+		if(!this._groupid) throw "ToggleButton ç»„ä»¶ç¼ºå°‘ _groupid å±žæ€§";
 		runtime.toggleMgr.add(this);
 		this.removeEventGroupListener("mouseevent");  //[TODO]
 		this.addEventGroupListener("mouseevent", {
@@ -38,6 +38,7 @@ _class("ToggleButton", BitButton, function(){
 		}
 	};
 	this.dispose = function(){
+		if(this._disposed) return;
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){

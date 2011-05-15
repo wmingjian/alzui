@@ -3,7 +3,7 @@ _package("alz.mui");
 _import("alz.mui.Container");
 
 /**
- * Ãæ°å×é¼þ£¬Ö§³Ö²¼¾Ö×ÔÊÊÓ¦ÌØÐÔµÄÃæ°å
+ * é¢æ¿ç»„ä»¶ï¼Œæ”¯æŒå¸ƒå±€è‡ªé€‚åº”ç‰¹æ€§çš„é¢æ¿
  */
 _class("Panel", Container, function(){
 	this._init = function(){

@@ -3,13 +3,13 @@ _package("alz.core");
 _import("alz.core.EventTarget");
 
 /**
- * Õë¶ÔApplicationµÄ²å¼ş»ùÀà
+ * é’ˆå¯¹Applicationçš„æ’ä»¶åŸºç±»
  */
 _class("Plugin", EventTarget, function(){
 	this._init = function(){
 		_super._init.call(this);
-		this._app = null;  //²å¼şËùÊôµÄÓ¦ÓÃ(Application)»ò¹ÜÀíÕß{PluginManager}
-		this._name = "";   //²å¼şµÄÃû×Ö
+		this._app = null;  //æ’ä»¶æ‰€å±çš„åº”ç”¨(Application)æˆ–ç®¡ç†è€…{PluginManager}
+		this._name = "";   //æ’ä»¶çš„åå­—
 	};
 	this.create = function(name, app){
 		this._app = app;

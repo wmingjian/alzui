@@ -3,7 +3,7 @@ _package("alz.action");
 _import("alz.action.ActionElement");
 
 /**
- * selectԪ�صķ�װ
+ * select元素的封装
  */
 _class("ComboBox", ActionElement, function(){
 	this._init = function(obj){

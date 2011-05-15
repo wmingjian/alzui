@@ -7,8 +7,9 @@ _class("DomUtil2", "", function(){
 		this._domTemp = null;
 	}
 	this.dispose = function(){
+		if(this._disposed) return;
 		this._domTemp = null;
-		//½â³ýËùÓÐDOMÔªËØºÍ½Å±¾¶ÔÏóµÄ°ó¶¨¹ØÏµ
+		//è§£é™¤æ‰€æœ‰DOMå…ƒç´ å’Œè„šæœ¬å¯¹è±¡çš„ç»‘å®šå…³ç³»
 		for(var i = 0, len = this._nodes.length; i < len; i++){
 			this._nodes[i].dispose();
 			this._nodes[i] = null;
@@ -27,7 +28,7 @@ _class("DomUtil2", "", function(){
 		if(parent){
 			parent.appendChild(obj);
 			/*
-			//ÖÍºó¼ÓÔØÍ¼Æ¬
+			//æ»žåŽåŠ è½½å›¾ç‰‡
 			var imgs = obj.getElementsByTagName("img");
 			for(var i = 0, len = imgs.length; i < len; i++){
 				imgs[i].src = imgs[i].getAttribute("src0");
@@ -38,7 +39,7 @@ _class("DomUtil2", "", function(){
 		return obj;
 	};
 	/**
-	 * Í³Ò» IE ºÍ Moz ÏµÁÐä¯ÀÀÆ÷µÄ²îÒì
+	 * ç»Ÿä¸€ IE å’Œ Moz ç³»åˆ—æµè§ˆå™¨çš„å·®å¼‚
 	 */
 	this.parseInt = function(tag, v){
 		switch(v){
@@ -60,7 +61,7 @@ _class("DomUtil2", "", function(){
 		}else if(el.currentStyle){
 			style = el.currentStyle;
 		}else{
-			throw "ÎÞ·¨¶¯Ì¬»ñÈ¡DOMµÄÊµ¼ÊÑùÊ½ÊôÐÔ";
+			throw "æ— æ³•åŠ¨æ€èŽ·å–DOMçš„å®žé™…æ ·å¼å±žæ€§";
 		}
 		return style;
 	};

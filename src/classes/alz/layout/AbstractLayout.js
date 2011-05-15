@@ -3,14 +3,15 @@ _package("alz.layout");
 _class("AbstractLayout", "", function(){
 	this._init = function(){
 		_super._init.call(this);
-		this._component = null;  //ÆôÓÃ¸Ã²¼¾ÖµÄ×é¼ş
-		this._self = null;       //ÆôÓÃ¸Ã²¼¾ÖµÄDOMÔªËØ
+		this._component = null;  //å¯ç”¨è¯¥å¸ƒå±€çš„ç»„ä»¶
+		this._self = null;       //å¯ç”¨è¯¥å¸ƒå±€çš„DOMå…ƒç´ 
 	};
 	this.init = function(obj){
 		this._self = obj;
 		this._component = obj.__ptr__;
 	};
 	this.dispose = function(){
+		if(this._disposed) return;
 		this._self = null;
 		this._component = null;
 		_super.dispose.apply(this);
@@ -18,7 +19,7 @@ _class("AbstractLayout", "", function(){
 	this.destroy = function(){
 	};
 	/**
-	 * Ê¹ÓÃµ±Ç°²¼¾Ö£¬²¼ÖÃÒ»¸öÔªËØµÄÄÚ²¿×ÓÔªËØ
+	 * ä½¿ç”¨å½“å‰å¸ƒå±€ï¼Œå¸ƒç½®ä¸€ä¸ªå…ƒç´ çš„å†…éƒ¨å­å…ƒç´ 
 	 */
 	this.layoutElement = function(){
 	};

@@ -4,15 +4,15 @@ _import("alz.template.TrimPath");
 //_import("alz.core.Ajax");
 
 /**
- * Ìá¹©¶ÔÄ£°åÊı¾İµÄ¹ÜÀíÖ§³Ö£¬ÊµÏÖÁË¶Ô¶àÖÖÀàĞÍµÄÇ°¶ËÄ£°åµÄ¹ÜÀíºÍ·½±ãµÄÍâ²¿µ÷ÓÃ½Ó
- * ¿Ú£¬´ïµ½·ÖÀëÇ°¶Ë¿ª·¢¹ı³ÌÖĞÂß¼­ºÍ½çÃæµÄ³õ²½·ÖÀë¡£
+ * æä¾›å¯¹æ¨¡æ¿æ•°æ®çš„ç®¡ç†æ”¯æŒï¼Œå®ç°äº†å¯¹å¤šç§ç±»å‹çš„å‰ç«¯æ¨¡æ¿çš„ç®¡ç†å’Œæ–¹ä¾¿çš„å¤–éƒ¨è°ƒç”¨æ¥
+ * å£ï¼Œè¾¾åˆ°åˆ†ç¦»å‰ç«¯å¼€å‘è¿‡ç¨‹ä¸­é€»è¾‘å’Œç•Œé¢çš„åˆæ­¥åˆ†ç¦»ã€‚
  *
- * [TODO]TrimPath Ã¿´ÎÖØ¸´½âÎöÄ£°åµÄĞÔÄÜÎÊÌâ»¹Ã»ÓĞ½â¾ö¡£
+ * [TODO]TrimPath æ¯æ¬¡é‡å¤è§£ææ¨¡æ¿çš„æ€§èƒ½é—®é¢˜è¿˜æ²¡æœ‰è§£å†³ã€‚
  *
- * Ä£°åµÄÀàĞÍ
- * html = ´¿ HTML ´úÂë
- * tpl  = ·ûºÏ /\{[\$=]\w+\}/ ¹æÔòµÄ¼òÒ×Ä£°å
- * asp  = ·Â ASP Óï·¨µÄÄ£°å
+ * æ¨¡æ¿çš„ç±»å‹
+ * html = çº¯ HTML ä»£ç 
+ * tpl  = ç¬¦åˆ /\{[\$=]\w+\}/ è§„åˆ™çš„ç®€æ˜“æ¨¡æ¿
+ * asp  = ä»¿ ASP è¯­æ³•çš„æ¨¡æ¿
  */
 _class("TemplateManager", "", function(){
 	//var RE_TPL = /<!-- template name=\"(\w+\.tpl)\" type=\"(html|tpl|asp)\"( title=\"[^\"]+\")* -->/;
@@ -20,10 +20,10 @@ _class("TemplateManager", "", function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._path = "";
-		this._hash = {};  //Ä£°åÊı¾İ¹şÏ£±í {"name":{tpl:"",func:null},...}
+		this._hash = {};  //æ¨¡æ¿æ•°æ®å“ˆå¸Œè¡¨ {"name":{tpl:"",func:null},...}
 		this._func = null;
 		this._trimPath = null;
-		this._context = {  //[Ö»¶Á]Ä£°å±àÒëºóµÄº¯Êı¹«ÓÃµÄÉÏÏÂÎÄ»·¾³¶ÔÏó
+		this._context = {  //[åªè¯»]æ¨¡æ¿ç¼–è¯‘åçš„å‡½æ•°å…¬ç”¨çš„ä¸Šä¸‹æ–‡ç¯å¢ƒå¯¹è±¡
 			"trim": function(str){return str.replace(/^\s+|[\s\xA0]+$/g, "");}
 		};
 	};
@@ -43,6 +43,57 @@ _class("TemplateManager", "", function(){
 	};
 	this.destroy = function(){
 	};
+	/**
+	 * æ£€æŸ¥æ¨¡ç‰ˆçš„è¯­æ³•
+	 */
+	this.checkSyntax = function(xml){
+		if(runtime.ie){
+			try{
+				var xmldoc = new ActiveXObject("Msxml.DOMDocument");
+				xmldoc.async = false;
+				xmldoc.loadXML(xml);
+				//return xmldoc;  //.documentElement
+				return true;
+			}catch(ex){
+				console.error("htmlä»£ç æ ¼å¼ä¸å¤åˆxmlè¯­æ³•è§„èŒƒ", ex, xml);
+				return false;
+			}
+		}else if(window.DOMParser){
+			var p = new DOMParser();
+			var xmldoc = p.parseFromString(xml, "text/xml");
+			if(xmldoc.documentElement.getElementsByTagName("parsererror").length > 0){
+				console.error("htmlä»£ç æ ¼å¼ä¸å¤åˆxmlè¯­æ³•è§„èŒƒ", xml);
+				return false;
+			}
+			return true;
+		}else{
+			runtime.error("æµè§ˆå™¨ä¸æ”¯æŒxmldom");
+			return false;
+		}
+	};
+	this.reg = function(tpls){
+		var arr = [];
+		for(var k in tpls){
+			var v = tpls[k];
+			if(v === null){  //å’ŒPHPç¨‹åºçº¦å®šä¸ºæ¨¡æ¿ä¸å­˜åœ¨
+				v = '<div style="color:red;">æ¨¡æ¿(' + k + ')ä¸å­˜åœ¨</div>';
+				arr.push(k);
+			}else{
+				this.checkSyntax(v);
+			}
+			this._hash[k] = v;
+		}
+		if(arr.length > 0){
+			runtime.error("ä¸‹åˆ—è¿™äº›æ¨¡æ¿ä¸å­˜åœ¨ï¼Œè¯·æ£€æŸ¥ï¼š" + arr.join(","));
+		}
+	};
+	this.getTpl = function(name){
+		if(!(name in this._hash)){
+			runtime.error("[ERROR]æ¨¡ç‰ˆåº“ä¸­æ²¡æœ‰æŒ‡å®šçš„æ¨¡æ¿(name=" + name + ")");
+			return "";
+		}
+		return this._hash[name];
+	};
 	/*
 	this.load1 = function(tpls, callback){
 		var i = 0;
@@ -55,7 +106,7 @@ _class("TemplateManager", "", function(){
 					new Ajax().netInvoke("GET", this._path + tpls[i], "", "text", cb);
 				});
 			}else{
-				callback();  //Ä£°å¼ÓÔØÍê±Ïºó£¬Ö´ĞĞ»Øµ÷º¯Êı
+				callback();  //æ¨¡æ¿åŠ è½½å®Œæ¯•åï¼Œæ‰§è¡Œå›è°ƒå‡½æ•°
 			}
 		}
 		new Ajax().netInvoke("GET", this._path + tpls[i], "", "text", cb);
@@ -68,7 +119,7 @@ _class("TemplateManager", "", function(){
 		callback();
 	};
 	/ **
-	 * Ê¹ÓÃ½Å±¾½âÎöÔ­Ê¼µÄÄ£°æÎÄ¼ş
+	 * ä½¿ç”¨è„šæœ¬è§£æåŸå§‹çš„æ¨¡ç‰ˆæ–‡ä»¶
 	 * /
 	this.load3 = function(tplData, callback){
 		var arr = tplData.split("$$$$");
@@ -82,41 +133,41 @@ _class("TemplateManager", "", function(){
 			if(a){
 				this.appendItem(a[1], a[2], arr[i]);
 			}else{
-				window.alert("ÕÒ²»µ½Ä£°åµÄ name ÊôĞÔ");
+				window.alert("æ‰¾ä¸åˆ°æ¨¡æ¿çš„ name å±æ€§");
 			}
 		}
 		callback();
 	};
 	/ **
-	 * @param {Array} data Êı×éÀàĞÍµÄÄ£°åÁĞ±í
-	 * @param {Object} agent »Øµ÷´úÀí¶ÔÏó
-	 * @param {Function} fun »Øµ÷º¯Êı
+	 * @param {Array} data æ•°ç»„ç±»å‹çš„æ¨¡æ¿åˆ—è¡¨
+	 * @param {Object} agent å›è°ƒä»£ç†å¯¹è±¡
+	 * @param {Function} func å›è°ƒå‡½æ•°
 	 * /
-	this.load = function(data, agent, fun){
+	this.load = function(data, agent, func){
 		this.appendItems(data);
-		fun.call(agent);
+		func.call(agent);
 	};
-	this.loadData = function(url, agent, funName){
+	this.loadData = function(url, agent, func){
 		new Ajax().netInvoke("POST", url, "", "json", this, function(json){
 			this.load(json, this, function(){
-				funName.apply(agent);
+				func.apply(agent);
 			});
 		});
 	};
 	*/
 	/**
-	 * Ìí¼ÓÒ»¸öÄ£°åµ½Ä£°å¹ÜÀíÀàÖĞ
-	 * @param {String} name ±ØÑ¡£¬ÒªÌí¼ÓµÄÄ£°åµÄÃû³Æ
-	 * @param {String} type ±ØÑ¡£¬Ä£°åµÄÀàĞÍ£¬²Î¼ûËµÃ÷
-	 * @param {String} data ±ØÑ¡£¬Ä£°åÄÚÈİ
-	 * @return {void} Ô­Ê¼µÄÄ£°åÄÚÈİ
+	 * æ·»åŠ ä¸€ä¸ªæ¨¡æ¿åˆ°æ¨¡æ¿ç®¡ç†ç±»ä¸­
+	 * @param {String} name å¿…é€‰ï¼Œè¦æ·»åŠ çš„æ¨¡æ¿çš„åç§°
+	 * @param {String} type å¿…é€‰ï¼Œæ¨¡æ¿çš„ç±»å‹ï¼Œå‚è§è¯´æ˜
+	 * @param {String} data å¿…é€‰ï¼Œæ¨¡æ¿å†…å®¹
+	 * @return {void} åŸå§‹çš„æ¨¡æ¿å†…å®¹
 	 */
 	this._appendItem = function(data){
 		var name = data.name;
 		var type = data.type;
 		var tpl = data.tpl;
 		if(this._hash[name]){
-			runtime.warning("[TemplateManager::_appendItem]Ä£°å " + name + " ÒÑ¾­´æÔÚ£¡");
+			runtime.warning("[TemplateManager::_appendItem]æ¨¡æ¿ " + name + " å·²ç»å­˜åœ¨ï¼");
 		}else{
 			if(type == "html" || type == "tpl"){
 				tpl = tpl
@@ -130,7 +181,7 @@ _class("TemplateManager", "", function(){
 				"code": "",
 				"func": null
 			};
-			if(type == "asp"){  //html,tpl ÀàĞÍÄ£°å£¬²»ĞèÒª±àÒë
+			if(type == "asp"){  //html,tpl ç±»å‹æ¨¡æ¿ï¼Œä¸éœ€è¦ç¼–è¯‘
 				template.code = "var func = " + this.parse(tpl, data.params) + ";";
 				with(this._context){
 					eval(template.code);
@@ -140,6 +191,7 @@ _class("TemplateManager", "", function(){
 			this._hash[name] = template;
 		}
 	};
+	this.addTemplate =  //[nouse]
 	this.appendItem = function(name, type, data){
 		this._appendItem({
 			"name": name,
@@ -154,7 +206,7 @@ _class("TemplateManager", "", function(){
 			if(a){
 				this.appendItem(a[1], a[2], data[i]);
 			}else{
-				window.alert("ÕÒ²»µ½Ä£°åµÄ name ÊôĞÔ");
+				window.alert("æ‰¾ä¸åˆ°æ¨¡æ¿çš„ name å±æ€§");
 			}
 			*/
 			this._appendItem(data[i]);
@@ -198,8 +250,8 @@ _class("TemplateManager", "", function(){
 				p2 = p1;
 			}
 		}
-		//»ñÈ¡×îºóÒ»¸öÄ£°å±äÁ¿Ö®ºóµÄÄÚÈİ
-		//Èç¹ûÒ»¸öÄ£°å±äÁ¿¶¼Ã»ÓĞ£¬Ôò»ñÈ¡Õû¸ö×Ö·û´®
+		//è·å–æœ€åä¸€ä¸ªæ¨¡æ¿å˜é‡ä¹‹åçš„å†…å®¹
+		//å¦‚æœä¸€ä¸ªæ¨¡æ¿å˜é‡éƒ½æ²¡æœ‰ï¼Œåˆ™è·å–æ•´ä¸ªå­—ç¬¦ä¸²
 		sb.push(html.substr(p2));
 		return sb.join("");
 	};
@@ -217,7 +269,7 @@ _class("TemplateManager", "", function(){
 	};
 	this.getTemplate = function(name){
 		if(!(name in this._hash)){
-			window.alert("[TemplateManager::getTemplate]ÇëÈ·ÈÏÄ£°å" + name + "ÒÑ¾­´æÔÚ");
+			window.alert("[TemplateManager::getTemplate]è¯·ç¡®è®¤æ¨¡æ¿" + name + "å·²ç»å­˜åœ¨");
 		}else{
 			if(this._hash[name].type == "xml"){
 				return this.str2xmldoc(this._hash[name].data);
@@ -226,6 +278,7 @@ _class("TemplateManager", "", function(){
 			}
 		}
 	};
+	//[profile]runtime.__tpl = {};
 	this.invoke = function(name){
 		/*
 		var arr = [];
@@ -236,19 +289,26 @@ _class("TemplateManager", "", function(){
 		*/
 		var html;
 		if(!(name in this._hash)){
-			window.alert("[TemplateManager::invoke]ÇëÈ·ÈÏÄ£°å" + name + "ÒÑ¾­´æÔÚ");
+			window.alert("[TemplateManager::invoke]è¯·ç¡®è®¤æ¨¡æ¿" + name + "å·²ç»å­˜åœ¨");
 		}else{
 			var tpl = this._hash[name];
-			switch(tpl.type){  //¸ù¾İÄ£°åµÄÀàĞÍ£¬Ê¹ÓÃ²»Í¬µÄ·½Ê½Éú³É HTML ´úÂë
-			case "html":  //Ö±½ÓÊä³ö
+			//[profile]if(!(name in runtime.__tpl)){
+			//[profile]	runtime.__tpl[name] = 0;
+			//[profile]}
+			switch(tpl.type){  //æ ¹æ®æ¨¡æ¿çš„ç±»å‹ï¼Œä½¿ç”¨ä¸åŒçš„æ–¹å¼ç”Ÿæˆ HTML ä»£ç 
+			case "html":  //ç›´æ¥è¾“å‡º
 				html = tpl.data;
 				break;
-			case "tpl":  //Ê¹ÓÃÕıÔòÌæ»»
+			case "tpl":  //ä½¿ç”¨æ­£åˆ™æ›¿æ¢
+				//[profile]var t0 = new Date().getTime();
 				html = this.callTpl(tpl.data, arguments[1]);
+				//[profile]runtime.__tpl[name] += new Date().getTime() - t0;
 				break;
-			case "asp":  //Ö´ĞĞº¯Êıµ÷ÓÃ
+			case "asp":  //æ‰§è¡Œå‡½æ•°è°ƒç”¨
+				//[profile]var t0 = new Date().getTime();
 				var arr = Array.prototype.slice.call(arguments, 1);
 				html = this._hash[name].func.apply(null, arr);
+				//[profile]runtime.__tpl[name] += new Date().getTime() - t0;
 				break;
 			case "tmpl":
 				html = this._trimPath.parseTemplate(this._hash[name].data).process(arguments[1]);
@@ -261,7 +321,7 @@ _class("TemplateManager", "", function(){
 		return html;
 	};
 	/**
-	 * ÔÚÖ¸¶¨µÄDOMÔªËØÖĞäÖÈ¾Ò»¸öÄ£°åµÄÄÚÈİ
+	 * åœ¨æŒ‡å®šçš„DOMå…ƒç´ ä¸­æ¸²æŸ“ä¸€ä¸ªæ¨¡æ¿çš„å†…å®¹
 	 * @param {HTMLElement} element
 	 * @param {String} tplName
 	 */
@@ -276,8 +336,8 @@ _class("TemplateManager", "", function(){
 		element.innerHTML = this.invoke.apply(this, arr);  //arr[0] = tplName;
 	};
 	/**
-	 * Èç¹ûÊ¹ÓÃ×·¼Ó·½Ê½ĞèÒª¿¼ÂÇ£¬×·¼ÓµÄÄ£°æÊÇ²»ÊÇ_align="client"Í£¿¿µÄÃæ°å£¬ÒÔ±ãÓÚ
-	 * ·½±ãµÄ²¼¾ÖµÄÕı³£¹¤×÷
+	 * å¦‚æœä½¿ç”¨è¿½åŠ æ–¹å¼éœ€è¦è€ƒè™‘ï¼Œè¿½åŠ çš„æ¨¡ç‰ˆæ˜¯ä¸æ˜¯_align="client"åœé çš„é¢æ¿ï¼Œä»¥ä¾¿äº
+	 * æ–¹ä¾¿çš„å¸ƒå±€çš„æ­£å¸¸å·¥ä½œ
 	 */
 	this.render2 = function(element, tplName){
 		/*
@@ -291,9 +351,9 @@ _class("TemplateManager", "", function(){
 		return element.appendChild(runtime.createDomElement(tpl));
 	};
 	/**
-	 * äÖÈ¾Ö¸¶¨µÄÄ£°åºÍÊı¾İµ½Pane×é¼şÖĞ
-	 * @param {Pane} pane Pane ÀàĞÍ×é¼ş
-	 * @param {String} tplName Ä£°åÃû×Ö
+	 * æ¸²æŸ“æŒ‡å®šçš„æ¨¡æ¿å’Œæ•°æ®åˆ°Paneç»„ä»¶ä¸­
+	 * @param {Pane} pane Pane ç±»å‹ç»„ä»¶
+	 * @param {String} tplName æ¨¡æ¿åå­—
 	 */
 	this.renderPane = function(pane, tplName){
 		this.render.apply(this, arguments);
@@ -336,8 +396,8 @@ _class("TemplateManager", "", function(){
 		}
 	};
 	/**
-	 * ½«×Ö·û´®×ª»»³É¿ÉÒÔ±»×Ö·û´®±íÊ¾·ûºÅ(",')À¨ÆğÀ´ÒÑ±íÊ¾Ô­À´×Ö·û´®ÒâÒåµÄ×Ö·û´®
-	 * @param {String} str Òª×ª»»µÄ×Ö·û´®ÄÚÈİ
+	 * å°†å­—ç¬¦ä¸²è½¬æ¢æˆå¯ä»¥è¢«å­—ç¬¦ä¸²è¡¨ç¤ºç¬¦å·(",')æ‹¬èµ·æ¥å·²è¡¨ç¤ºåŸæ¥å­—ç¬¦ä¸²æ„ä¹‰çš„å­—ç¬¦ä¸²
+	 * @param {String} str è¦è½¬æ¢çš„å­—ç¬¦ä¸²å†…å®¹
 	 */
 	this.toJsString = function(str){
 		if(typeof str != "string") return "";
@@ -353,9 +413,9 @@ _class("TemplateManager", "", function(){
 		});
 	};
 	/**
-	 * ½«ÀàËÆ ASP ´úÂëµÄÄ£°å½âÎöÎªÒ»¸ö JS º¯ÊıµÄ´úÂëĞÎÊ½
-	 * @param {String} code Ä£°åµÄÄÚÈİ
-	 * @param {String} params Ä£°å±àÒë¡°Ä¿±êº¯Êı¡±²ÎÊıÁĞ±íµÄ×Ö·û´®ĞÎÊ½±íÊ¾
+	 * å°†ç±»ä¼¼ ASP ä»£ç çš„æ¨¡æ¿è§£æä¸ºä¸€ä¸ª JS å‡½æ•°çš„ä»£ç å½¢å¼
+	 * @param {String} code æ¨¡æ¿çš„å†…å®¹
+	 * @param {String} params æ¨¡æ¿ç¼–è¯‘â€œç›®æ ‡å‡½æ•°â€å‚æ•°åˆ—è¡¨çš„å­—ç¬¦ä¸²å½¢å¼è¡¨ç¤º
 	 */
 	this.parse = function(code, params){
 		/*
@@ -364,7 +424,7 @@ _class("TemplateManager", "", function(){
 		var p0 = code.indexOf(tag0, 0);
 		var t0 = {"tag":tag0,"len":l0,"p":p0};
 		*/
-		var t0 = this.findTag(code, "start", 0);  //Ñ°ÕÒ¿ªÊ¼±êÇ©
+		var t0 = this.findTag(code, "start", 0);  //å¯»æ‰¾å¼€å§‹æ ‡ç­¾
 		//this.dumpTag(t0);
 		var tag1 = "%--" + ">";
 		var l1 = tag1.length;
@@ -373,7 +433,7 @@ _class("TemplateManager", "", function(){
 		var sb = [];
 		sb.push("function(" + (params || "") + "){");
 		sb.push("\nvar __sb = [];");
-		var bExp = false;  //ÊÇ·ñÕıÔÚ½âÎö±í´ïÊ½
+		var bExp = false;  //æ˜¯å¦æ­£åœ¨è§£æè¡¨è¾¾å¼
 		while(t0.p != -1){
 			if(t0.p > t1.p + t1.len){
 				if(bExp){
@@ -386,45 +446,45 @@ _class("TemplateManager", "", function(){
 					sb.push("\n__sb.push(\"" + this.toJsString(code.substring(t1.p + t1.len, t0.p)) + "\");");
 				}
 			}
-			t1 = this.findTag(code, "end", t0.p + t0.len);  //Ñ°ÕÒ½áÊø±êÇ©
+			t1 = this.findTag(code, "end", t0.p + t0.len);  //å¯»æ‰¾ç»“æŸæ ‡ç­¾
 			//this.dumpTag(t1);
 			//t1.p = code.indexOf(t1.tag, t0.p + t0.len);
 			if(t1.p != -1){
 				switch(code.charAt(t0.p + t0.len)){
-				case "!":  //º¯ÊıÉùÃ÷
-					if(!params){  //ºöÂÔÉùÃ÷ÖĞµÄ²ÎÊı»ñÈ¡·½Ê½
+				case "!":  //å‡½æ•°å£°æ˜
+					if(!params){  //å¿½ç•¥å£°æ˜ä¸­çš„å‚æ•°è·å–æ–¹å¼
 						bExp = false;
-						sb[0] = code.substring(t0.p + t0.len + 1, t1.p - 1) + "{";  //ºöÂÔÉùÃ÷½áÊøµÄ·ÖºÅ£¬²¢Ìæ»»³É "{"
+						sb[0] = code.substring(t0.p + t0.len + 1, t1.p - 1) + "{";  //å¿½ç•¥å£°æ˜ç»“æŸçš„åˆ†å·ï¼Œå¹¶æ›¿æ¢æˆ "{"
 					}
 					break;
-				case '=':  //Èç¹û±í´ïÊ½£¬°Ñ±í´ïÊ½µÄ½á¹û»º´æµ½ __sb ÖĞ
+				case '=':  //å¦‚æœè¡¨è¾¾å¼ï¼ŒæŠŠè¡¨è¾¾å¼çš„ç»“æœç¼“å­˜åˆ° __sb ä¸­
 					bExp = true;
 					var s = sb.pop();
-					//°ÑÒ»²¿·ÖÊôÓÚjs±í´ïÊ½µÄ´úÂëÌí¼Óµ½Ç°ÃæÒ»¸ö__sb.push£¨»¹¿ÉÄÜÊÇ'var __sb = [];'¶¨Òå£©ÖĞ
+					//æŠŠä¸€éƒ¨åˆ†å±äºjsè¡¨è¾¾å¼çš„ä»£ç æ·»åŠ åˆ°å‰é¢ä¸€ä¸ª__sb.pushï¼ˆè¿˜å¯èƒ½æ˜¯'var __sb = [];'å®šä¹‰ï¼‰ä¸­
 					//s = s.substr(0, s.length - 2)
 					//	+ (sb.length <= 2 ? "" : " + ")
 					//	+ code.substring(t0.p + t0.len + 1, t1.p)
 					//	+ s.substr(s.length - 2);
-					s = s.substr(0, s.length - 2)                     //ÉÏÒ»¸ö__sbÔªËØ²åÈëµãÖ®Ç°µÄ²¿·Ö
-						+ (s.charAt(s.length - 3) == "[" ? "" : " + ")  //´¦ÀíÌØÊâÇé¿ö
-						+ code.substring(t0.p + t0.len + 1, t1.p)       //±í´ïÊ½²¿·Ö
-						+ s.substr(s.length - 2);                       //ÉÏÒ»¸ö__sbÔªËØ²åÈëµãÖ®ºóµÄ²¿·Ö
+					s = s.substr(0, s.length - 2)                     //ä¸Šä¸€ä¸ª__sbå…ƒç´ æ’å…¥ç‚¹ä¹‹å‰çš„éƒ¨åˆ†
+						+ (s.charAt(s.length - 3) == "[" ? "" : " + ")  //å¤„ç†ç‰¹æ®Šæƒ…å†µ
+						+ code.substring(t0.p + t0.len + 1, t1.p)       //è¡¨è¾¾å¼éƒ¨åˆ†
+						+ s.substr(s.length - 2);                       //ä¸Šä¸€ä¸ª__sbå…ƒç´ æ’å…¥ç‚¹ä¹‹åçš„éƒ¨åˆ†
 					sb.push(s);
 					//sb.push("\n__sb.push(" + code.substring(t0.p + t0.len + 1, t1.p) + ");");
 					break;
-				default:  //ÆÕÍ¨µÄ´úÂë£¬±£³Ö²»±ä
+				default:  //æ™®é€šçš„ä»£ç ï¼Œä¿æŒä¸å˜
 					bExp = false;
 					sb.push(code.substring(t0.p + t0.len, t1.p));
 					break;
 				}
 			}else{
-				return "Ä£°åÖĞµÄ'" + t0.tag + "'Óë'" + t1.tag + "'²»Æ¥Åä£¡";
+				return "æ¨¡æ¿ä¸­çš„'" + t0.tag + "'ä¸'" + t1.tag + "'ä¸åŒ¹é…ï¼";
 			}
-			t0 = this.findTag(code, "start", t1.p + t1.len);  //Ñ°ÕÒ¿ªÊ¼±êÇ©
+			t0 = this.findTag(code, "start", t1.p + t1.len);  //å¯»æ‰¾å¼€å§‹æ ‡ç­¾
 			//this.dumpTag(t0);
 			//t0.p = code.indexOf(t0.tag, t1.p + t1.len);
 		}
-		if(t1.p + t1.len >= 0 && t1.p + t1.len < code.length){  //±£´æ½áÊø±êÖ¾Ö®ºóµÄ´úÂë
+		if(t1.p + t1.len >= 0 && t1.p + t1.len < code.length){  //ä¿å­˜ç»“æŸæ ‡å¿—ä¹‹åçš„ä»£ç 
 			sb.push("\n__sb.push(\"" + this.toJsString(code.substr(t1.p + t1.len)) + "\");");
 		}
 		sb.push("\nreturn __sb.join(\"\");");
@@ -454,16 +514,16 @@ _class("TemplateManager", "", function(){
 				/*
 				if(name in this._hashAAA){
 					if(!(tagName in this._hashAAA[name])){
-						print("[error]" + tagName + "²»ÔÊĞí´æÔÚ" + name+ "ÊôĞÔ(value=" + value + ")\n");
+						print("[error]" + tagName + "ä¸å…è®¸å­˜åœ¨" + name+ "å±æ€§(value=" + value + ")\n");
 					}
 				}else if(name.charAt(0) == "_"){
-					runtime.warning(tagName + "º¬ÓĞ×Ô¶¨ÒåÊôĞÔ" + name+ "=\"" + value + "\"\n");
+					runtime.warning(tagName + "å«æœ‰è‡ªå®šä¹‰å±æ€§" + name+ "=\"" + value + "\"\n");
 				}else if(name == "style"){
-					runtime.warning(tagName + "º¬ÓĞÊôĞÔ" + name+ "=\"" + value + "\"\n");
+					runtime.warning(tagName + "å«æœ‰å±æ€§" + name+ "=\"" + value + "\"\n");
 				}else if(name.substr(0, 2) == "on"){
-					runtime.warning(tagName + "º¬ÓĞÊÂ¼ş´úÂë" + name+ "=\"" + value + "\"\n");
+					runtime.warning(tagName + "å«æœ‰äº‹ä»¶ä»£ç " + name+ "=\"" + value + "\"\n");
 				}else if(!(name in this._att)){
-					runtime.error(tagName + "º¬ÓĞÎ´ÖªÊôĞÔ" + name+ "=\"" + value + "\"\n");
+					runtime.error(tagName + "å«æœ‰æœªçŸ¥å±æ€§" + name+ "=\"" + value + "\"\n");
 				}
 				*/
 				sb.push(" " + name + "=\"" + value + "\"");
@@ -480,7 +540,7 @@ _class("TemplateManager", "", function(){
 				if(tagName in this._hashTag){
 					sb.push(" />");
 				}else{
-					//runtime.warning(tagName + "ÊÇ¿Õ±êÇ©\n");
+					//runtime.warning(tagName + "æ˜¯ç©ºæ ‡ç­¾\n");
 					sb.push("></" + tagName + ">");
 				}
 			}
@@ -495,7 +555,7 @@ _class("TemplateManager", "", function(){
 			//sb.push("<!--" + node.data + "-->");
 			break;
 		default:
-			//runtime.warning("ÎŞ·¨´¦ÀíµÄnodeType" + node.nodeType + "\n");
+			//runtime.warning("æ— æ³•å¤„ç†çš„nodeType" + node.nodeType + "\n");
 			break;
 		}
 		return sb.join("");

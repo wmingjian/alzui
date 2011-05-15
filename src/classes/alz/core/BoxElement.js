@@ -10,7 +10,7 @@ _class("BoxElement", "", function(){
 		this._self = null;
 		this._nodes = [];
 		this._style = {};
-		this.__style = null;  //DOMÔªËØµÄstyleÊôĞÔ
+		this.__style = null;  //DOMå…ƒç´ çš„styleå±æ€§
 		this._currentStyle = {};
 		this.__layout = null;  //{AbstractLayout}
 		this._layout = "";
@@ -76,7 +76,7 @@ _class("BoxElement", "", function(){
 		obj.__ptr__ = this;
 		this._self = obj;
 		this.__style = obj.style;
-		//³õÊ¼»¯Ó¦ÓÃµ½µÄÊôĞÔ£¬´ÓDOM¶ÔÏóÖĞ½âÎö³öÊµ¼ÊµÄÖµ£¬Ö»¶Á·½Ê½Ê¹ÓÃ
+		//åˆå§‹åŒ–åº”ç”¨åˆ°çš„å±æ€§ï¼Œä»DOMå¯¹è±¡ä¸­è§£æå‡ºå®é™…çš„å€¼ï¼Œåªè¯»æ–¹å¼ä½¿ç”¨
 		var properties = [
 			"width","height",
 			"marginLeft","marginRight","marginTop","marginBottom",
@@ -107,6 +107,7 @@ _class("BoxElement", "", function(){
 		this._self.style.padding = "0px";
 	};
 	this.dispose = function(){
+		if(this._disposed) return;
 		if(this.__layout){
 			this.__layout.dispose();
 			this.__layout = null;
@@ -125,7 +126,7 @@ _class("BoxElement", "", function(){
 		this._nodes.push(node);
 	};
 	/**
-	 * Í³Ò» IE ºÍ Moz ÏµÁĞä¯ÀÀÆ÷µÄ²îÒì
+	 * ç»Ÿä¸€ IE å’Œ Moz ç³»åˆ—æµè§ˆå™¨çš„å·®å¼‚
 	 */
 	this.parseInt = function(tag, v){
 		switch(v){
@@ -154,7 +155,7 @@ _class("BoxElement", "", function(){
 		}else if(this._self.currentStyle){
 			style = this._self.currentStyle;
 		}else{
-			throw "ÎŞ·¨¶¯Ì¬»ñÈ¡DOMµÄÊµ¼ÊÑùÊ½ÊôĞÔ";
+			throw "æ— æ³•åŠ¨æ€è·å–DOMçš„å®é™…æ ·å¼å±æ€§";
 		}
 		return style;
 	};
@@ -231,7 +232,7 @@ _class("BoxElement", "", function(){
 		return innerWidth;
 	};
 	this.setInnerWidth = function(w, skip){
-		//this.setWidth(w/*- this._marginLeft - this._marginRight*/);  //¾ø¶Ô¶¨Î»£¬marginRightÃ»ÓĞ×÷ÓÃ
+		//this.setWidth(w/*- this._marginLeft - this._marginRight*/);  //ç»å¯¹å®šä½ï¼ŒmarginRightæ²¡æœ‰ä½œç”¨
 		w = w - (skip ? 0 : (this._marginLeft + this._marginRight))
 			- this._borderLeftWidth - this._borderRightWidth
 			- this._paddingLeft - this._paddingRight;

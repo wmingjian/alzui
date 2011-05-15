@@ -3,13 +3,16 @@ _package("alz.action");
 _import("alz.action.ActionElement");
 
 /**
- * ³¬Á´½Ó(a)ÔªËØµÄ·â×°
+ * è¶…é“¾æ¥(a)å…ƒç´ çš„å°è£…
  */
 _class("LinkLabel", ActionElement, function(){
+	this._init = function(){
+		_super._init.call(this);
+	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
 		var _this = this;
-		this._self.onclick = function(ev, sender){  //sender ´ú±íÒªÌæ»»µÄÎ±×°µÄ sender ²ÎÊı
+		this._self.onclick = function(ev, sender){  //sender ä»£è¡¨è¦æ›¿æ¢çš„ä¼ªè£…çš„ sender å‚æ•°
 			ev = ev || window.event;
 			ev.cancelBubble = true;
 			return _this.dispatchAction(sender || this, ev);

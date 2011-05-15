@@ -1,6 +1,7 @@
 _package("alz.core");
 
 _import("alz.lang.Exception");
+_import("alz.core.AppManager");
 //_import("alz.core.DOMUtil");
 //_import("alz.core.AjaxEngine");
 //_import("alz.mui.Component");
@@ -9,78 +10,86 @@ _import("alz.lang.Exception");
 _class("WebRuntime", "", function(){
 	this._init = function(){
 		_super._init.call(this);
-		//µ÷ÊÔ¼°ÆäËü¸÷ÖÖ¿ª¹ØÑ¡Ïî
-		this._startTime = __start;   //ÏµÍ³´úÂë¿ªÊ¼Ö´ĞĞµÄÊ±¼ä´Á
-		this._debug = false;         //ÏµÍ³ÊÇ·ñ´¦ÓÚµ÷ÊÔ×´Ì¬
-		this._globalName = "__runtime__";  //¶àRuntime»·¾³ÏÂµÄÈ«¾ÖÎ¨Ò»±äÁ¿µÄÃû×Ö
+		//è°ƒè¯•åŠå…¶å®ƒå„ç§å¼€å…³é€‰é¡¹
+		this._startTime = new Date().getTime();   //__start ç³»ç»Ÿä»£ç å¼€å§‹æ‰§è¡Œçš„æ—¶é—´æˆ³
+		this._debug = false;         //ç³»ç»Ÿæ˜¯å¦å¤„äºè°ƒè¯•çŠ¶æ€
+		this._globalName = "__runtime__";  //å¤šRuntimeç¯å¢ƒä¸‹çš„å…¨å±€å”¯ä¸€å˜é‡çš„åå­—
 
-		//Â·¾¶ÅäÖÃ
-		this.pathSep   = "/";  //Ä¿Â¼·Ö¸î·û
-		this.pathAui   = "/alzui/";     //alzuiÄÚºËËùÔÚÄ¿Â¼("http://www.iiios.net:8081/alzui/")
-		this.classpath = this.pathAui + "classes/";     //Ä¬ÈÏµÄÀàÎÄ¼ş´æ´¢Ä¿Â¼
-		this.pathLib   = this.pathAui + "lib/";         //Ä¬ÈÏµÄÀà¿â°ü´æ´¢Ä¿Â¼
-		this.pathApp   = this.pathAui + "netapp/";      //appËùÔÚ¸ùÄ¿Â¼
-		this.pathSrv   = this.pathAui + "data/";        //·şÎñ¶Ë³ÌĞòµÄ¸ùÄ¿Â¼
-		this.pathHtml  = this.pathAui + "html/";        //HtmlApp Ä¿Â¼
-		this.pathTpl   = this.pathLib + "res/tpl/";     //tplÄ£°æÎÄ¼şÄ¿Â¼
-		this.pathCss   = this.pathLib + "res/css/";     //cssÎÄ¼şÄ¿Â¼
-		this.pathImg   = this.pathLib + "res/images/";  //Í¼Æ¬×ÊÔ´
-		this.pathSkin  = this.pathLib + "skin/win2k/";  //Æ¤·ô(Í¼±ê)
-		this.pathPlugin = this.pathAui + "plugins/";    //²å¼şÄ¿Â¼
+		//è·¯å¾„é…ç½®
+		this._pathSep   = "/";  //ç›®å½•åˆ†å‰²ç¬¦
+		this._pathAui   = "/alzui/";     //alzuiå†…æ ¸æ‰€åœ¨ç›®å½•("http://www.iiios.net:8081/alzui/")
+		this._classpath = this._pathAui + "classes/";     //é»˜è®¤çš„ç±»æ–‡ä»¶å­˜å‚¨ç›®å½•
+		this._pathLib   = this._pathAui + "lib/";         //é»˜è®¤çš„ç±»åº“åŒ…å­˜å‚¨ç›®å½•
+		this._pathApp   = this._pathAui + "netapp/";      //appæ‰€åœ¨æ ¹ç›®å½•
+		this._pathSrv   = this._pathAui + "data/";        //æœåŠ¡ç«¯ç¨‹åºçš„æ ¹ç›®å½•
+		this._pathHtml  = this._pathAui + "html/";        //HtmlApp ç›®å½•
+		this._pathTpl   = this._pathLib + "res/tpl/";     //tplæ¨¡ç‰ˆæ–‡ä»¶ç›®å½•
+		this._pathCss   = this._pathLib + "res/css/";     //cssæ–‡ä»¶ç›®å½•
+		this._pathImg   = this._pathLib + "res/images/";  //å›¾ç‰‡èµ„æº
+		this._pathSkin  = this._pathLib + "skin/win2k/";  //çš®è‚¤(å›¾æ ‡)
+		this._pathPlugin = this._pathAui + "plugins/";    //æ’ä»¶ç›®å½•
 
-		//ÔËĞĞÊ±»·¾³ËùÔÚµÄËŞÖ÷£¬ÎªÔËĞĞÊ±»·¾³Ìá¹©Í³Ò»µÄ»·¾³½Ó¿Ú
-		this._global   = null;  //±£´æÎ¨Ò»µÄÒ»¸öÈ«¾Ö this µÄÖ¸Õë
-		this._host     = null;  //ÔËĞĞÊ±»·¾³µÄËŞÖ÷¶ÔÏó£¨ËŞÖ÷»·¾³£©
-		this._hostenv  = "";    //ËŞÖ÷»·¾³(ÌØ±ğµÄËŞÖ÷:hta,chm)
-		this._config   = {};    //ÏµÍ³ÅäÖÃ±äÁ¿£¨º¬Òå²Î¼ûÎÄµµËµÃ÷£©
+		//è¿è¡Œæ—¶ç¯å¢ƒæ‰€åœ¨çš„å®¿ä¸»ï¼Œä¸ºè¿è¡Œæ—¶ç¯å¢ƒæä¾›ç»Ÿä¸€çš„ç¯å¢ƒæ¥å£
+		this._global   = null;  //ä¿å­˜å”¯ä¸€çš„ä¸€ä¸ªå…¨å±€ this çš„æŒ‡é’ˆ
+		this._host     = null;  //è¿è¡Œæ—¶ç¯å¢ƒçš„å®¿ä¸»å¯¹è±¡ï¼ˆå®¿ä¸»ç¯å¢ƒï¼‰
+		this._hostenv  = "";    //å®¿ä¸»ç¯å¢ƒ(ç‰¹åˆ«çš„å®¿ä¸»:hta,chm)
+		this._config   = {};    //ç³»ç»Ÿé…ç½®å˜é‡ï¼ˆå«ä¹‰å‚è§æ–‡æ¡£è¯´æ˜ï¼‰
 		/**
-		 * confÅäÖÃĞÅÏ¢ËµÃ÷
-		 * debug   boolean ÊÇ·ñµ÷ÊÔ×´Ì¬
-		 * runmode number  ÔËĞĞÄ£Ê½
-		 * skinid  string  Ä¬ÈÏÆ¤·ôid
-		 * action  string  Ä¬ÈÏ´¥·¢µÄ¶¯×÷(mini°æÊ¹ÓÃ)
-		 * aulFile string  Ä¬ÈÏÆô¶¯µÄaulÎÄ¼ş
-		 * screen  string  ×ÀÃæÆÁÄ»×é¼şµÄDOMÈİÆ÷id
+		 * confé…ç½®ä¿¡æ¯è¯´æ˜
+		 * debug   boolean æ˜¯å¦è°ƒè¯•çŠ¶æ€
+		 * runmode number  è¿è¡Œæ¨¡å¼
+		 * skinid  string  é»˜è®¤çš®è‚¤id
+		 * action  string  é»˜è®¤è§¦å‘çš„åŠ¨ä½œ(miniç‰ˆä½¿ç”¨)
+		 * aulFile string  é»˜è®¤å¯åŠ¨çš„aulæ–‡ä»¶
+		 * screen  string  æ¡Œé¢å±å¹•ç»„ä»¶çš„DOMå®¹å™¨id
 		 */
 		this._conf = {};
-		this._tpls = {};       //Ä£°å¿â¼¯ºÏ
-		this._srvFiles = {};  //·şÎñµÄÎÄ¼şÁĞ±í
-		this._parentRuntime = null;  //¸¸WebRuntime¶ÔÏó
-		this._libManager = null;  //¿âÎÄ¼ş¹ÜÀíÕß
-		this._libLoader = null;   //¿âÎÄ¼ş¼ÓÔØÆ÷
-		this._contextList = {};   //ÉÏÏÂÎÄ»·¾³¶ÔÏóÁĞ±í
-		this._libContext = null;  //µ±Ç°libµÄÉÏÏÂÎÄ»·¾³¶ÔÏó
-		this._plugins = {};       //×¢²áµÄ²å¼şÁĞ±í
-		this._log = [];  //ÈÕÖ¾»º´æ
+		this._tpls = {};       //æ¨¡æ¿åº“é›†åˆ
+		this._srvFiles = {};  //æœåŠ¡çš„æ–‡ä»¶åˆ—è¡¨
+		this._parentRuntime = null;  //çˆ¶WebRuntimeå¯¹è±¡
+		this._plugins = {};       //æ³¨å†Œçš„æ’ä»¶åˆ—è¡¨
+		this.dom = null;
+		this._libManager = null;  //åº“æ–‡ä»¶ç®¡ç†è€…
+		this._libLoader = null;   //åº“æ–‡ä»¶åŠ è½½å™¨
+		this._appManager = null;  //åº”ç”¨ç®¡ç†è€…
+		this._contextList = {};   //ä¸Šä¸‹æ–‡ç¯å¢ƒå¯¹è±¡åˆ—è¡¨
+		this._libContext = null;  //å½“å‰libçš„ä¸Šä¸‹æ–‡ç¯å¢ƒå¯¹è±¡
+		this._log = [];  //æ—¥å¿—ç¼“å­˜
 
-		//ä¯ÀÀÆ÷»·¾³ÏÂÔÚ¿ÉÄÜÓĞµÄ½Ó¿Ú
-		this._win       = null;  //ÔËĞĞÊ±»·¾³ËùÔÚµÄ window ¶ÔÏó
+		//æµè§ˆå™¨ç¯å¢ƒä¸‹åœ¨å¯èƒ½æœ‰çš„æ¥å£
+		this._win       = null;  //è¿è¡Œæ—¶ç¯å¢ƒæ‰€åœ¨çš„ window å¯¹è±¡
 		this._doc       = null;
-		this._domScript = null;  //script DOM ¶ÔÏó
-		this.ie     = false;  //ÊÇ·ñIEä¯ÀÀÆ÷
-		this.ff     = false;  //ÊÇ·ñFireFox
-		this.ns     = false;  //ÊÇ·ñNetscape
-		this.opera  = false;  //ÊÇ·ñOpera
-		this.safari = false;  //ÊÇ·ñSafari
-		this.chrome = false;  //ÊÇ·ñ¹È¸èä¯ÀÀÆ÷
-		this.moz    = false;  //ÊÇ·ñMozillaÏµÁĞä¯ÀÀÆ÷
-		this.ie5    = false;  //ÊÇ·ñIE5
-		this.ie55   = false;  //ÊÇ·ñIE5.5
-		this.ie6    = false;  //ÊÇ·ñIE6
-		this.ie7    = false;  //ÊÇ·ñIE7
-		this.ff1    = false;  //ÊÇ·ñFF1
-		this.ff2    = false;  //ÊÇ·ñFF2
-		this.max    = false;  //ÊÇ·ñMaxthon
-		this.tt     = false;  //ÊÇ·ñTencentTraveler
+		this._docView   = null;
+		this._domScript = null;  //script DOM å¯¹è±¡
+		this.isStrict = null; //æ˜¯å¦ä¸¥æ ¼æ¨¡å¼
+		this.ie       = false;  //æ˜¯å¦IEæµè§ˆå™¨
+		this.ff       = false;  //æ˜¯å¦FireFox
+		this.ns       = false;  //æ˜¯å¦Netscape
+		this.opera    = false;  //æ˜¯å¦Opera
+		this.safari   = false;  //æ˜¯å¦Safari
+		this.chrome   = false;  //æ˜¯å¦è°·æ­Œæµè§ˆå™¨
+		this.moz      = false;  //æ˜¯å¦Mozillaç³»åˆ—æµè§ˆå™¨
+		this.ie5      = false;  //æ˜¯å¦IE5
+		this.ie55     = false;  //æ˜¯å¦IE5.5
+		this.ie6      = false;  //æ˜¯å¦IE6
+		this.ie7      = false;  //æ˜¯å¦IE7
+		this.ie8      = false;  //æ˜¯å¦IE8
+		this.ie9      = false;  //æ˜¯å¦IE9
+		this.ie678    = false;  //æ˜¯å¦IE6/7/8
+		this.ff1      = false;  //æ˜¯å¦FF1
+		this.ff2      = false;  //æ˜¯å¦FF2
+		this.ff3      = false;  //æ˜¯å¦FF3
+		this.max      = false;  //æ˜¯å¦Maxthon
+		this.tt       = false;  //æ˜¯å¦TencentTraveler
 
-		//Ì½²âÊÇ·ñ Gadget ÔËĞĞ»·¾³
+		//æ¢æµ‹æ˜¯å¦ Gadget è¿è¡Œç¯å¢ƒ
 		this.inGadget = false;
-		this.option = {  //GadgetÏà¹ØÊôĞÔ
-			"timer"     : 2000,  //¼ì²éĞÂÓÊ¼şµÄÊ±¼ä¼ä¸ô
-			"newMailNum": 0      //ĞÂÓÊ¼şÊıÁ¿
+		this.option = {  //Gadgetç›¸å…³å±æ€§
+			"timer"     : 2000,  //æ£€æŸ¥æ–°é‚®ä»¶çš„æ—¶é—´é—´éš”
+			"newMailNum": 0      //æ–°é‚®ä»¶æ•°é‡
 		};
-		this._files = {};  //ÒÑ¾­¼ÓÔØµÄjs»òcssÎÄ¼ş
-		this._boxModel = this.ie ? 0 : 1;
+		this._files = {};  //å·²ç»åŠ è½½çš„jsæˆ–cssæ–‡ä»¶
+		this._boxModel = 0;
 		this._info = null;
 		this._testDiv = null;
 		this._zIndex = 0;
@@ -95,49 +104,52 @@ _class("WebRuntime", "", function(){
 
 		this._funs = [];
 		this.__eventHandle = null;
-
-		this._win = __global;
-		this._doc = this._win.document;
-		this.inGadget = !!(this._win.System && this._win.System.Gadget);  //typeof System != "undefined"
-		this._checkBrowser();
-
 		this._inited = false;
 	};
-	this.init = function(){
-		this.exportInterface(this._win);  //µ¼³öÈ«¾Ö±äÁ¿
+	this.init = function(global, cxt){
+		this._win = global;
+		this._doc = this._win.document;
+		this._docView = this._doc.defaultView;
+		this._checkBrowser();
+		this.inGadget = !!(this._win.System && this._win.System.Gadget);  //typeof System != "undefined"
+		this._boxModel = this.ie ? 0 : 1;
+		var _this = this;
+		this.__eventHandle = function(ev){
+			_this.eventHandle(ev || _this._win.event);
+			/*
+			if(ev.type == "unload"){
+				var win = window.open("/sinamail-dev/demos/profile.html", "_blank", "toolbar=no");
+				var a = [];
+				for(var k in runtime.__tpl){
+					a.push(k + "=" + runtime.__tpl[k]);
+				}
+				a.push(__profile._methods["MailModel::formatMailData"].time);
+				window.alert(a.join("\n"));
+				window.alert("window.onunload");
+			}
+			*/
+		};
+		this.exportInterface(this._win);  //å¯¼å‡ºå…¨å±€å˜é‡
 		this._checkHostEnv();
 		this._pathCss = this._config["pathcss"];
 		//this._pathCss = this._products[this._productName].pathCss;
 		this._pathSkin = this._config["pathskin"];
-		this.pathPlugin = this._config["pathplugin"];
-
+		this._pathPlugin = this._config["pathplugin"];
 		this._libManager = new LibManager();
-
+		this._appManager = new AppManager();
 		if(this._config["skin"]){
-			var url = this.pathLib + "skin/" + this._config["skin"] + "/skin.css";
+			var url = this._pathLib + "skin/" + this._config["skin"] + "/skin.css";
 			this._doc.write('<link type="text/css" rel="stylesheet" href="' + url + '" />');
 		}
 		this._preLoadFile("css", this._pathCss, this._config["css"].split(","), this._pathSkin);
-		if(this._config["plugin"]){  //Èç¹ûÓĞ²å¼ş£¬¼ÓÔØ²å¼şµÄCSSÎÄ¼ş
-			var plugins = this._config["plugin"].split(",");
-			for(var i = 0, len = plugins.length; i < len; i++){
-				var plugin = plugins[i];
-				this._preLoadFile("css", this.pathPlugin + plugin + "/css/", [plugin + ".css"]);
-				this._preLoadFile("js" , this.pathPlugin + plugin + "/js/" , [plugin + ".js" ]);
-				plugin = null;
-			}
-			plugins = null;
+		if(this._config["plugin"]){  //å¦‚æœæœ‰æ’ä»¶ï¼ŒåŠ è½½æ’ä»¶çš„CSSæ–‡ä»¶
+			this.loadPluginRes(this._config["plugin"].split(","));
 		}
-		if(this._config["autotest"]){  //¼ÓÔØ×Ô¶¯²âÊÔÎÄ¼ş
+		if(this._config["autotest"]){  //åŠ è½½è‡ªåŠ¨æµ‹è¯•æ–‡ä»¶
 			this._doc.write('<script type="text/javascript" src="' + this._config["autotest"] + '" charset=\"utf-8\"></sc'+'ript>');
 		}
-
-		var _this = this;
-		this.__eventHandle = function(ev){
-			_this.eventHandle(ev || _this._win.event);
-		};
 		if(this._doc.attachEvent){
-			try{  //ÏÂÃæÕâ¾äÔÚWinXP+IE6ÏÂ±¨´í£¬ËùÒÔ¼ÓÉÏ·À´í´¦Àí
+			try{  //ä¸‹é¢è¿™å¥åœ¨WinXP+IE6ä¸‹æŠ¥é”™ï¼Œæ‰€ä»¥åŠ ä¸Šé˜²é”™å¤„ç†
 				this._doc.execCommand("BackgroundImageCache", false, true);
 			}catch(ex){
 			}
@@ -163,17 +175,27 @@ _class("WebRuntime", "", function(){
 			//this._workspace.resize(640, 480);
 			//if(this._win.onContentLoaded) this._win.onContentLoaded();
 		}
+		/*
 		if(this._win.onKernelLoaded){
 			this._win.onKernelLoaded();
 		}
+		*/
 		if(this._doc.body){
 			this.onContentLoaded();
+		}
+	};
+	this.loadPluginRes = function(plugins){
+		for(var i = 0, len = plugins.length; i < len; i++){
+			var plugin = plugins[i];
+			this._preLoadFile("css", this._pathPlugin + plugin + "/css/", [plugin + ".css"]);
+			this._preLoadFile("js" , this._pathPlugin + plugin + "/js/" , [plugin + ".js" ]);
+			plugin = null;
 		}
 	};
 	/**
 	 * @param {Boolean} newWorkspace
 	 */
-	this.onContentLoaded = function(newWorkspace){
+	this.onContentLoaded = function(ev, newWorkspace){
 		if(this._inited) return;
 		this._inited = true;
 		var code = this._config["onstartloading"];
@@ -183,26 +205,26 @@ _class("WebRuntime", "", function(){
 			}catch(ex){
 			}
 		}
-		//°´Ë³ĞòÖ´ĞĞ¹¹ÔìÀ©Õ¹
-		//for(var i = 1, len = this._exts.length; i < len; i++){
-		//	this._exts[i].init.call(this);
+		//æŒ‰é¡ºåºæ‰§è¡Œæ„é€ æ‰©å±•
+		//for(var i = 1, len = this._clazz._exts.length; i < len; i++){
+		//	this._clazz._exts[i].init.call(this);
 		//}
 		this._libManager.initLoadLib();
 		this._newWorkspace = newWorkspace;
 		//this._workspace = new Screen();
 		//this._workspace[this._newWorkspace ? "create" : "bind"](this.getBody());
-		if(this.ie){  //IEÔÚ´ËÊ±´¥·¢ resize
-			this.eventHandle({type:"resize"});  //Ö÷¶¯´¥·¢Ò»´Î resize ÊÂ¼ş
+		if(this.ie){  //IEåœ¨æ­¤æ—¶è§¦å‘ resize
+			this.eventHandle({"type": "resize"});  //ä¸»åŠ¨è§¦å‘ä¸€æ¬¡ resize äº‹ä»¶
 		}
 		//var _this = this;
 		//this.addEventListener(this._win, "mousemove", function(ev){_this.eventHandle(ev || _this._win.event);});
 		//this.addEventListener(this._doc.body, "mousemove", function(ev){_this.eventHandle(ev || _this._win.event);});
-		this._boxModel = this._testBoxModel();  //Ì½²âºĞÄ£ĞÍ
-		//[TODO]¿â´úÂëµÄ¼ÓÔØÊ±»úÓ¦¸Ã¸üÔç²Å¶Ô£¬ÖÁÉÙÒªÔÚ onContentLoaded Ö®Ç°£¬×îºÃÊÇÔÚ³õÊ¼»¯½Å±¾¼ÓÔØ²¢³õÊ¼»¯Íê±ÏµÄÊ±ºò
-		var libs = this._config["lib"];  //.replace(/^core,ui,/, "");  //ºöÂÔcore,ui¿â´úÂë
+		this._boxModel = this._testBoxModel();  //æ¢æµ‹ç›’æ¨¡å‹
+		//[TODO]åº“ä»£ç çš„åŠ è½½æ—¶æœºåº”è¯¥æ›´æ—©æ‰å¯¹ï¼Œè‡³å°‘è¦åœ¨ onContentLoaded ä¹‹å‰ï¼Œæœ€å¥½æ˜¯åœ¨åˆå§‹åŒ–è„šæœ¬åŠ è½½å¹¶åˆå§‹åŒ–å®Œæ¯•çš„æ—¶å€™
+		var libs = this._config["lib"];  //.replace(/^core,ui,/, "");  //å¿½ç•¥core,uiåº“ä»£ç 
 		this._libLoader = new LibLoader();
 		this._libLoader.init(libs.split(","), this._config["codeprovider"], this, "onLibLoad");
-		//ÒÀ´Îµ÷ÓÃ°ó¶¨µÄº¯Êı
+		//ä¾æ¬¡è°ƒç”¨ç»‘å®šçš„å‡½æ•°
 		for(var i = 0, len = this._funs.length; i < len; i++){
 			var agent = this._funs[i].agent;
 			var func = this._funs[i].func;
@@ -230,10 +252,6 @@ _class("WebRuntime", "", function(){
 			this.removeEventListener(this._doc, types[i], this.__eventHandle);
 		}
 		this.__eventHandle = null;
-		for(var k in this._plugins){
-			this._plugins[k].dispose();
-			delete this._plugins[k];
-		}
 		this._libContext = null;
 		for(var i = 0, len = this._components.length; i < len; i++){
 			this._components[i].dispose();
@@ -242,10 +260,20 @@ _class("WebRuntime", "", function(){
 		this._components = [];
 		this._testDiv = null;
 		this._info = null;
+		this._appManager.dispose();
+		this._appManager = null;
 		this._libLoader.dispose();
 		this._libLoader = null;
 		this._libManager.dispose();
 		this._libManager = null;
+		if(this.dom){
+			this.dom.dispose();
+			this.dom = null;
+		}
+		for(var k in this._plugins){
+			this._plugins[k].dispose();
+			delete this._plugins[k];
+		}
 		this._domScript = null;
 		this._doc = null;
 		this._win = null;
@@ -256,7 +284,7 @@ _class("WebRuntime", "", function(){
 	this.destroy = function(){
 	};
 	/**
-	 * ÀûÓÃÕıÔòÆ¥Åä window.navigator.userAgent À´»ñÈ¡ä¯ÀÀÆ÷µÄÀàĞÍ
+	 * åˆ©ç”¨æ­£åˆ™åŒ¹é… window.navigator.userAgent æ¥è·å–æµè§ˆå™¨çš„ç±»å‹
 	 * @param {Navigator} nav
 	 * Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; en) Opera 8.00
 	 * Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9b4pre) Gecko/2008022005 Minefield/3.0b4pre (.NET CLR 3.5.30729)
@@ -273,17 +301,29 @@ _class("WebRuntime", "", function(){
 			"ns"    : /Netscape\/(\d+(?:\.\d+)+)/,  //Netscape/7.0
 			"safari": /Version\/(\d+(?:\.\d+)+)\x20Safari\/(\d+(?:\.\d+)+)/, //Version/3.0.3 Safari/522.15.5
 			"chrome": /Chrome\/(\d+(?:\.\d+)+)\x20Safari\/(\d+(?:\.\d+)+)/,  //Chrome/0.2.149.27 Safari/525.13
+			"mbsafari": /Version\/(\d+(?:\.\d+)+)\x20Mobile\/(\d|\D)+\x20Safari\/(\d+(?:\.\d+)+)/,
 			"mf"    : /Minefield\/(\d+(?:\.\d+)+)/  //Minefield/3.0b4pre
 		};
-		var host = {"os":"unix","env":"unknown","ver":"0","compatMode":""};
+		var host = {"os":"unix","env":"unknown","ver":"0","compatMode":"","osver":""};
 		if(nav.platform == "Win32" || nav.platform == "Windows"){
 			//"Window NT 5.0" win2k
 			//"Window NT 5.1" winxp
 			host.os = "win";
+			if(/Windows NT 5\.1/.test(nav.userAgent)){
+				host.osver = "win2k";
+			}else if(/Windows NT 6\.1/.test(nav.userAgent)){
+				host.osver = "win7";
+			}else if(/Windows NT 5\.0/.test(nav.userAgent)){
+				host.osver = "win2k";
+			}else if(/Windows NT 6\.0/.test(nav.userAgent)){
+				host.osver = "vista";
+			}
 		}else if(nav.platform == "Mac68K" || nav.platform == "MacPPC" || nav.platform == "Macintosh"){
 			host.os = "mac";
 		}else if(nav.platform == "X11"){
 			host.os = "unix";
+		}else if(nav.platform == "iPad" || nav.platform == "iPhone"){
+			host.os = "iPhoneOS";  //[TODO]
 		}
 		for(var k in re){
 			var arr = re[k].exec(nav.userAgent);
@@ -301,53 +341,58 @@ _class("WebRuntime", "", function(){
 			}
 		}
 		if(host.env == "unknown"){
-			runtime.log("[WebRuntime::getHostenv]Î´ÖªµÄËŞÖ÷»·¾³£¬userAgent:" + nav.userAgent);
+			runtime.log("[WebRuntime::getHostenv]æœªçŸ¥çš„å®¿ä¸»ç¯å¢ƒï¼ŒuserAgent:" + nav.userAgent);
 		}
 		return host;
 	};
 	/**
-	 * ¼ì²âä¯ÀÀÆ÷ÀàĞÍ
+	 * æ£€æµ‹æµè§ˆå™¨ç±»å‹
 	 */
 	this._checkBrowser = function(){
 		var nav = this._win.navigator;
 		this._host = this.getHostenv(nav);
 		this._hostenv = this._host.env;
+		this.isStrict = this._doc.compatMode == "CSS1Compat";
 		this.ie = this._hostenv == "ie";
 		this.ff = this._hostenv == "ff";
 		this.ns = this._hostenv == "ns";
 		this.opera = this._hostenv == "opera";
-		this.safari = this._hostenv == "safari";
+		this.safari = this._hostenv == "safari" || this._hostenv == "mbsafari";
 		this.chrome = this._hostenv == "chrome";
 		this.moz = this.ns || this.ff;  //nav.product == "Gecko";
 		this.ie6 = nav.userAgent.indexOf("MSIE 6.0") != -1;
 		this.ie7 = nav.userAgent.indexOf("MSIE 7.0") != -1;
+		this.ie8 = nav.userAgent.indexOf("MSIE 8.0") != -1;
+		this.ie9 = nav.userAgent.indexOf("MSIE 9.0") != -1;
+		this.ie678 = this.ie6 || this.ie7 || this.ie8;
 		this.ff1 = nav.userAgent.indexOf("Firefox/1.0") != -1;
 		this.ff2 = nav.userAgent.indexOf("Firefox/2.0") != -1;
+		this.ff3 = nav.userAgent.indexOf("Firefox/3.0") != -1;
 		this.max = nav.userAgent.indexOf("Maxthon") != -1;
 		this.tt = nav.userAgent.indexOf("TencentTraveler") != -1;
 		/*
 		if(this.ie && this.max && this.tt){
 			this._win.alert(
-						"ÄúÍ¬Ê±¿ªÆôÁËMaxthonºÍÌÚÑ¶TTä¯ÀÀÆ÷£¬Á½¸öä¯ÀÀÆ÷"
-				+ "\n¿ÉÄÜ»áÏà»¥Ó°Ïìµ¼ÖÂÏµÍ³³öÏÖÒ»Ğ©Ğ¡ÎÊÌâ¡£"
-				+ "\n½â¾ö·½·¨£ºÇëÏÈ´ò¿ªMaxthon£¬È»ºóÔÙ´ò¿ªÌÚÑ¶TT¡£"
+						"æ‚¨åŒæ—¶å¼€å¯äº†Maxthonå’Œè…¾è®¯TTæµè§ˆå™¨ï¼Œä¸¤ä¸ªæµè§ˆå™¨"
+				+ "\nå¯èƒ½ä¼šç›¸äº’å½±å“å¯¼è‡´ç³»ç»Ÿå‡ºç°ä¸€äº›å°é—®é¢˜ã€‚"
+				+ "\nè§£å†³æ–¹æ³•ï¼šè¯·å…ˆæ‰“å¼€Maxthonï¼Œç„¶åå†æ‰“å¼€è…¾è®¯TTã€‚"
 			);
 		}
 		*/
 	};
 	/**
-	 * ¼ì²â²¢³õÊ¼»¯ËŞÖ÷»·¾³ÖĞ script ±êÇ©Ëù¶¨ÒåµÄÅäÖÃĞÅÏ¢
+	 * æ£€æµ‹å¹¶åˆå§‹åŒ–å®¿ä¸»ç¯å¢ƒä¸­ script æ ‡ç­¾æ‰€å®šä¹‰çš„é…ç½®ä¿¡æ¯
 	 * [TODO]
-	 *  1)Èç¹ûÒ³ÃæÊÇ¶¯Ì¬Éú³É£¬²¢ÇÒÖ±½ÓÒ»´ÎĞÔĞ´ÈëµÄ£¬»áµ¼ÖÂÎŞ·¨ÕıÈ·¶¨Î» alzui ÏµÍ³
-	 *    Î»ÖÃ£¬Ô­ÒòÔÚÓÚ¶Ô script ÔªËØµÄ²éÑ¯Ä¬ÈÏ×îºóÒ»¸öÎÊÌâ¡£
+	 *  1)å¦‚æœé¡µé¢æ˜¯åŠ¨æ€ç”Ÿæˆï¼Œå¹¶ä¸”ç›´æ¥ä¸€æ¬¡æ€§å†™å…¥çš„ï¼Œä¼šå¯¼è‡´æ— æ³•æ­£ç¡®å®šä½ alzui ç³»ç»Ÿ
+	 *    ä½ç½®ï¼ŒåŸå› åœ¨äºå¯¹ script å…ƒç´ çš„æŸ¥è¯¢é»˜è®¤æœ€åä¸€ä¸ªé—®é¢˜ã€‚
 	 */
 	this._checkHostEnv = function(){
-		//Â·¾¶ÉèÖÃ
+		//è·¯å¾„è®¾ç½®
 		if(!this._domScript){
 			var ol = this._doc.getElementsByTagName("script");
-			this._domScript = ol[ol.length - 1];  //×îºóÒ»¸öscript±êÇ©
+			this._domScript = ol[ol.length - 1];  //æœ€åä¸€ä¸ªscriptæ ‡ç­¾
 		}
-		//ÅĞ¶ÏÊÇ·ñ°üº¬µ±Ç°ÉÏÏÂÎÄ»·¾³µÄÃû×Ö£¬¾Í¿¿ËüÀ´Ê¶±ğÒıÈë³õÊ¼»¯ÎÄ¼şµÄSCRIPT±êÇ©µÄ
+		//åˆ¤æ–­æ˜¯å¦åŒ…å«å½“å‰ä¸Šä¸‹æ–‡ç¯å¢ƒçš„åå­—ï¼Œå°±é å®ƒæ¥è¯†åˆ«å¼•å…¥åˆå§‹åŒ–æ–‡ä»¶çš„SCRIPTæ ‡ç­¾çš„
 		var url = this._domScript.src || this._domScript.getAttribute("src");
 		if(url.indexOf(__context__.__name) == -1){
 			while(true){
@@ -358,13 +403,13 @@ _class("WebRuntime", "", function(){
 			}
 		}
 
-		//ÅäÖÃĞÅÏ¢
+		//é…ç½®ä¿¡æ¯
 		var keys = [
 			"src",
 			"pathlib", "pathapp", "pathcss", "pathskin", "pathimg", "pathtpl", "pathplugin",
 			"css", "lib", "plugin",
 			"conf", "runmode", "skinid", "skin", "codeprovider", "autotest", "action",
-			"onstartloading"  //¿ªÊ¼¼ÓÔØÊ±Ö´ĞĞµÄ´úÂë
+			"onstartloading"  //å¼€å§‹åŠ è½½æ—¶æ‰§è¡Œçš„ä»£ç 
 		];
 		for(var i = 0, len = keys.length; i < len; i++){
 			var key = keys[i];
@@ -401,23 +446,23 @@ _class("WebRuntime", "", function(){
 		conf = null;
 		config = null;
 
-		//Â·¾¶¼ì²â
+		//è·¯å¾„æ£€æµ‹
 
-		//¶¨Î» alzui ÏµÍ³Â·¾¶
+		//å®šä½ alzui ç³»ç»Ÿè·¯å¾„
 		var path = this._config["src"];
 		var arr = (/^(.+)(\\|\/)[^\\\/]+$/ig).exec(path);  //this._win.location
 		if(arr){
-			this.pathSep  = arr[2];
-			this.pathAui = arr[1] + arr[2];
-			//path = path.substring(0, path.lastIndexOf(this.pathSep) + 1).replace(/lib\/$/, "")
-			this._setPathAui(path.substring(0, path.lastIndexOf(this.pathSep) + 1).replace(/lib\/$/, ""));
+			this._pathSep  = arr[2];
+			this._pathAui = arr[1] + arr[2];
+			//path = path.substring(0, path.lastIndexOf(this._pathSep) + 1).replace(/lib\/$/, "")
+			this._setPathAui(path.substring(0, path.lastIndexOf(this._pathSep) + 1).replace(/lib\/$/, ""));
 		}else{
-			this.showException("Î´ÄÜÕıÈ·¶¨Î» alzui ÏµÍ³Î»ÖÃ");
+			this.showException("æœªèƒ½æ­£ç¡®å®šä½ alzui ç³»ç»Ÿä½ç½®");
 			return;
 		}
-		//¶¨Î» WebApp µÄÂ·¾¶
+		//å®šä½ WebApp çš„è·¯å¾„
 		var url = "" + window.location;
-		this.pathApp = url.substr(0, url.lastIndexOf("/") + 1);  //[TODO]pathAppµÄº¬ÒåÒÑ¾­¸Ä±ä
+		this._pathApp = url.substr(0, url.lastIndexOf("/") + 1);  //[TODO]pathAppçš„å«ä¹‰å·²ç»æ”¹å˜
 
 		this._extendSystemObject();
 	};
@@ -429,7 +474,7 @@ _class("WebRuntime", "", function(){
 				skin = true;
 			}
 			var url = (skin ? pathSkin : path) + file;
-			this._files[url] = true;  //±êÊ¶ÒÑ¾­¼ÓÔØ
+			this._files[url] = true;  //æ ‡è¯†å·²ç»åŠ è½½
 			if(ext == "css"){
 				if(!this._host.xul){
 					this._doc.write('<link rel="stylesheet" type="text/css" media="all" href="' + url /*+ '?' + new Date().getTime()*/ + '" />');
@@ -451,13 +496,13 @@ _class("WebRuntime", "", function(){
 	this.dynamicLoadFile = function(ext, path, files, pathSkin){
 		for(var i = 0, len = files.length; i < len; i++){
 			var file = files[i], skin = false;
-			if(file.charAt(0) == "#"){  //Æ¤·ôÎÄ¼ş
+			if(file.charAt(0) == "#"){  //çš®è‚¤æ–‡ä»¶
 				file = file.substr(1).replace(/(\d+)\.css$/, "$1/_skin.css");
 				skin = true;
 			}
 			var url = (skin ? pathSkin : path) + file;
-			if(url in this._files) continue;  //Èç¹ûÒÑ¾­¼ÓÔØ£¬ÔòºöÂÔ
-			this._files[url] = true;  //±êÊ¶ÒÑ¾­¼ÓÔØ
+			if(url in this._files) continue;  //å¦‚æœå·²ç»åŠ è½½ï¼Œåˆ™å¿½ç•¥
+			this._files[url] = true;  //æ ‡è¯†å·²ç»åŠ è½½
 			if(ext == "css"){
 				var link = this._doc.createElement("link");
 				link.type  = "text/css";
@@ -475,28 +520,28 @@ _class("WebRuntime", "", function(){
 		}
 	};
 	/**
-	 * ²âÊÔ¿ÉÄÜÓĞ¿çÓòÎÊÌâµÄ´úÂë
+	 * æµ‹è¯•å¯èƒ½æœ‰è·¨åŸŸé—®é¢˜çš„ä»£ç 
 	 */
 	this._testCrossDomainWindow = function(win, type){
 		try{
 			switch(type){
-			case 0:  //·ÃÎÊparentÊôĞÔ
+			case 0:  //è®¿é—®parentå±æ€§
 				var p = win.parent && win.runtime;
 				break;
-			case 1:  //·ÃÎÊ__main__flagÊôĞÔ
+			case 1:  //è®¿é—®__main__flagå±æ€§
 				if(win.__main__flag && win.runtime){
 					return true;
 				}else{
 					return false;
 				}
-			case 2:  //¶Ô__main__flag¸³Öµ
+			case 2:  //å¯¹__main__flagèµ‹å€¼
 				if(win.runtime){
 					win.__main__flag = true;
 				}else{
 					throw new Exception("[WebRuntime::_testCrossDomainWindow]");
 				}
 				break;
-			case 3:  //²âÊÔlocationÊôĞÔ·ÃÎÊ
+			case 3:  //æµ‹è¯•locationå±æ€§è®¿é—®
 				win.locaiton.pathname.indexOf("/");
 				break;
 			}
@@ -506,9 +551,9 @@ _class("WebRuntime", "", function(){
 		}
 	};
 	/**
-	 * »ñÈ¡Í¬ÓòµÄ¶¥²ã window ¶ÔÏó
-	 * °´ÕÕÖğ¼¶²éÕÒ window.parent ¶ÔÏó£¬²¢²âÊÔ¸³ÖµµÄË¼Â·ÊµÏÖ
-	 * NOTICE!!!¼æÈİĞÔ¿¼ÂÇºÜÎ¢Ãî£¬Ó°ÏìÒ²ºÜ´ó£¬ÇëÎğËæÒâĞŞ¸Ä
+	 * è·å–åŒåŸŸçš„é¡¶å±‚ window å¯¹è±¡
+	 * æŒ‰ç…§é€çº§æŸ¥æ‰¾ window.parent å¯¹è±¡ï¼Œå¹¶æµ‹è¯•èµ‹å€¼çš„æ€è·¯å®ç°
+	 * NOTICE!!!å…¼å®¹æ€§è€ƒè™‘å¾ˆå¾®å¦™ï¼Œå½±å“ä¹Ÿå¾ˆå¤§ï¼Œè¯·å‹¿éšæ„ä¿®æ”¹
 	 */
 	this._getSameDomainTopWindow = function(win){
 		var w, p;
@@ -523,11 +568,11 @@ _class("WebRuntime", "", function(){
 			p = w.parent;
 			if(p == null) break;
 			if(p == w){
-				//ÔÊĞíÄ³¸öÒ³Ãæ¿ÉÒÔ¶¨Òå×Ô¼ºÎª¶¥²ã´°Ìå£¬ĞèÒª×Ô¼ºÊµÏÖÊı¾İ´æ´¢½Ó¿Ú
-				if(this._testCrossDomainWindow(w, 1)){  //Èç¹û´æÔÚ__main__flagÊôĞÔ£¬Ö±½Ó·µ»Ø
+				//å…è®¸æŸä¸ªé¡µé¢å¯ä»¥å®šä¹‰è‡ªå·±ä¸ºé¡¶å±‚çª—ä½“ï¼Œéœ€è¦è‡ªå·±å®ç°æ•°æ®å­˜å‚¨æ¥å£
+				if(this._testCrossDomainWindow(w, 1)){  //å¦‚æœå­˜åœ¨__main__flagå±æ€§ï¼Œç›´æ¥è¿”å›
 					return w;
 				}
-				if(this._testCrossDomainWindow(w, 2)){  //Èç¹û¿ÉÒÔ¶Ô__main__flag¸³Öµ
+				if(this._testCrossDomainWindow(w, 2)){  //å¦‚æœå¯ä»¥å¯¹__main__flagèµ‹å€¼
 					return w;
 				}else{
 					return null;
@@ -545,9 +590,9 @@ _class("WebRuntime", "", function(){
 		return w;
 	};
 	/**
-	 * Õâ¸öº¯Êı¼æÈİ Vista Gadget Ğ¡³ÌĞòÉè¼Æ£¬ÓĞ¿çÓòµÄÈİ´íÅĞ¶Ï£¬ÎÈ¶¨ĞÔÓ¦¸Ã²»´íÁË£¬
-	 * ²»ÒªÖØ¸´Éè¼ÆÕâ¸ö·â×°¹ı³Ì¡£
-	 * __main__flag ±êÊ¾ window ¶ÔÏóÊÇµ±Ç°Ó¦ÓÃµÄ¶¥²ã window ¶ÔÏó
+	 * è¿™ä¸ªå‡½æ•°å…¼å®¹ Vista Gadget å°ç¨‹åºè®¾è®¡ï¼Œæœ‰è·¨åŸŸçš„å®¹é”™åˆ¤æ–­ï¼Œç¨³å®šæ€§åº”è¯¥ä¸é”™äº†ï¼Œ
+	 * ä¸è¦é‡å¤è®¾è®¡è¿™ä¸ªå°è£…è¿‡ç¨‹ã€‚
+	 * __main__flag æ ‡ç¤º window å¯¹è±¡æ˜¯å½“å‰åº”ç”¨çš„é¡¶å±‚ window å¯¹è±¡
 	 */
 	this.getMainWindow = function(){
 		var win = this._getSameDomainTopWindow(window);
@@ -558,14 +603,16 @@ _class("WebRuntime", "", function(){
 					if(!w){
 						return win;
 					}
-					//[2009-8-14] chromeä¯ÀÀÆ÷ÏÂ£¬Ç°ÃæµÄ²âÊÔ¾ù¿ÉÍ¨¹ı£¬µ«location·ÃÎÊ´æÔÚÎÊ
-					//Ìâ£¬ËùÒÔÔÚ´Ë²âÊÔlocationµÄ¿É·ÃÎÊĞÔ¡£
-					if((this.chrome || this.safari) && !this._testCrossDomainWindow(w, 3)){  //²âÊÔlocationÊôĞÔ·ÃÎÊ
+					//[2009-8-14] chromeæµè§ˆå™¨ä¸‹ï¼Œå‰é¢çš„æµ‹è¯•å‡å¯é€šè¿‡ï¼Œä½†locationè®¿é—®å­˜åœ¨é—®
+					//é¢˜ï¼Œæ‰€ä»¥åœ¨æ­¤æµ‹è¯•locationçš„å¯è®¿é—®æ€§ã€‚
+					// add by zhout 11-02-23
+					// å¢åŠ äº†å¯¹Firefoxçš„å¤„ç†ï¼Œæ‰‹æœºå·ç»‘å®šæ—¶FFä¸‹æç¤ºè„šæœ¬æ‰§è¡Œç¼“æ…¢ç›´è‡³å¡æ­»
+					if((this.chrome || this.safari || this.ff) && !this._testCrossDomainWindow(w, 3)){  //æµ‹è¯•locationå±æ€§è®¿é—®
 						return win;
 					}
 					win = w;
 				}
-			}catch(ex){  //·ÀÖ¹ window.opener ¿çÓòµÄ´íÎó
+			}catch(ex){  //é˜²æ­¢ window.opener è·¨åŸŸçš„é”™è¯¯
 			}
 		}else{
 			win = System.Gadget.document.parentWindow;
@@ -574,20 +621,20 @@ _class("WebRuntime", "", function(){
 		return win;
 	};
 	this._setPathAui = function(v){
-		this.pathAui   = v;
-		this.classpath = v + "classes/";
-		this.pathLib   = this._config["pathlib"] || v + "lib/";
-		this.pathSrv   = v + "data/";
+		this._pathAui   = v;
+		this._classpath = v + "classes/";
+		this._pathLib   = this._config["pathlib"] || v + "lib/";
+		this._pathSrv   = v + "data/";
 		var ext = this._win && this._win.location.port == "8081" ? ".jsp" : ".asp";
 		this._srvFiles["service"] = "service" + ext;
 		this._srvFiles["tool"]    = "tool" + ext;
 		this._srvFiles["vfs"]     = "vfs" + ext;
-		this.pathHtml  = v + "html/";
-		this.pathImg   = this.pathLib + "images/";
-		this.pathSkin  = this.pathLib + "skin/win2k/";
+		this._pathHtml  = v + "html/";
+		this._pathImg   = this._pathLib + "images/";
+		this._pathSkin  = this._pathLib + "skin/win2k/";
 	};
 	/**
-	 * ÏµÍ³¶ÔÏó·½·¨À©Õ¹
+	 * ç³»ç»Ÿå¯¹è±¡æ–¹æ³•æ‰©å±•
 	 */
 	this._extendSystemObject = function(){
 		//if(typeof HTMLElement != "undefined" && !window.opera){
@@ -638,7 +685,7 @@ _class("WebRuntime", "", function(){
 			});
 			_p.__defineGetter__("srcElement", function(){
 				var n = this.target;
-				while(n.nodeType != 1){
+				while(n && n.nodeType != 1){
 					n = n.parentNode;
 				}
 				return n;
@@ -679,7 +726,7 @@ _class("WebRuntime", "", function(){
 		}else if(obj.addEventListener){
 			obj.addEventListener(type, eventHandle, false);
 		}else{
-			throw new Exception("[WebRuntime::addEventListener]¸Ãä¯ÀÀÆ÷ÎŞ·¨¶Ô DOM ÔªËØ°ó¶¨ÊÂ¼ş");
+			throw new Exception("[WebRuntime::addEventListener]è¯¥æµè§ˆå™¨æ— æ³•å¯¹ DOM å…ƒç´ ç»‘å®šäº‹ä»¶");
 		}
 	};
 	this.removeEventListener = function(obj, type, eventHandle){
@@ -688,15 +735,21 @@ _class("WebRuntime", "", function(){
 		}else if(obj.removeEventListener){
 			obj.removeEventListener(type, eventHandle, false);
 		}else{
-			throw new Exception("[WebRuntime::removeEventListenerEventListener]¸Ãä¯ÀÀÆ÷ÎŞ·¨¶Ô DOM ÔªËØ°ó¶¨ÊÂ¼ş");
+			throw new Exception("[WebRuntime::removeEventListenerEventListener]è¯¥æµè§ˆå™¨æ— æ³•å¯¹ DOM å…ƒç´ ç»‘å®šäº‹ä»¶");
+		}
+	};
+	this.fireEvent = function(ev){
+		var name = "on" + ev.type.capitalize();
+		if(typeof this[name] == "function"){
+			this[name](ev);
 		}
 	};
 	/**
-	 * È«¾ÖÊÂ¼şÏìÓ¦º¯Êı
+	 * å…¨å±€äº‹ä»¶å“åº”å‡½æ•°
 	 * [TODO]
-	 *   1)Workspace×é¼şµÄÒ»Ğ©·½·¨ÊôÓÚÏµÍ³¼¶µÄ£¬¶ø²»ÊÇComponent×é¼şµÄ
-	 *   2)this.getViewPort ºÍ DOMUtil.getViewPort ´úÂëÒ»ÖÂ
-	 *   3)¾¡¿ÉÄÜÔçµÄ´¥·¢Ò»´Î resize ÊÂ¼ş£¬Í¬Ê±ÔÚÓ¦ÓÃ³õÊ¼»¯Íê±ÏÔÙ´¥·¢Ò»´Î
+	 *   1)Workspaceç»„ä»¶çš„ä¸€äº›æ–¹æ³•å±äºç³»ç»Ÿçº§çš„ï¼Œè€Œä¸æ˜¯Componentç»„ä»¶çš„
+	 *   2)this.getViewPort å’Œ DOMUtil.getViewPort ä»£ç ä¸€è‡´
+	 *   3)å°½å¯èƒ½æ—©çš„è§¦å‘ä¸€æ¬¡ resize äº‹ä»¶ï¼ŒåŒæ—¶åœ¨åº”ç”¨åˆå§‹åŒ–å®Œæ¯•å†è§¦å‘ä¸€æ¬¡
 	 */
 	this.eventHandle = function(ev){
 		switch(ev.type){
@@ -708,24 +761,35 @@ _class("WebRuntime", "", function(){
 			}
 		case "DOMContentLoaded":
 			if(this._inited) return;
-			this.onContentLoaded();
-			//this.init();  //ÏµÍ³³õÊ¼»¯
+			this.fireEvent({"type": "contentLoaded"});
+			//this.init();  //ç³»ç»Ÿåˆå§‹åŒ–
 			//window.alert(runtime.getBrowser().getTestMode());
 			break;
 		case "unload":
-			//try{  //ÆÁ±ÎÒ³ÃæonunloadÊ±¿ÉÄÜ²úÉúµÄ´íÎó
-				if(!this._disposed){  //iframeÄÚµÄruntime¿ÉÄÜ±»ÌáÇ°Ö´ĞĞ¹ıÁË
+			//try{  //å±è”½é¡µé¢onunloadæ—¶å¯èƒ½äº§ç”Ÿçš„é”™è¯¯
+				if(!this._disposed){  //iframeå†…çš„runtimeå¯èƒ½è¢«æå‰æ‰§è¡Œè¿‡äº†
 					this.dispose();
 				}
+				/*
+				var hash = {
+					"alz.core.BoxElement"    : true
+				};
+				for(var k in AObject.__hash__){
+					var obj = AObject.__hash__[k];
+					if(obj._className in hash && !obj._disposed){
+						obj.dispose();
+						delete AObject.__hash__[k];
+					}
+				}
+				alert("check memleak");
+				*/
 			//}catch(ex){
 			//	this.log("[WebRuntime::dispose]exception");
 			//}
 			//if(application) application = null;
 			break;
 		case "resize":
-			if(this.onResize){
-				this.onResize(ev);
-			}
+			this.fireEvent(ev);
 			break;
 		/*
 		case "contextmenu":
@@ -768,8 +832,11 @@ _class("WebRuntime", "", function(){
 	this.setDocument = function(v){
 		this._doc = v;
 	};
+	this.getAppManager = function(){
+		return this._appManager;
+	};
 	/**
-	 * »ñÈ¡µ±Ç°lib(__init__mini.lib)ËùÔÚµÄÉÏÏÂÎÄ»·¾³
+	 * è·å–å½“å‰lib(__init__mini.lib)æ‰€åœ¨çš„ä¸Šä¸‹æ–‡ç¯å¢ƒ
 	 */
 	this.getLibContext = function(){
 		return this._libContext;
@@ -778,21 +845,21 @@ _class("WebRuntime", "", function(){
 		this._libContext = v;
 	};
 	/**
-	 * ´´½¨Ò»¸öÉÏÏÂÎÄ»·¾³¶ÔÏó
-	 * @param {String} name ¿âÃû
-	 * @param {String} libs µ±Ç°¿âÒÀÀµµÄ¿âÁĞ±í
-	 * Ã¿Ò»¸ölibÎÄ¼ş±ØÈ»ÒÀÀµÓÚ__init__.lib£¬ËùÒÔlibs²ÎÊıÖĞºöÂÔÁËÕâ¸ölib
+	 * åˆ›å»ºä¸€ä¸ªä¸Šä¸‹æ–‡ç¯å¢ƒå¯¹è±¡
+	 * @param {String} name åº“å
+	 * @param {String} libs å½“å‰åº“ä¾èµ–çš„åº“åˆ—è¡¨
+	 * æ¯ä¸€ä¸ªlibæ–‡ä»¶å¿…ç„¶ä¾èµ–äº__init__.libï¼Œæ‰€ä»¥libså‚æ•°ä¸­å¿½ç•¥äº†è¿™ä¸ªlib
 	 */
 	this.createContext = function(name, libs){
 		//return this.getLibContext();
 		if(name in this._contextList){
-			throw new Exception("[WebRuntime::createContext]ÉÏÏÂÎÄ»·¾³ " + name + " ÒÑ¾­´æÔÚ£¬Çë¼ì²éÊÇ·ñÖØÃû£¿");
+			throw new Exception("[WebRuntime::createContext]ä¸Šä¸‹æ–‡ç¯å¢ƒ " + name + " å·²ç»å­˜åœ¨ï¼Œè¯·æ£€æŸ¥æ˜¯å¦é‡åï¼Ÿ");
 		}
-		var cxt = new Context(name, this);
-		//cxt.__name = name;  //ÉèÖÃ¿âµÄÃû³Æ
-		//cxt.runtime = this;    //±£Ö¤ runtime ÊÇÈ«¾ÖÎ¨Ò»¶ÔÏó
-		//Ä¬ÈÏµ¼ÈëËùÓĞÒÑ¾­¼ÓÔØµÄÀà£¨¸´ÖÆºËĞÄ context ÒıÈëµÄÀàµ½ĞÂ½¨µÄ context ÖĞ£©
-		//[TODO]°´ÕÕ²ã²ãÀ©Õ¹»úÖÆ£¬½øĞĞÏŞ¶¨ĞÔÒıÈë
+		var cxt = new LibContext(name, this);
+		//cxt.__name = name;  //è®¾ç½®åº“çš„åç§°
+		//cxt.runtime = this;    //ä¿è¯ runtime æ˜¯å…¨å±€å”¯ä¸€å¯¹è±¡
+		//é»˜è®¤å¯¼å…¥æ‰€æœ‰å·²ç»åŠ è½½çš„ç±»ï¼ˆå¤åˆ¶æ ¸å¿ƒ context å¼•å…¥çš„ç±»åˆ°æ–°å»ºçš„ context ä¸­ï¼‰
+		//[TODO]æŒ‰ç…§å±‚å±‚æ‰©å±•æœºåˆ¶ï¼Œè¿›è¡Œé™å®šæ€§å¼•å…¥
 		/*
 		for(var k in this._libContext.alz){
 			if(!(k in cxt)){
@@ -800,32 +867,88 @@ _class("WebRuntime", "", function(){
 			}
 		}
 		*/
-		this._contextList[name] = cxt;  //×¢²áÉÏÏÂÎÄ»·¾³
+		this._contextList[name] = cxt;  //æ³¨å†Œä¸Šä¸‹æ–‡ç¯å¢ƒ
 		return cxt;
 	};
+	//æ—¥å¿—è¾“å‡ºæ¥å£
 	/**
-	 * ×¢²áÒ»¸öÓ¦ÓÃ
-	 * @param {String} name Ó¦ÓÃÃû³Æ
-	 * @param {Object} appConf Ó¦ÓÃµÄÅäÖÃĞÅÏ¢
+	 * è®°å½•ä¸€æ¡æ—¥å¿—ä¿¡æ¯
 	 */
-	this.regApp = function(name, appConf){
+	this.log = function(msg){
+		this._log.push(msg);
+		if(console){
+			console.log(msg);
+		}
 	};
+	/**
+	 * è®°å½•ä¸€æ¡è­¦å‘Šä¿¡æ¯
+	 */
+	this.warning = function(msg){
+		this._log.push("[warning]" + msg);
+		if(console){
+			console.warn(msg);
+		}
+	};
+	/**
+	 * è®°å½•ä¸€æ¡é”™è¯¯ä¿¡æ¯
+	 */
+	this.error = function(msg){
+		this._log.push("[error]" + msg);
+		if(console){
+			console.error(msg);
+		}
+	};
+	/**
+	 * æ³¨å†Œä¸€ä¸ªåº”ç”¨
+	 * @param {String} name åº”ç”¨åç§°
+	 * @param {Object} conf åº”ç”¨çš„é…ç½®ä¿¡æ¯
+	 */
+	this.regApp = function(name, conf){
+		this._appManager.regApp(name, conf);
+	};
+	this.createApp = function(context, appClassName, parentApp, len){
+		return this._appManager.createApp(context, appClassName, parentApp, len);
+	};
+	/*
 	this.regLib = function(name, lib){
 		if(name == "aui" || name == "__init__"){
 			this._contextList[name] = __context__;
 			this.setLibContext(__context__);
-			this.init();
+			this.init(this._global);  //åˆå§‹åŒ–æœ€ç®€çš„è¿è¡Œæ—¶ç¯å¢ƒ
 		}else{
 			if(this._libManager.exists(name)){
-				this._win.alert("¿â(name=" + name + ")ÒÑ¾­´æÔÚ£¬Çë¼ì²éÊÇ·ñÖØÃû£¿");
+				this.error("åº“(name=" + name + ")å·²ç»å­˜åœ¨ï¼Œè¯·æ£€æŸ¥æ˜¯å¦é‡åï¼Ÿ");
 				return;
 			}
 			this._libManager.reg(name, lib);
 		}
 	};
+	*/
+	/**
+	 * æ³¨å†Œä¸€ä¸ª lib å¯¹è±¡
+	 * æ¯ä¸ªlibåº”è¯¥é»˜è®¤æœ€å¤šå­˜åœ¨ä¸€ä¸ªApplicationçš„å­ç±»ï¼ŒappNameè‹¥æŒ‡å®šäº†APPç±»ï¼Œåˆ™åœ¨lib
+	 * åˆ›å»ºå®Œæ¯•æ—¶è‡ªåŠ¨åˆ›å»ºå¯¹åº”çš„APPç±»çš„å®ä¾‹ã€‚
+	 * @param {String} name åº“å
+	 * @param {String} appName åº“ä¸­åº”ç”¨çš„ç±»å
+	 * @param {Function} libImp åº“å®ç°å‡½æ•°
+	 */
+	this.regLib = function(name, appName, libImp){
+		//runtime.createContext("alc")
+		//runtime.createApp("alz.util.alc.AppAlc")
+		var cxt = this.createContext(name);
+		libImp(cxt);
+		if(appName != ""){
+			cxt.__context__.application = this.createApp(cxt, appName);  //ç¬¬ä¸€ä¸ªå‚æ•°æ˜¯æ–°åˆ›å»ºçš„Contextå®ä¾‹
+		}
+		if(this._libManager.exists(name)){
+			this.error("åº“(name=" + name + ")å·²ç»å­˜åœ¨ï¼Œè¯·æ£€æŸ¥æ˜¯å¦é‡åï¼Ÿ");
+		}
+		this._libManager.reg(name.replace(/\.\w+$/, ""), {"context": cxt});
+		return cxt;
+	};
 	this.regTpl = function(name, tplData){
 		if(name in this._tpls){
-			this.error("[WebRuntime::regTpl]Ä£°æ¿âÖØÃûname=" + name);
+			this.error("[WebRuntime::regTpl]æ¨¡ç‰ˆåº“é‡åname=" + name);
 		}
 		this._tpls[name] = tplData;
 	};
@@ -833,75 +956,67 @@ _class("WebRuntime", "", function(){
 		return this._tpls[name];
 	};
 	/**
-	 * Ã¿¸ölibÎÄ¼ş¼ÓÔØÍê³ÉÊ±µÄ»Øµ÷·½·¨
+	 * æ¯ä¸ªlibæ–‡ä»¶åŠ è½½å®Œæˆæ—¶çš„å›è°ƒæ–¹æ³•
 	 * @-param {String} libName core|ui|...
 	 * @param {Lib} lib {type:"",name:"",inApp:false}
-	 * @param {LibConf} libConf libÅäÖÃĞÅÏ¢
+	 * @param {LibConf} libConf libé…ç½®ä¿¡æ¯
 	 */
 	this.onLibLoad = function(lib, libConf, loaded){
 		if(!loaded){
 			if(lib.type == "lib"){
 				var libConf = this._libManager.getLib(lib.name);
 				if(libConf){
-					libConf.init.apply(this);  //°ó¶¨ÔÚ runtime ¶ÔÏóÉÏÃæ£¬ÕâÊÇ¶Ôruntime¶ÔÏóµÄÒ»ÖÖÀ©Õ¹»úÖÆ
+					libConf.init.apply(this);  //ç»‘å®šåœ¨ runtime å¯¹è±¡ä¸Šé¢ï¼Œè¿™æ˜¯å¯¹runtimeå¯¹è±¡çš„ä¸€ç§æ‰©å±•æœºåˆ¶
 					libConf._inited = true;
 				}
 				libConf = null;
 			}
-		}else{  //ÕÒ²»µ½£¬ÔòÈÏÎª¿âÒÑ¾­¼ÓÔØÍê±Ï
-			if(lib.type == "lib" || lib.type == "tpl"){
-				if(typeof this.onLoad == "function"){
-					this.onLoad();
-				}
-				/*
-				//ÒÀ´Îµ÷ÓÃ°ó¶¨µÄº¯Êı
-				for(var i = 0, len = this._funs.length; i < len; i++){
-					var agent = this._funs[i].agent;
-					var func = this._funs[i].func;
-					if(typeof agent == "object"){
-						func.call(agent);
-					}else if(typeof agent == "function"){
-						agent();
+		}else{  //æ‰¾ä¸åˆ°ï¼Œåˆ™è®¤ä¸ºåº“å·²ç»åŠ è½½å®Œæ¯•
+			this._appManager.loadAppFiles("address.app", null, this, function(){
+				if(lib.type == "lib" || lib.type == "tpl"){
+					if(typeof this.onLoad == "function"){
+						this.onLoad();
+					}
+					/*
+					//ä¾æ¬¡è°ƒç”¨ç»‘å®šçš„å‡½æ•°
+					for(var i = 0, len = this._funs.length; i < len; i++){
+						var agent = this._funs[i].agent;
+						var func = this._funs[i].func;
+						if(typeof agent == "object"){
+							func.call(agent);
+						}else if(typeof agent == "function"){
+							agent();
+						}
+					}
+					*/
+					if(this._appManager){
+						this._appManager.init();  //åˆå§‹åŒ–æ‰€æœ‰åº”ç”¨
+					}
+					//if(!this.ie){  //é IE åœ¨æ­¤æ—¶è§¦å‘ resize
+						this.eventHandle({type:"resize"});  //ä¸»åŠ¨è§¦å‘ä¸€æ¬¡ resize äº‹ä»¶
+					//}
+					if(typeof this._win.onContentLoaded == "function"){
+						this._win.onContentLoaded();
+					}else if(this._win.__webpage__){
+						new this._win.__webpage__().main();
 					}
 				}
-				*/
-				if(this._appManager){
-					this._appManager.init();  //³õÊ¼»¯ËùÓĞÓ¦ÓÃ
-				}
-				//if(!this.ie){  //·Ç IE ÔÚ´ËÊ±´¥·¢ resize
-					this.eventHandle({type:"resize"});  //Ö÷¶¯´¥·¢Ò»´Î resize ÊÂ¼ş
-				//}
-				if(typeof this._win.onContentLoaded == "function"){
-					this._win.onContentLoaded();
-				}else if(this._win.__webpage__){
-					new this._win.__webpage__().main();
-				}
-			}
+			});
 		}
 	};
 	/**
-	 * ÈÕÖ¾Êä³ö½Ó¿Ú
-	 */
-	this.log = function(str){
-		this._log.push(str);
-	};
-	this.warning = function(str){
-	};
-	this.error = function(str){
-	};
-	/**
-	 * µ¼³ö½Ó¿Úµ½¶ÔÏó obj ÉÏÃæ
+	 * å¯¼å‡ºæ¥å£åˆ°å¯¹è±¡ obj ä¸Šé¢
 	 */
 	this.exportInterface = function(scope){
-		scope.runtime = this;  //µ¼³öÈ«¾Ö¶ÔÏó runtime
+		scope.runtime = this;  //å¯¼å‡ºå…¨å±€å¯¹è±¡ runtime
 		/**
-		 * Õâ¸öº¯ÊıÊÇÎªÁË¹ı¶ÉĞÔ¿¼ÂÇÒòËØ£¬Ä£Äâ Prototype µÈÏµÍ³¶øÉè¼ÆµÄ£¬ÔÚÕâÀï²¢²»½¨
-		 * ÒéÊ¹ÓÃÕâÑùµÄÏµÍ³º¯Êı¡£ÔÚ»ñÈ¡ DOM ÔªËØÖ®ºó£¬ÈÔÈ»½¨ÒéÍ¨¹ı½Å±¾×é¼ş²Ù×÷ DOMÔª
-		 * ËØµÄÏà¹ØÊôĞÔ¡£
+		 * è¿™ä¸ªå‡½æ•°æ˜¯ä¸ºäº†è¿‡æ¸¡æ€§è€ƒè™‘å› ç´ ï¼Œæ¨¡æ‹Ÿ Prototype ç­‰ç³»ç»Ÿè€Œè®¾è®¡çš„ï¼Œåœ¨è¿™é‡Œå¹¶ä¸å»º
+		 * è®®ä½¿ç”¨è¿™æ ·çš„ç³»ç»Ÿå‡½æ•°ã€‚åœ¨è·å– DOM å…ƒç´ ä¹‹åï¼Œä»ç„¶å»ºè®®é€šè¿‡è„šæœ¬ç»„ä»¶æ“ä½œ DOMå…ƒ
+		 * ç´ çš„ç›¸å…³å±æ€§ã€‚
 		 */
 		/*scope.$ = function(id){return this.runtime.getElement(id);};*/
 		/**
-		 * »ñÈ¡ DOM ÔªËØ¶ÔÓ¦µÄ½Å±¾×é¼ş
+		 * è·å– DOM å…ƒç´ å¯¹åº”çš„è„šæœ¬ç»„ä»¶
 		 */
 		//scope.$get = function(id){return this.runtime.getComponentById(id);};
 		//scope.$init = function(ids){return this.runtime.initComponents(ids);};
@@ -922,8 +1037,8 @@ _class("WebRuntime", "", function(){
 		*/
 	};
 	/**
-	 * È¡µÃµ±Ç°ÎÄµµÊ¹ÓÃµÄºĞÄ£ĞÍ
-	 * @return {number} 0=ÍâÄ£ĞÍ£¬1=ÄÚÄ£ĞÍ
+	 * å–å¾—å½“å‰æ–‡æ¡£ä½¿ç”¨çš„ç›’æ¨¡å‹
+	 * @return {number} 0=å¤–æ¨¡å‹ï¼Œ1=å†…æ¨¡å‹
 	 */
 	this.getBoxModel = function(){
 		return this._boxModel;
@@ -941,10 +1056,10 @@ _class("WebRuntime", "", function(){
 		}
 	};
 	/**
-	 * ¼ì²âµ±Ç°ä¯ÀÀÆ÷£¬µ±Ç°ÎÄµµÀàĞÍÖ§³ÖµÄºĞÄ£ĞÍ
-	 * @return number ºĞÄ£ĞÍµÄµÄÊı×Ö±êÊ¶
-	 *         0 = ÄÚËõµÄºĞÄ£ĞÍ
-	 *         1 = ÍâÀ©µÄºĞÄ£ĞÍ
+	 * æ£€æµ‹å½“å‰æµè§ˆå™¨ï¼Œå½“å‰æ–‡æ¡£ç±»å‹æ”¯æŒçš„ç›’æ¨¡å‹
+	 * @return number ç›’æ¨¡å‹çš„çš„æ•°å­—æ ‡è¯†
+	 *         0 = å†…ç¼©çš„ç›’æ¨¡å‹
+	 *         1 = å¤–æ‰©çš„ç›’æ¨¡å‹
 	 */
 	this._testBoxModel = function(){
 		if(!this._host.xul && !this._doc.body){
@@ -1020,14 +1135,14 @@ _class("WebRuntime", "", function(){
 		return ++this._zIndex;
 	};
 	/**
-	 * ×¢²áÒ»¸ö²å¼ş
+	 * æ³¨å†Œä¸€ä¸ªæ’ä»¶
 	 */
 	this.regPlugin = function(name, clazz){
 		this._plugins[name] = new clazz();
 	};
 	/**
-	 * ¼ÓÔØÒ»¸ö²å¼ş
-	 * @param {String} url ²å¼şJSµÄURLµØÖ·
+	 * åŠ è½½ä¸€ä¸ªæ’ä»¶
+	 * @param {String} url æ’ä»¶JSçš„URLåœ°å€
 	 */
 	this.loadPlugin = function(url){
 	};
@@ -1055,23 +1170,27 @@ _class("WebRuntime", "", function(){
 		return rect;
 	};
 	/**
-	 * °ÑÒ»¸öJSON×Ö·û´®½âÎöÎª json ¶ÔÏó£¬³É¹¦·µ»Ø json ¶ÔÏó£¬Ê§°Ü·µ»Ø null
-	 * @param {String} data [JsonCode]·ûºÏ JSON Ğ­ÒéµÄ js ´úÂë
+	 * æŠŠä¸€ä¸ªJSONå­—ç¬¦ä¸²è§£æä¸º json å¯¹è±¡ï¼ŒæˆåŠŸè¿”å› json å¯¹è±¡ï¼Œå¤±è´¥è¿”å› null
+	 * @param {String} data [JsonCode]ç¬¦åˆ JSON åè®®çš„ js ä»£ç 
 	 */
 	this.parseJson = function(data){
-		if(data == "") return null;  //·ÀÖ¹¿ÕÊı¾İ±¨´í
-		try{
-			return eval("(" + data + ")");
-		}catch(ex){  //json ½âÎö´íÎó
-			if(this._debug){
-				this.showException(ex, "parse json data error");
+		if(data == "") return null;  //é˜²æ­¢ç©ºæ•°æ®æŠ¥é”™
+		//try{
+		//	return JSON.parse(data);
+		//}catch(ex){
+			try{
+				return eval("(" + data + ")");
+			}catch(ex){  //json è§£æé”™è¯¯
+				if(this._debug){
+					this.showException(ex, "parse json data error");
+				}
+				return null;
 			}
-			return null;
-		}
+		//}
 	};
 	/**
-	 * ½«×Ö·û´®×ª»»³É¿ÉÒÔ±»×Ö·û´®±íÊ¾·ûºÅ(",')À¨ÆğÀ´ÒÑ±íÊ¾Ô­À´×Ö·û´®ÒâÒåµÄ×Ö·û´®
-	 * @param {String} str Òª×ª»»µÄ×Ö·û´®ÄÚÈİ
+	 * å°†å­—ç¬¦ä¸²è½¬æ¢æˆå¯ä»¥è¢«å­—ç¬¦ä¸²è¡¨ç¤ºç¬¦å·(",')æ‹¬èµ·æ¥å·²è¡¨ç¤ºåŸæ¥å­—ç¬¦ä¸²æ„ä¹‰çš„å­—ç¬¦ä¸²
+	 * @param {String} str è¦è½¬æ¢çš„å­—ç¬¦ä¸²å†…å®¹
 	 */
 	this.toJsString = function(str){
 		if(typeof str != "string") return "";
@@ -1086,8 +1205,21 @@ _class("WebRuntime", "", function(){
 		});
 	};
 	/**
-	 * ½«Ä£°å½âÎöÎªÒ»¸ö JS º¯ÊıµÄ´úÂëĞÎÊ½
-	 * @param {String} code Ä£°åµÄÄÚÈİ
+	 * æ¨¡æ¿æ›¿æ¢å‡½æ•°
+	 * @param {String} tpl æ¨¡æ¿å†…å®¹
+	 * @param {Object} json å±€éƒ¨å˜é‡åŒº
+	 * @param {Object} hash å…¨å±€å˜é‡åŒº
+	 */
+	this.tpl_replace = function(tpl, json, hash){
+		hash = hash || {};
+		return tpl.replace(/\{\$(\w+)\}/ig, function(_0, _1){
+			//return _1 in json ? json[_1] : (hash ? hash[_1] : _0);
+			return _1 in hash ? hash[_1] : (_1 in json ? json[_1] : _0);
+		});
+	};
+	/**
+	 * å°†æ¨¡æ¿è§£æä¸ºä¸€ä¸ª JS å‡½æ•°çš„ä»£ç å½¢å¼
+	 * @param {String} code æ¨¡æ¿çš„å†…å®¹
 	 */
 	this.parseTemplate = function(code){
 		var sBegin = "<" + "%", sEnd = "%" + ">";
@@ -1103,19 +1235,19 @@ _class("WebRuntime", "", function(){
 			p2 = code.indexOf(sEnd, p1 + 2);
 			if(p2 != -1){
 				switch(code.charAt(p1 + 2)){
-				case '=':  //Èç¹û±í´ïÊ½£¬°Ñ±í´ïÊ½µÄ½á¹û»º´æµ½ __sb ÖĞ
+				case '=':  //å¦‚æœè¡¨è¾¾å¼ï¼ŒæŠŠè¡¨è¾¾å¼çš„ç»“æœç¼“å­˜åˆ° __sb ä¸­
 					sb.push("__sb.push(" + code.substring(p1 + 3, p2) + ");");
 					break;
-				default:  //ÆÕÍ¨µÄ´úÂë£¬±£³Ö²»±ä
+				default:  //æ™®é€šçš„ä»£ç ï¼Œä¿æŒä¸å˜
 					sb.push(code.substring(p1 + 2, p2));
 					break;
 				}
 			}else{
-				return "Ä£°åÖĞµÄ'" + sBegin + "'Óë'" + sEnd + "'²»Æ¥Åä£¡";
+				return "æ¨¡æ¿ä¸­çš„'" + sBegin + "'ä¸'" + sEnd + "'ä¸åŒ¹é…ï¼";
 			}
 			p1 = code.indexOf(sBegin, p2 + 2);
 		}
-		if(p2 != -2 && p2 + 2 < code.length){  //±£´æ½áÊø±êÖ¾Ö®ºóµÄ´úÂë
+		if(p2 != -2 && p2 + 2 < code.length){  //ä¿å­˜ç»“æŸæ ‡å¿—ä¹‹åçš„ä»£ç 
 			sb.push("__sb.push(\"" + this.toJsString(code.substr(p2 + 2)) + "\");");
 		}
 		sb.push("return __sb.join(\"\");");
@@ -1123,24 +1255,24 @@ _class("WebRuntime", "", function(){
 		return sb.join("");
 		//return eval("(" + sb.join("\n") + ")")();
 	};
-	//var _pool = [];  //Ä£ÄâÏß³Ì³Ø
-	//Ìí¼Ó²¢Æô¶¯Ò»¸öÏß³Ì
-	this.addThread = function(msec, agent, fun){
-		var f = typeof fun == "string" ? agent[fun] : fun;
+	//var _pool = [];  //æ¨¡æ‹Ÿçº¿ç¨‹æ± 
+	//æ·»åŠ å¹¶å¯åŠ¨ä¸€ä¸ªçº¿ç¨‹
+	this.addThread = function(msec, agent, func){
+		var f = typeof func == "string" ? agent[func] : func;
 		/*
 		_pool.push({
-			"agent": agent,       //´úÀí¶ÔÏó
-			"fun"  : f,           //ÒªÖ´ĞĞµÄ´úÂë
-			"time" : new Date(),  //µ±Ç°Ê±¼ä
-			"msec" : msec         //Ê±¼ä¼ä¸ô
+			"agent": agent,       //ä»£ç†å¯¹è±¡
+			"func" : f,           //è¦æ‰§è¡Œçš„ä»£ç 
+			"time" : new Date(),  //å½“å‰æ—¶é—´
+			"msec" : msec         //æ—¶é—´é—´éš”
 		});
 		*/
 		return window.setTimeout(function(){
 			f.apply(agent);
 		}, msec);
 	};
-	this.startTimer = function(msec, agent, fun){
-		var f = typeof fun == "string" ? agent[fun] : fun;
+	this.startTimer = function(msec, agent, func){
+		var f = typeof func == "string" ? agent[func] : func;
 		var timer = this.addThread(msec, this, function(){
 			try{
 				var ret = f.apply(agent);

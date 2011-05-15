@@ -1,14 +1,15 @@
 _package("alz.core");
 
 /**
- * Action¹ÜÀíÕßÀà
+ * Actionç®¡ç†è€…ç±»
  */
 _class("ActionManager", "", function(){
 	this._init = function(){
 		_super._init.call(this);
-		this._actionEngine = null;  //¶¯×÷Ö´ĞĞÒıÇæ£¬ÊµÏÖÁËdoAction½Ó¿ÚµÄÀàµÄÊµÀı
-		this._nodes = {};  //Ëù¹ÜÀíµÄÈ«²¿action×é¼ş
+		this._actionEngine = null;  //åŠ¨ä½œæ‰§è¡Œå¼•æ“ï¼Œå®ç°äº†doActionæ¥å£çš„ç±»çš„å®ä¾‹
+		this._nodes = {};  //æ‰€ç®¡ç†çš„å…¨éƒ¨actionç»„ä»¶
 		this._components = [];
+		this._focusbutton = null
 	};
 	this.init = function(actionEngine){
 		this._actionEngine = actionEngine;
@@ -22,7 +23,7 @@ _class("ActionManager", "", function(){
 		this._components = [];
 		for(var k in this._nodes){
 			for(var i = 0, len = this._nodes[k].length; i < len; i++){
-				this._nodes[k][i] = null;  //ÔÙ´ËÎŞĞèµ÷ÓÃ dispose ·½·¨
+				this._nodes[k][i] = null;  //å†æ­¤æ— éœ€è°ƒç”¨ dispose æ–¹æ³•
 			}
 			delete this._nodes[k];
 		}
@@ -31,6 +32,9 @@ _class("ActionManager", "", function(){
 	};
 	this.destroy = function(){
 	};
+	this.setFocusButton = function(btn){
+		this._focusbutton = btn;
+	};
 	this.add = function(component){
 		//var act = component._self.getAttribute("_action");
 		var act = component.getAction();
@@ -38,7 +42,7 @@ _class("ActionManager", "", function(){
 			this._nodes[act] = [];
 		}
 		this._nodes[act].push(component);
-		this._components.push(component);  //×¢²á×é¼ş
+		this._components.push(component);  //æ³¨å†Œç»„ä»¶
 	};
 	/*this.enable = function(name){
 		var nodes = this._nodes[name];
@@ -49,19 +53,19 @@ _class("ActionManager", "", function(){
 		nodes = null;
 	};*/
 	/**
-	 * ÆôÓÃÃû×ÖÎªname¶ÔµÄaction(¿ÉÄÜÊÇÒ»×é)
+	 * å¯ç”¨åå­—ä¸ºnameå¯¹çš„action(å¯èƒ½æ˜¯ä¸€ç»„)
 	 */
 	this.enable = function(name){
-		this.updateState(name, {"disabled":false});
+		this.updateState(name, {"disabled": false});
 	};
 	/**
-	 * ½ûÓÃÃû×ÖÎªname¶ÔµÄaction(¿ÉÄÜÊÇÒ»×é)
+	 * ç¦ç”¨åå­—ä¸ºnameå¯¹çš„action(å¯èƒ½æ˜¯ä¸€ç»„)
 	 */
 	this.disable = function(name){
-		this.updateState(name, {"disabled":true});
+		this.updateState(name, {"disabled": true});
 	};
 	/**
-	 * ¸üĞÂÃû×ÖÎªnameµÄactionµÄ×´Ì¬
+	 * æ›´æ–°åå­—ä¸ºnameçš„actionçš„çŠ¶æ€
 	 */
 	this.updateState = function(name, state){
 		if(name){
@@ -81,15 +85,18 @@ _class("ActionManager", "", function(){
 		var nodes = this._nodes[name];
 		if(!nodes) return;
 		for(var i = 0, len = nodes.length; i < len; i++){
+			var node = nodes[i];
 			for(var k in state){  //visible,disabled
 				var name = "set" + k.charAt(0).toUpperCase() + k.substr(1);
-				if(name in nodes[i]) nodes[i][name](state[k]);
+				if(name in node){
+					node[name](state[k]);
+				}
 			}
 		}
 		nodes = null;
 	};
 	/**
-	 * ·ÖÅÉÒ»¸öaction
+	 * åˆ†æ´¾ä¸€ä¸ªaction
 	 */
 	this.dispatchAction = function(name, sender, ev){
 		if(this._actionEngine.doAction){

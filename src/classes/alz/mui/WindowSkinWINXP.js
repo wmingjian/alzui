@@ -14,7 +14,7 @@ _import("alz.mui.Component");
 		<div class="se"></div>
 	</div>
 
-Ò»¸ö´°Ìå×é¼şµÄ¼¸ÖÖBorderStyle£º
+ä¸€ä¸ªçª—ä½“ç»„ä»¶çš„å‡ ç§BorderStyleï¼š
 	bsDialog
 	bsNone
 	bsSingle
@@ -76,7 +76,7 @@ _class("WindowSkinWINXP", Component, function(){
 			"sbtn_height" : 21,
 			"icon_width" : 16,
 			"sep_num"    : 7,
-			"top_use_opacity": true  //¶¥²¿ÉÏµ÷ÇøÓòÊÇ·ñĞèÒªÊ¹ÓÃÍ¸Ã÷¶È£¬ÊÜ±êÌâÀ¸IMG±êÇ©Ó°Ïì
+			"top_use_opacity": true  //é¡¶éƒ¨ä¸Šè°ƒåŒºåŸŸæ˜¯å¦éœ€è¦ä½¿ç”¨é€æ˜åº¦ï¼Œå—æ ‡é¢˜æ IMGæ ‡ç­¾å½±å“
 		};
 	};
 	this.create = function(parent){
@@ -92,7 +92,7 @@ _class("WindowSkinWINXP", Component, function(){
 	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
-		this._xpath = ".mui-Window-winxp";
+		this._xpath = ".aui-Window-winxp";
 		//this._skins = [];
 		for(var i = 0, len = this._cursors.length; i < len; i++){
 			var o = this._createElement2(this._self, "div", this._cursors[i]/*, {
@@ -128,6 +128,7 @@ _class("WindowSkinWINXP", Component, function(){
 		//runtime.dom.applyCssStyle(this, _cssName, "resizable");
 	};
 	this.dispose = function(){
+		if(this._disposed) return;
 		this._title = null;
 		this._title1.onmousedown = null;
 		this._title2.onmousedown = null;
@@ -143,17 +144,17 @@ _class("WindowSkinWINXP", Component, function(){
 		//if(_super.resize.apply(this, arguments)) return true;
 		_super.resize.apply(this, arguments);
 		if(this._parent.getResizable()){
-			var w1 =  7;  //¶¥¿í
-			var w2 =  4;  //ÖĞ¿í
-			var w3 =  5;  //µ×¿í
-			var h1 = 30;  //¶¥¸ß
-			var h3 =  4;  //µ×¸ß
+			var w1 =  7;  //é¡¶å®½
+			var w2 =  4;  //ä¸­å®½
+			var w3 =  5;  //åº•å®½
+			var h1 = 30;  //é¡¶é«˜
+			var h3 =  4;  //åº•é«˜
 		}else{
-			var w1 =  7;  //¶¥¿í
-			var w2 =  3;  //ÖĞ¿í
-			var w3 =  4;  //µ×¿í
-			var h1 = 29;  //¶¥¸ß
-			var h3 =  3;  //µ×¸ß
+			var w1 =  7;  //é¡¶å®½
+			var w2 =  3;  //ä¸­å®½
+			var w3 =  4;  //åº•å®½
+			var h1 = 29;  //é¡¶é«˜
+			var h3 =  3;  //åº•é«˜
 		}
 		this.setElementRect(this._ee["_skin0"],    0 ,    0 ,     w1 ,      h1);
 		this.setElementRect(this._ee["_skin1"],   w1 ,    0 , w-2*w1 ,      h1);

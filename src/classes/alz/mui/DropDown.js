@@ -5,7 +5,7 @@ _import("alz.mui.Component");
 _class("DropDown", Component, function(){
 	this._init = function(){
 		_super._init.call(this);
-		this._drop = null;
+		this._menu = null;
 	};
 	this.bind = function(obj){
 		_super.bind.apply(this, arguments);
@@ -19,37 +19,37 @@ _class("DropDown", Component, function(){
 		if(this._disposed) return;
 		this._self.onmousedown = null;
 		this._self.onclick = null;
-		if(this._drop){
-			this._drop.dispose();
-			this._drop = null;
+		if(this._menu){
+			this._menu.dispose();
+			this._menu = null;
 		}
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){
 	};
 	this._bindDrop = function(){
-		if(!this._drop){
+		if(!this._menu){
 			var id = this._dropid;  //this._self.getAttribute("dropid")
-			if(!id) runtime.getWindow()._alert("组件DropDown缺少属性dropid");
-			this._drop = runtime.initComponent(runtime._workspace, id);
-			if(!this._drop) throw "未找到DropDown组件的下拉列表[Popup,id=\"" + id + "\"]";
-			this._drop.setVisible(false);
+			if(!id) runtime.getWindow()._alert("缁勪欢DropDown缂哄皯灞炴�ropid");
+			this._menu = runtime.initComponent(runtime._workspace, id);
+			if(!this._menu) throw "鏈壘鍒癉ropDown缁勪欢鐨勪笅鎷夊垪琛╗Popup,id=\"" + id + "\"]";
+			this._menu.setVisible(false);
 			this._self.onmousedown = function(ev){return this._ptr.onMouseDown(ev || this._ptr._win.event);};
 			this._self.onclick = function(ev){return false;};
-			this._drop._self.onmousedown = function(ev){
+			this._menu._self.onmousedown = function(ev){
 				ev = ev || this._ptr._win.event;
 				window.alert((ev.srcElement || ev.target).innerHTML);
 			};
 		}
 	};
 	this.onMouseDown = function(ev){
-		if(this._drop.getVisible()){
-			runtime._workspace.setPopup(null);
+		if(this._menu.getVisible()){
+			runtime._workspace.setActivePopup(null);
 		}else{
+			this._menu.setWidth(Math.max(this.getWidth(), this._menu.getWidth()));
+			runtime._workspace.setActivePopup(this._menu);
 			var pos = this.getPosition(ev, 0);
-			pos.y += this.getHeight();
-			this._drop.setWidth(Math.max(this.getWidth(), this._drop.getWidth()));
-			runtime._workspace.setPopup(this._drop, pos);
+			this._menu.moveTo(pos.x, pos.y + this.getHeight());
 		}
 		ev.cancelBubble = true;
 		return false;

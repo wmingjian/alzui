@@ -5,10 +5,10 @@ _import("alz.mui.Component");
 _class("TextItem", Component, function(){
 	this._init = function(){
 		_super._init.call(this);
-		this._type = "sys";  //µ±Ç°ÎÄ±¾µÄÀàĞÍ
-		this._text = "";     //ÎÄ±¾ÄÚÈİ
-		this._active = false;  //µ±Ç°ÎÄ±¾ÊÇ·ñ´¦ÓÚ»î¶¯×´Ì¬Ö®ÏÂ
-		this._cursor = -1;     //Èç¹û´¦ÔÚ»î¶¯×´Ì¬ÏÂ£¬µ±Ç°¹â±êÎ»ÖÃ
+		this._type = "sys";  //å½“å‰æ–‡æœ¬çš„ç±»å‹
+		this._text = "";     //æ–‡æœ¬å†…å®¹
+		this._active = false;  //å½“å‰æ–‡æœ¬æ˜¯å¦å¤„äºæ´»åŠ¨çŠ¶æ€ä¹‹ä¸‹
+		this._cursor = -1;     //å¦‚æœå¤„åœ¨æ´»åŠ¨çŠ¶æ€ä¸‹ï¼Œå½“å‰å…‰æ ‡ä½ç½®
 		//this.create(parent, type, text);
 	};
 	this.create = function(parent, type, text){
@@ -26,6 +26,7 @@ _class("TextItem", Component, function(){
 		this.update();
 	};
 	this.dispose = function(){
+		if(this._disposed) return;
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){

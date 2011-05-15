@@ -1,24 +1,33 @@
 _package("alz.core");
 
 /**
- * DOM Event Model
- * ¡¶Document Object Model (DOM) Level 2 Events Specification¡·
- * http://www.w3.org/TR/2000/REC-DOM-Level-2-Events-20001113
+ * @class EventTarget
+ * @extends alz.lang.AObject
+ * @desc DOMäº‹ä»¶æ¨¡å‹
+ DOM Event Model
+ ã€ŠDocument Object Model (DOM) Level 2 Events Specificationã€‹
+ http://www.w3.org/TR/2000/REC-DOM-Level-2-Events-20001113
+ * @example
+var _dom = new DOMUtil();
  */
 _class("EventTarget", "", function(){
 	this._init = function(){
 		_super._init.call(this);
 		/**
-		 * ËùÓĞµÄÊÂ¼şÏìÓ¦º¯Êı¶¼²»Óë×é¼ş¶ÔÏó°ó¶¨£¬¶øÊÇ´æ´¢ÔÚÕâ¸öÓ³Éä±íÖĞ
-		 * [×¢Òâ]²»ÄÜ½«¸ÃÊôĞÔ·Åµ½Ô­ĞÍÊôĞÔÀïÃæÈ¥£¬²»È»Á½¸ö¶ÔÏó»á¹²ÏíÖ®
+		 * æ‰€æœ‰çš„äº‹ä»¶å“åº”å‡½æ•°éƒ½ä¸ä¸ç»„ä»¶å¯¹è±¡ç»‘å®šï¼Œè€Œæ˜¯å­˜å‚¨åœ¨è¿™ä¸ªæ˜ å°„è¡¨ä¸­
+		 * [æ³¨æ„]ä¸èƒ½å°†è¯¥å±æ€§æ”¾åˆ°åŸå‹å±æ€§é‡Œé¢å»ï¼Œä¸ç„¶ä¸¤ä¸ªå¯¹è±¡ä¼šå…±äº«ä¹‹
 		 */
-		this._eventMaps = {};  //ÊÂ¼şÓ³Éä±í
+		this._eventMaps = {};  //äº‹ä»¶æ˜ å°„è¡¨
 		//this._listeners = {};
 		this._listener = null;
 		this._enableEvent = true;
-		this._parent = null;  //×é¼şËùÊôµÄ¸¸×é¼ş
+		this._parent = null;  //ç»„ä»¶æ‰€å±çš„çˆ¶ç»„ä»¶
 		this._disabled = false;
 	};
+	/**
+	 * @method dispose
+	 * @desc ææ„æ–¹æ³•
+	 */
 	this.dispose = function(){
 		if(this._disposed) return;
 		this._parent = null;
@@ -27,22 +36,54 @@ _class("EventTarget", "", function(){
 	};
 	this.destroy = function(){
 	};
+	/**
+	 * @method setEnableEvent
+	 * @param {Boolean} v
+	 * @desc è®¾ç½®æ˜¯å¦ç¦ç”¨äº‹ä»¶
+	 */
 	this.setEnableEvent = function(v){
 		this._enableEvent = v;
 	};
+	/**
+	 * @method getParent
+	 * @return {Object}
+	 * @desc è·å–ç»„ä»¶æ‰€å±çš„çˆ¶ç»„ä»¶
+	 */
 	this.getParent = function(){
 		return this._parent;
 	};
+	/**
+	 * @method setParent
+	 * @return {Object} v
+	 * @desc è®¾ç½®ç»„ä»¶æ‰€å±çš„çˆ¶ç»„ä»¶
+	 */
 	this.setParent = function(v){
 		this._parent = v;
 	};
+	/**
+	 * @method getDisabled
+	 * @return {Boolean}
+	 * @desc ä¸çŸ¥é“_disabledæ˜¯ä»€ä¹ˆä¸œä¸œ
+	 */
 	this.getDisabled = function(){
 		return this._disabled;
 	};
+	/**
+	 * @method setDisabled
+	 * @param {Boolean} v
+	 * @desc ä¸çŸ¥é“_disabledæ˜¯ä»€ä¹ˆä¸œä¸œ
+	 */
 	this.setDisabled = function(v){
 		if(this._disabled == v) return;
 		this._disabled = v;
 	};
+	/**
+	 * @method addEventGroupListener
+	 * @param {String} eventMap äº‹ä»¶åçš„åºåˆ—ï¼Œç”¨,éš”å¼€ï¼Œä¹Ÿå¯ä¼ å…¥mouseeventæˆ–keyeventï¼Œè¿™è¡¨ç¤ºä¸€ä¸ªäº‹ä»¶é›†
+	 * @param {Function} listener äº‹ä»¶å“åº”å‡½æ•°
+	 * @desc æ³¨å†Œäº‹ä»¶ä¾¦å¬å™¨
+	 */
+	this.addEventListener1 =
 	this.addEventGroupListener = function(eventMap, listener){
 		this._listener = listener;
 		if(eventMap == "mouseevent"){
@@ -56,7 +97,7 @@ _class("EventTarget", "", function(){
 				this._self["on" + maps[i]] = function(ev){
 					ev = ev || runtime.getWindow().event;
 					//if(ev.type == "mousedown") window.alert(121);
-					if(this._ptr._enableEvent){  //Èç¹ûÆôÓÃÁËÊÂ¼şÏàÓ¦»úÖÆ£¬Ôò´¥·¢ÊÂ¼ş
+					if(this._ptr._enableEvent){  //å¦‚æœå¯ç”¨äº†äº‹ä»¶ç›¸åº”æœºåˆ¶ï¼Œåˆ™è§¦å‘äº‹ä»¶
 						if(ev.type in this._ptr._listener){
 							this._ptr._listener[ev.type].call(this._ptr, ev);
 						}
@@ -66,6 +107,12 @@ _class("EventTarget", "", function(){
 		}
 		maps = null;
 	};
+	/**
+	 * @method removeEventGroupListener
+	 * @param {String} eventMap äº‹ä»¶åçš„åºåˆ—ï¼Œç”¨,éš”å¼€ï¼Œä¹Ÿå¯ä¼ å…¥mouseeventæˆ–keyeventï¼Œè¿™è¡¨ç¤ºä¸€ä¸ªäº‹ä»¶é›†
+	 * @desc ç§»é™¤äº‹ä»¶ä¾¦å¬å™¨
+	 */
+	this.removeEventListener1 =
 	this.removeEventGroupListener = function(eventMap){
 		if(eventMap == "mouseevent"){
 			eventMap = "mousedown,mouseup,mousemove,mouseover,mouseout,click,dblclick";
@@ -82,27 +129,39 @@ _class("EventTarget", "", function(){
 		this._listener = null;
 	};
 	/**
-	 * ´Ë·½·¨ÔÊĞíÔÚÊÂ¼şÄ¿±êÉÏ×¢²áÊÂ¼şÕìÌıÆ÷¡£
+	 * æ­¤æ–¹æ³•å…è®¸åœ¨äº‹ä»¶ç›®æ ‡ä¸Šæ³¨å†Œäº‹ä»¶ä¾¦å¬å™¨ã€‚
 	 * @java void addEventListener(String type, EventListener listener, boolean useCapture);
-	 * [TODO]¼ì²étypeµÄºÏ·¨Öµ
-	 * [TODO]Í¬Ò»¸öÊÂ¼şÏìÓ¦º¯Êı²»Ó¦¸Ã±»°ó¶¨Á½´Î
+	 * [TODO]æ£€æŸ¥typeçš„åˆæ³•å€¼
+	 * [TODO]åŒä¸€ä¸ªäº‹ä»¶å“åº”å‡½æ•°ä¸åº”è¯¥è¢«ç»‘å®šä¸¤æ¬¡
+	 * @method addEventListener
+	 * @param {String} type äº‹ä»¶ç±»å‹
+	 * @param {Function} eventHandle äº‹ä»¶å¤„ç†å‡½æ•°
+	 * @param {Boolean} useCapture
+	 * @desc åœ¨EventTargetä¸Šæ³¨å†Œäº‹ä»¶ä¾¦å¬å™¨
 	 */
 	this.addEventListener = function(type, eventHandle, useCapture){
 		if(!this._eventMaps[type]){
-			this._eventMaps[type] = [];  //[TODO]Ê¹ÓÃ{}À´Ä£Äâ¶à¸öÊÂ¼şÖ´ĞĞË³ĞòµÄÎŞ¹ØĞÔ
+			this._eventMaps[type] = [];  //[TODO]ä½¿ç”¨{}æ¥æ¨¡æ‹Ÿå¤šä¸ªäº‹ä»¶æ‰§è¡Œé¡ºåºçš„æ— å…³æ€§
 		}
 		this._eventMaps[type].push(eventHandle);
 	};
+	/**
+	 * @method removeEventListener
+	 * @param {String} type äº‹ä»¶ç±»å‹
+	 * @param {Function} eventHandle äº‹ä»¶å¤„ç†å‡½æ•°
+	 * @param {Boolean} useCapture
+	 * @desc åœ¨EventTargetä¸Šç§»é™¤äº‹ä»¶ä¾¦å¬å™¨
+	 */
 	this.removeEventListener = function(type, eventHandle, useCapture){
 		if(this._eventMaps[type]){
 			var arr = this._eventMaps[type];
 			for(var i = 0, len = arr.length; i < len; i++){
-				if(eventHandle == null){  //ÒÆ³ıËùÓĞÊÂ¼ş
+				if(eventHandle == null){  //ç§»é™¤æ‰€æœ‰äº‹ä»¶
 					arr[i] = null;
 					arr.removeAt(i, 1);
 				}else if(arr[i] == eventHandle){
 					arr[i] = null;
-					arr.removeAt(i, 1);  //ÒÆ³ıÔªËØ
+					arr.removeAt(i, 1);  //ç§»é™¤å…ƒç´ 
 					break;
 				}
 			}
@@ -110,35 +169,35 @@ _class("EventTarget", "", function(){
 	};
 	this.dispatchEvent = function(ev){
 		var ret = true;
-		for(var obj = this; obj; obj = obj.getParent()){  //Ä¬ÈÏÊÂ¼ş´«µİË³ĞòÎªÓĞÄÚÏòÍâ
+		for(var obj = this; obj; obj = obj.getParent()){  //é»˜è®¤äº‹ä»¶ä¼ é€’é¡ºåºä¸ºæœ‰å†…å‘å¤–
 			if(obj.getDisabled()){
 				ev.cancelBubble = true;
 				ret = false;
 				break;  //continue;
 			}
-			if(obj["on" + ev.type]){  //Èç¹û×é¼şµÄÊ±¼äÏìÓ¦·½·¨´æÔÚ
-				ret = obj["on" + ev.type](ev);  //Ó¦¸ÃÅĞ¶ÏÊÂ¼şÏìÓ¦º¯ÊıµÄ·µ»ØÖµ²¢×öĞ©¹¤×÷
+			if(obj["on" + ev.type]){  //å¦‚æœç»„ä»¶çš„æ—¶é—´å“åº”æ–¹æ³•å­˜åœ¨
+				ret = obj["on" + ev.type](ev);  //åº”è¯¥åˆ¤æ–­äº‹ä»¶å“åº”å‡½æ•°çš„è¿”å›å€¼å¹¶åšäº›å·¥ä½œ
 				if(ev.cancelBubble){
-					return ret;  //Èç¹û½ûÖ¹Ã°Åİ£¬ÔòÍË³ö
+					return ret;  //å¦‚æœç¦æ­¢å†’æ³¡ï¼Œåˆ™é€€å‡º
 				}
 			}else{
 				var map = obj._eventMaps[ev.type];
-				if(map){  //¼ì²éÊÂ¼şÓ³Éä±íÖĞÊÇ·ñÓĞ¶ÔÓ¦µÄÊÂ¼ş
+				if(map){  //æ£€æŸ¥äº‹ä»¶æ˜ å°„è¡¨ä¸­æ˜¯å¦æœ‰å¯¹åº”çš„äº‹ä»¶
 					var bCancel = false;
-					ev.cancelBubble = false;  //»¹Ô­
+					ev.cancelBubble = false;  //è¿˜åŸ
 					for(var i = 0, len = map.length; i < len; i++){
 						ret = map[i].call(obj, ev);
-						bCancel = bCancel || ev.cancelBubble;  //ÓĞÒ»¸öÎªÕæ£¬ÔòÍ£Ö¹Ã°Åİ
+						bCancel = bCancel || ev.cancelBubble;  //æœ‰ä¸€ä¸ªä¸ºçœŸï¼Œåˆ™åœæ­¢å†’æ³¡
 					}
-					ev.cancelBubble = false;  //»¹Ô­
+					ev.cancelBubble = false;  //è¿˜åŸ
 					if(bCancel){
-						return ret;  //Èç¹û½ûÖ¹Ã°Åİ£¬ÔòÍË³ö
+						return ret;  //å¦‚æœç¦æ­¢å†’æ³¡ï¼Œåˆ™é€€å‡º
 					}
 				}
 			}
-			//[TODO]ÊÂ¼ş±ä¸ü·¢ËÍÕßµÄÊ±ºò£¬offsetX,offsetYÊôĞÔÒ²ÒªËæ×Å·¢Éú±é»¯
+			//[TODO]äº‹ä»¶å˜æ›´å‘é€è€…çš„æ—¶å€™ï¼ŒoffsetX,offsetYå±æ€§ä¹Ÿè¦éšç€å‘ç”ŸéåŒ–
 			ev.sender = obj;
-			if(obj._self){  //[TODO] obj ÓĞ¿ÉÄÜÊÇdesignBox£¬¶øËüÃ»ÓĞ_selfÊôĞÔ
+			if(obj._self){  //[TODO] obj æœ‰å¯èƒ½æ˜¯designBoxï¼Œè€Œå®ƒæ²¡æœ‰_selfå±æ€§
 				ev.offsetX += obj._self.offsetLeft;
 				ev.offsetY += obj._self.offsetTop;
 			}
@@ -148,16 +207,60 @@ _class("EventTarget", "", function(){
 	this.fireEvent = function(ev, argv){
 		var name = "on" + ev.type.capitalize();
 		if(typeof this[name] == "function"){
-			try{
+			//try{
 				switch(arguments.length){
 				case 1: return this[name](ev);
 				case 2: return this[name].apply(this, [ev].concat(argv));
 				case 3: return this[name].apply(this, arguments);
 				}
-			}catch(ex){  //ÆÁ±ÎÊÂ¼şÖĞµÄ´íÎó
-				//runtime.showException(ex, "[" + this._className + "::onInit]");
-				return false;
-			}
+			//}catch(ex){  //å±è”½äº‹ä»¶ä¸­çš„é”™è¯¯
+			//	//runtime.showException(ex, "[" + this._className + "::onInit]");
+			//	return false;
+			//}
 		}
+	};
+	/**
+	 * @method getEvent
+	 * @param {Event} ev äº‹ä»¶å¯¹è±¡
+	 * @return {Event}
+	 * @desc è·å–å…¼å®¹çš„äº‹ä»¶å¯¹è±¡
+	 */
+	this.getEvent = function(ev){
+		return ev || runtime.getWindow().event;
+	};
+	/**
+	 * @method preventDefault
+	 * @param {Event} ev äº‹ä»¶å¯¹è±¡
+	 * @desc é˜»æ­¢é»˜è®¤è¡Œä¸º
+	 */
+	this.preventDefault = function(ev){
+		ev = this.getEvent(ev);
+		if(ev.preventDefault) {
+			ev.preventDefault();
+		}else{
+			ev.returnValue = false;
+		}
+	};
+	/**
+	 * @method stopPropagation
+	 * @param {Event} ev äº‹ä»¶å¯¹è±¡
+	 * @desc é˜»æ­¢äº‹ä»¶æµç»§ç»­å†’æ³¡
+	 */
+	this.stopPropagation = function(ev){
+		ev = this.getEvent(ev);
+		if(ev.stopPropagation){
+			ev.stopPropagation();
+		}else{
+			ev.cancelBubble = true;
+		}
+	};
+	/**
+	 * @method stopEvent
+	 * @param {Event} ev äº‹ä»¶å¯¹è±¡
+	 * @desc åœæ­¢å½“å‰äº‹ä»¶å¯¹è±¡çš„ä¸€åˆ‡æ´»åŠ¨
+	 */
+	this.stopEvent = function(ev){
+		this.preventDefault(ev);
+		this.stopPropagation(ev);
 	};
 });

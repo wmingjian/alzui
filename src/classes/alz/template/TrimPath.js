@@ -24,9 +24,9 @@ _class("TrimPath", "", function(){
 		return eval(src);
 	};
 	/**
-	 * @param tmplContent Ä£°åÄÚÈİ
-	 * @param optTmplName [¿ÉÑ¡]Ä£°åµÄÃû×Ö
-	 * @param optEtc      [¿ÉÑ¡]ÉèÖÃÑ¡Ïî
+	 * @param tmplContent æ¨¡æ¿å†…å®¹
+	 * @param optTmplName [å¯é€‰]æ¨¡æ¿çš„åå­—
+	 * @param optEtc      [å¯é€‰]è®¾ç½®é€‰é¡¹
 	 */
 	this.parseTemplate = function(tmplContent, optTmplName, optEtc){
 		var tpl = new Template(optTmplName, tmplContent, optEtc || this.etc);

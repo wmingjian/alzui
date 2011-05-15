@@ -3,39 +3,40 @@ _package("alz.mui");
 _import("alz.mui.Component");
 
 /**
- * Ä£Ì¬¶Ô»°¿òÊ¹ÓÃµÄÕÚµ²Ãæ°å×é¼ş
+ * æ¨¡æ€å¯¹è¯æ¡†ä½¿ç”¨çš„é®æŒ¡é¢æ¿ç»„ä»¶
  */
 _class("ModalPanel", Component, function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._targetList = [];
 		this._activeTarget = null;
-		this._iframe = null;  //ÓÃÀ´ÕÚµ²SELECTµÈDIVÕÚµ²²»×¡µÄ×é¼ş
-		this._panel = null;   //ÔÙÓÃÕâ¸öDIVÕÚµ²ÔÚIFRAMEÉÏÃæ
+		this._iframe = null;  //ç”¨æ¥é®æŒ¡SELECTç­‰DIVé®æŒ¡ä¸ä½çš„ç»„ä»¶
+		this._panel = null;   //å†ç”¨è¿™ä¸ªDIVé®æŒ¡åœ¨IFRAMEä¸Šé¢
 	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
 		this._self.className = "wui-ModalPanel";
 		this.moveTo(0, 0);
-		this.setOpacity(0.2);
+		this.setOpacity(0.01);
 		if(runtime.ie){
-			this._iframe = this._createElement("iframe");
-			this._iframe.setAttribute("scrolling", "no");
-			this._iframe.setAttribute("frameBorder", "0");
-			this._iframe.setAttribute("frameSpacing", "0");
-			//this._iframe.setAttribute("allowTransparency", "true");
-			this._iframe.style.display = "none";
-			this._iframe.style.width = "100%";
-			this._iframe.style.height = "100%";
-			this._iframe.src = "about:blank";
-			this._self.appendChild(this._iframe);
+			this._iframe = this._createElement2(this._self, "iframe", "", {
+				"scrolling": "no",
+				"frameBorder": "0",
+				"frameSpacing": "0",
+				//"allowTransparency": "true",
+				"src": "about:blank",
+				"display": "none",
+				"position": "absolute",
+				"width": "100%",
+				"height": "100%"
+			});
 		}
-		this._panel = this._createElement("div");
-		this._panel.style.display = "none";
-		this._panel.style.position = "absolute";
-		this._panel.style.left = "0px";
-		this._panel.style.top = "0px";
-		this._self.appendChild(this._panel);
+		this._panel = this._createElement2(this._self, "div", "", {
+			"display": "none",
+			"position": "absolute",
+			"left": "0px",
+			"top": "0px"
+		});
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
@@ -56,7 +57,7 @@ _class("ModalPanel", Component, function(){
 			this._iframe.style.display = v ? "" : "none";
 		}
 		this._panel.style.display = v ? "" : "none";
-		if(this._visible){  //Èç¹ûÃæ°åÒÑ¾­ÏÔÊ¾
+		if(this._visible){  //å¦‚æœé¢æ¿å·²ç»æ˜¾ç¤º
 			//this.getActiveTarget().setVisible(false);
 		}else{
 		}
@@ -65,6 +66,9 @@ _class("ModalPanel", Component, function(){
 		_super.resize.apply(this, arguments);
 		this._panel.style.width = w + "px";
 		this._panel.style.height = h + "px";
+		if(this._activeTarget.moveToCenter){
+			this._activeTarget.moveToCenter();
+		}
 	};
 	this.pushTarget = function(v){
 		this._activeTarget = v;
@@ -72,7 +76,7 @@ _class("ModalPanel", Component, function(){
 		var rect = runtime._workspace.getViewPort();
 		this.resize(rect.w, rect.h);
 		//var screen = runtime.getBody();
-		/* ÊÇ·ñĞèÒªÒÆ¶¯ÄØ£¿
+		/* æ˜¯å¦éœ€è¦ç§»åŠ¨å‘¢ï¼Ÿ
 		var rect = this._parent.getViewPort();
 		this.moveTo(rect.x, rect.y);
 		*/

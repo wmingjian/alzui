@@ -1,6 +1,6 @@
 /*
-if(typeof __global.runtime != "undefined"){  //ÄÚÇ¶Ä£Ê½£¬ÖØĞÂ³õÊ¼»¯
-	if(!__global.confirm("alzuiÏµÍ³ÒÑ¾­¼ÓÔØÍê±Ï£¬È·ÈÏÒªÖØĞÂ³õÊ¼»¯Âğ£¿")){
+if(typeof __global.runtime != "undefined"){  //å†…åµŒæ¨¡å¼ï¼Œé‡æ–°åˆå§‹åŒ–
+	if(!__global.confirm("alzuiç³»ç»Ÿå·²ç»åŠ è½½å®Œæ¯•ï¼Œç¡®è®¤è¦é‡æ–°åˆå§‹åŒ–å—ï¼Ÿ")){
 		return;
 	}else{
 		__global.runtime.dispose();
@@ -12,170 +12,256 @@ if(typeof __global.runtime != "undefined"){  //ÄÚÇ¶Ä£Ê½£¬ÖØĞÂ³õÊ¼»¯
 }
 */
 
-var __version = "0.0.8";  //µ±Ç°°æ±¾ĞÅÏ¢£¬¸ñÊ½:"Ö÷°æ±¾ºÅ.¸±°æ±¾ºÅ.ĞŞ¶©°æ±¾ºÅ"
-var __buildtime = 1263906485218;
-var __start = new Date().getTime();  //¼ÇÂ¼¿ªÊ¼Ê±¼ä
+//var __version = "__VERSION__";  //å½“å‰ç‰ˆæœ¬ä¿¡æ¯ï¼Œæ ¼å¼:"ä¸»ç‰ˆæœ¬å·.å‰¯ç‰ˆæœ¬å·.ä¿®è®¢ç‰ˆæœ¬å·"
+//var __buildtime = __BUILD_TIME__;
+//var __start = new Date().getTime();  //è®°å½•å¼€å§‹æ—¶é—´
+//var __global = window;
 var __proto = "prototype";
-var __inDeclare = false;  //±êÊ¶ÊÇ·ñ´¦ÓÚÀàÉùÃ÷¹ı³ÌÖĞ
-/**
- * ´´½¨²¢·µ»ØÀàµÄÔ­ĞÍ»òÕßËµÀà¶ÔÏó×ÔÉí
- */
-function __newClass(){
-	//·µ»ØÒ»¸öº¯Êı¶ÔÏóµÈ¼ÛÓÚ´´½¨Ò»¸öFunctionÊµÀı£¬ËùÒÔÒÔºóµÄÄ£ÄâÃ¿¸öÀàµÄ¹¹Ôìº¯Êı²Å
-	//»áÊÇ²»Í¬µÄfunction¶ÔÏó£¬Èç¹ûÊ¹ÓÃÏàÍ¬µÄfunction¶ÔÏóOOÄ£ÄâÔÚ¼Ì³ĞÊ±½«´æÔÚÖÂÃüµÄ
-	//ÎÊÌâ£¬ÆäËûµÄÏñprototype,jQuery,mootoolsµÈ£¬Ä£ÄâOOµÄºËĞÄË¼Ïë¶¼ºÍÕâÀïÊÇÒ»ÖÂµÄ¡£
-	//return new Function("this._init.apply(this, arguments);");  //anonymous code
-	return function(){  //"F" + new Date().getTime()
-		//Èç¹û´¦ÓÚÀàÉùÃ÷¹ı³ÌÖĞ£¬Ö±½Ó·µ»Ø£¬½ö½ö½¨Á¢Ô­ĞÍÁ´£¬²»ĞèÒªµ÷ÓÃÊµ¼ÊµÄ¹¹Ôìº¯Êı
-		if(__inDeclare) return;
+var __inDeclare  = false;  //æ ‡è¯†æ˜¯å¦å¤„äºç±»å£°æ˜è¿‡ç¨‹ä¸­
+var __all__      = {};  //æ‰€æœ‰çš„ç±»å’Œæ¥å£
+var __interfaces = {};  //æ‰€æœ‰æ¥å£
+var __pkgName    = "";  //å½“å‰ç±»ï¼ˆæˆ–æ¥å£,æ‰©å±•ï¼‰æ‰€åœ¨çš„åŒ…çš„åå­—
 
-		//¼ì²é¹¹Ôìº¯ÊıÊÇ·ñ´æÔÚ£¬»ùÓÚÀàµÄÑÏ¸ñĞÔÖ»×öÓĞÎŞµÄ¼ì²é£¬²»×öÊÇ·ñÊÇº¯ÊıµÄ¼ì²é£¬
-		//ÒÔºóÎªÁËÌá¸ßĞÔÄÜ¿ÉÒÔ¿¼ÂÇºöÂÔ¸Ã¼ì²é
-		if(typeof this._init == "function"){
-			//µ÷ÓÃOOPÄ£ÄâÖĞÊµ¼ÊµÄ¹¹Ôìº¯Êı£¬²¢´«µİ²ÎÊı
-			this._init.apply(this, arguments);
-		}/*else{
-			throw "Àà " + name + " ¶¨ÒåÖĞÈ±ÉÙ¹¹Ôìº¯Êı _init";
-		}*/
-
-		//ÔÚÒÔºó¸ß¼¶µÄUI×é¼şÀàÖĞthis.create·½·¨ÊÇÀàÄÚ²¿ÊôĞÔÊµ¼Ê¹¹ÔìµÄµØ·½£¬¹¹Ôìº¯ÊıÆä
-		//ÊµÖ»ÊÇÒ»¸öÊôĞÔÉùÃ÷µÄ¼¯ÖĞµØ£¬ÕæÕıµÄcreate¶¯×÷ÔÚÕâ¸ö·½·¨ÄÚ²¿ÊµÏÖ£¬²¢ÆÚÍûËü²»
-		//½ö½öÊÇÒ»¸ö²ÎÊı¡£
-		//Èç¹û²ÎÊı¸öÊı²»Îª0£¬Ö´ĞĞ create ·½·¨
-		if(arguments.length != 0 && typeof this.create == "function"){  //this._className.indexOf("alz.ui.") == 0
-			this.create.apply(this, arguments);  //µ÷ÓÃcreate·½·¨²¢´«µİ²ÎÊı
-		}
-	};
+var __toString  = Object[__proto].toString,
+	__rwhite    = /\s/,
+	__trimLeft  = /^\s+/,
+	__trimRight = /\s+$/;
+// IE6/7/8 return false
+if(!__rwhite.test("\xA0")){
+	__trimLeft = /^[\s\xA0]+/;
+	__trimRight = /[\s\xA0]+$/;
 }
-/**
- * Õâ¸öº¯ÊıÖ»»á±»µ÷ÓÃÒ»´Î£¬½öÓÃÓÚ´´½¨ºËĞÄ Context ÊµÀı£¬¼´µÚÒ»¸öÉÏÏÂÎÄ»·¾³¶ÔÏó
- */
-function createContext(name/*, libs*/){  //bootstrap
-	/**
-	 * ºËĞÄÀà°ü¶¨Òå
-	 * ÔÚÕâÀï²»Ö±½Ó¶¨ÒåÎª WebRuntime µÄ³ÉÔ±£¬Ö÷ÒªÄ¿µÄÊÇÎªÁË½â¾öÔÚµ±Ç°µÄÃüÃû¿Õ¼ä
-	 * ÄÚ²»¿ÉÒÔÖ±½ÓÍ¨¹ı alz ÒıÓÃ½Å±¾ÀàµÄÎÊÌâ¡£
-	 */
-	var alz = {};  //¶¨ÒåÔÚÔ­ĞÍÉÏ£¬±£Ö¤ËùÓĞÃüÃû¿Õ¼äÏÂÖ¸ÏòÍ¬Ò»¸ö¸ù°ü
-	var _classes = {};  //ËùÓĞµÄÀà
-	var _pkg = "";      //µ±Ç°Àà£¨»ò½Ó¿Ú,À©Õ¹£©ËùÔÚµÄ°üµÄÃû×Ö
-	//var _exts = {};     //ËùÓĞÀàµÄÀ©Õ¹
-	var _cxt = null;
+initNative();
+//var __profile = __global.__profile = new Profile();
 
-	function initNative(){
-		var hash = {
-			"Object"   : Object,
-			"Array"    : Array,
-			"Boolean"  : Boolean,
-			"Number"   : Number,
-			"String"   : String,
-			"RegExp"   : RegExp,
-			"Function" : Function,
-			"Date"     : Date,
-			"Math"     : Math,
-			"Error"    : Error
-			//"ActiveXObject"   : ActiveXObject,
-			//"Dictionary"      : Dictionary,
-			//"Enumerator"      : Enumerator,
-			//"FileSystemObject": FileSystemObject,
-			//"Global"          : Global,
-			//"VBArray"         : VBArray
-		};
-		for(var k in hash){
-			_classes["alz.native." + k] = hash[k];
+function applyIf(o, c){
+	if(o){
+		for(var p in c){
+			if(typeof o[p] == "undefined"){
+				o[p] = c[p];
+			}
 		}
-		var _p = String[__proto];
-		_p.capitalize = function(){
-			return this.charAt(0).toUpperCase() + this.substr(1);
-		};
-		_p = Array[__proto];
-		/**
-		 * ÒÆ³ıÊı×éÖĞµÄµÚi¸ö¶ÔÏó
-		 */
-		_p.removeAt = function(i){
-			this.splice(i, 1);
-		};
-		if(!_p.pop){  // IE 5.x fix from Igor Poteryaev.
-			_p.pop = function(){
+	}
+	return o;
+}
+function initNative(){
+	var hash = {
+		"Object"   : Object,
+		"Array"    : Array,
+		"Boolean"  : Boolean,
+		"Number"   : Number,
+		"String"   : String,
+		"RegExp"   : RegExp,
+		"Function" : Function,
+		"Date"     : Date,
+		"Math"     : Math,
+		"Error"    : Error
+		//"ActiveXObject"   : ActiveXObject,
+		//"Dictionary"      : Dictionary,
+		//"Enumerator"      : Enumerator,
+		//"FileSystemObject": FileSystemObject,
+		//"Global"          : Global,
+		//"VBArray"         : VBArray
+	};
+	for(var k in hash){
+		__all__["alz.native." + k] = hash[k];
+	}
+	(function(map){
+		for(var key in map){
+			var p = hash[key][__proto];
+			var methods = map[key];
+			for(var k in methods){
+				if(!p[k]){
+					p[k] = methods[k];
+				}
+			}
+		}
+	})({
+		"String": {
+			/*
+			repeat: function(n){
+				var s = "", t = this + s;
+				while(--n >= 0){
+					s += t;
+				}
+				return s;
+			},
+			*/
+			capitalize: function(){
+				return this.charAt(0).toUpperCase() + this.substr(1);
+			},
+			trimLeft: function(){
+				return this.replace(__trimLeft, "");
+			},
+			trimRight: function(s){
+				return this.replace(__trimRight, "");
+			},
+			trim: function(){
+				return this.replace(__trimLeft,"").replace(__trimRight,"");
+			},
+			startsWith: function(prefix){
+				return this.lastIndexOf(prefix, 0) == 0;
+			},
+			endsWith: function(suffix){
+				var l = this.length - suffix.length;
+				return l >= 0 && this.indexOf(suffix, l) == l;
+			}
+		},
+		"Array": {
+			/**
+			 * ç§»é™¤æ•°ç»„ä¸­çš„ç¬¬iä¸ªå¯¹è±¡
+			 */
+			removeAt: function(i){
+				this.splice(i, 1);
+			},
+			// å¦‚æœä¸è€ƒè™‘IE5.5ä¸‹ç‰ˆæœ¬æµè§ˆå™¨ï¼Œè¯¥æ–¹æ³•å¯è€ƒè™‘ä¸¢å¼ƒ
+			// IE 5.x fix from Igor Poteryaev.
+			pop: function(){
 				var UNDEFINED;
 				if(this.length === 0){
 					return UNDEFINED;
 				}
 				return this[--this.length];
-			};
-		}
-		if(!_p.push){  // IE 5.x fix from Igor Poteryaev.
-			_p.push = function(){
+			},
+			// å¦‚æœä¸è€ƒè™‘IE5.5ä¸‹ç‰ˆæœ¬æµè§ˆå™¨ï¼Œè¯¥æ–¹æ³•å¯è€ƒè™‘ä¸¢å¼ƒ
+			// IE 5.x fix from Igor Poteryaev.
+			push: function(){
 				for(var i = 0, len = arguments.length; i < len; i++){
 					this[this.length] = arguments[i];
 				}
 				return this.length;
-			};
-		}
-		/**
-		 * ÔÚÊı×é¶ÔÏóÖĞËÑË÷oµÄË÷Òı
-		 */
-		_p.indexOf = function(o){
-			for(var i = 0, len = this.length; i < len; i++){
-				if(this[i] == o)return i;
+			},
+			// è¿”å›(é»˜è®¤ä»ç¬¬ä¸€ä¸ªå…ƒç´ å¼€å§‹æŸ¥æ‰¾)æŒ‡å®šå…ƒç´ çš„ç´¢å¼•ï¼Œå¦‚æœä¸å­˜åœ¨è¿”å›-1
+			indexOf: function(obj, idx){
+				var from = idx === undefined ? 0 : (idx < 0 ? Math.max(0, arr.length + idx) : idx);
+				for(var i = from, l = this.length; i < l; i++){
+					if(i in this && this[i] === obj){
+						return i;
+					}
+				}
+				return -1;
+			},
+			// è¿”å›(é»˜è®¤ä»æœ€åä¸€ä¸ªå…ƒç´ å¼€å§‹æŸ¥æ‰¾)æŒ‡å®šå…ƒç´ çš„ç´¢å¼•ï¼Œå¦‚æœä¸å­˜åœ¨è¿”å›-1
+			lastIndexOf: function(obj, idx){
+				var l = this.length, from = idx == null ? l - 1 : idx;
+				if(from < 0){
+					from = Math.max(0, l + from);
+				}
+				for(var i = from; i >= 0; i--){
+					if(i in this && this[i] === obj){
+						return i;
+					}
+				}
+				return -1;
+			},
+			// æ£€æŸ¥æ•°ç»„å…ƒç´ æ˜¯å¦éƒ½ç¬¦åˆæŸä¸ªæ¡ä»¶ï¼Œåªè¦æœ‰ä¸€ä¸ªä¸ç¬¦åˆè¿”å›falseï¼Œå¦åˆ™è¿”å›true
+			every: function(fn, thisObj){
+				var l = this.length;
+				for(var i = 0; i < l; i++){
+					if(i in this && !fn.call(thisObj, this[i], i, this)){
+						return false;
+					}
+				}
+				return true;
+			},
+			// æ£€æŸ¥æ•°ç»„ä¸­å…ƒç´ æ˜¯å¦ç¬¦åˆæŸä¸ªæ¡ä»¶ï¼Œåªè¦æœ‰ä¸€ä¸ªç¬¦åˆè¿”å›trueï¼Œå¦åˆ™è¿”å›false
+			some: function(fn, thisObj){
+				var l = this.length;
+				for(var i = 0; i < l; i++){
+					if(i in this && fn.call(thisObj, this[i], i, this)){
+						return true;
+					}
+				}
+				return false;
+			},
+			// åœ¨æ•°ç»„ä¸­çš„æ¯ä¸ªé¡¹ä¸Šè¿è¡Œä¸€ä¸ªå‡½æ•°ï¼Œå¹¶å°†å‡½æ•°è¿”å›çœŸå€¼çš„é¡¹ä½œä¸ºæ•°ç»„è¿”å›
+			filter: function(fn, thisObj){
+				var l = this.length, res = [], resLength = 0;
+				for(var i = 0; i < l; i++){
+					if(i in this){
+						var val = this[i];
+						if(fn.call(thisObj, val, i, this)){
+							res[resLength++] = val;
+						}
+					}
+				}
+				return res;
+			},
+			// åœ¨æ•°ç»„ä¸­çš„æ¯ä¸ªé¡¹ä¸Šè¿è¡Œä¸€ä¸ªå‡½æ•°ï¼Œå¹¶å°†å…¨éƒ¨ç»“æœä½œä¸ºæ•°ç»„è¿”å›
+			map: function(fn, thisObj){
+				var l = this.length, res = [];
+				for(var i = 0; i < l; i++){
+					if(i in this){
+						res[i] = fn.call(thisObj, this[i], i, this);
+					}
+				}
+				return res;
+			},
+			// åœ¨æ•°ç»„ä¸­çš„æ¯ä¸ªé¡¹ä¸Šè¿è¡Œä¸€ä¸ªå‡½æ•°
+			forEach: function(fn, thisObj){
+				var l = this.length;
+				for(var i = 0; i < l; i++){
+					if(i in this) {
+						fn.call(thisObj, this[i], i, this);
+					}
+				}
 			}
-			return -1;
-		};
-		_p = Date[__proto];
-		_p.toMyString = function(type){
-			var y = this.getFullYear();
-			var m = this.getMonth() + 1;
-			var d = this.getDate();
-			var h = this.getHours();
-			var n = this.getMinutes();
-			var s = this.getSeconds();
-			switch(type){
-			case 1:  //2007Äê2ÔÂ2ÈÕ
-				return y + "Äê" + m + "ÔÂ" + d + "ÈÕ";
-			case 2:  //2007-2-2
-				return y + "-" + m + "-" + d;
-			case 3:  //0:01:05
-				return h + ":" + n + ":" + s;
-			case 4:  //00:01
-				return n + ":" + s;
-			case 5:  //2007-02-02
-				return y
-					+ "-" + (m < 10 ? "0" + m : m)
-					+ "-" + (d < 10 ? "0" + d : d);
-			case 6:  //0702
-				return ("" + y).substr(2) + (m < 10 ? "0" + m : m);
-			case 7:  //000105
-				return "" + (h < 10 ? "0" + h : h)
-					+ (n < 10 ? "0" + n : n)
-					+ (s < 10 ? "0" + s : s);
-			case 8:  //00:01 123
-				return n + ":" + s + " " + this.getMilliseconds();
-			case 9:  //2007Äê2ÔÂ2ÈÕ 0Ê±01·Ö05Ãë
-				return y + "Äê" + m + "ÔÂ" + d + "ÈÕ "
-					+ h + "Ê±"
-					+ (n < 10 ? "0" + n : n) + "·Ö"
-					+ (s < 10 ? "0" + s : s) + "Ãë";
-			case 10:  //2008Äê4ÔÂ22ÈÕ(ĞÇÆÚ¶ş) ÏÂÎç02:29
-				return y + "Äê" + m + "ÔÂ" + d + "ÈÕ"
-					+ "(ĞÇÆÚ" + ("ÈÕÒ»¶şÈıËÄÎåÁù".charAt(this.getDay())) + ") "
-					+ (["ÉÏÎç","ÏÂÎç"][this.getHours() < 12 ? 0 : 1])
-					+ (h < 10 ? "0" + h : h) + ":"
-					+ (n < 10 ? "0" + n : n);
-			case 11:  //2007-2-2 0:01
-				return y + "-" + m + "-" + d + " " + h + ":" + (n < 10 ? "0" + n : n);
-			case 0:  //2007-2-2 0:01:05
-			default:
-				return y + "-" + m + "-" + d + " " + h + ":" + n + ":" + s;
+		},
+		"Date": {
+			toMyString: function(type){
+				var y = this.getFullYear();
+				var m = this.getMonth() + 1;
+				var d = this.getDate();
+				var h = this.getHours();
+				var n = this.getMinutes();
+				var s = this.getSeconds();
+				switch(type){
+				case 1:  //2007å¹´2æœˆ2æ—¥
+					return y + "å¹´" + m + "æœˆ" + d + "æ—¥";
+				case 2:  //2007-2-2
+					return y + "-" + m + "-" + d;
+				case 3:  //0:01:05
+					return h + ":" + n + ":" + s;
+				case 4:  //00:01
+					return n + ":" + s;
+				case 5:  //2007-02-02
+					return y
+						+ "-" + (m < 10 ? "0" + m : m)
+						+ "-" + (d < 10 ? "0" + d : d);
+				case 6:  //0702
+					return ("" + y).substr(2) + (m < 10 ? "0" + m : m);
+				case 7:  //000105
+					return "" + (h < 10 ? "0" + h : h)
+						+ (n < 10 ? "0" + n : n)
+						+ (s < 10 ? "0" + s : s);
+				case 8:  //00:01 123
+					return n + ":" + s + " " + this.getMilliseconds();
+				case 9:  //2007å¹´2æœˆ2æ—¥ 0æ—¶01åˆ†05ç§’
+					return y + "å¹´" + m + "æœˆ" + d + "æ—¥ "
+						+ h + "æ—¶"
+						+ (n < 10 ? "0" + n : n) + "åˆ†"
+						+ (s < 10 ? "0" + s : s) + "ç§’";
+				case 10:  //2008å¹´4æœˆ22æ—¥(æ˜ŸæœŸäºŒ) ä¸‹åˆ02:29
+					return y + "å¹´" + m + "æœˆ" + d + "æ—¥"
+						+ "(æ˜ŸæœŸ" + ("æ—¥ä¸€äºŒä¸‰å››äº”å…­".charAt(this.getDay())) + ") "
+						+ (["ä¸Šåˆ","ä¸‹åˆ"][this.getHours() < 12 ? 0 : 1])
+						+ (h < 10 ? "0" + h : h) + ":"
+						+ (n < 10 ? "0" + n : n);
+				case 11:  //2007-2-2 0:01
+					return y + "-" + m + "-" + d + " " + h + ":" + (n < 10 ? "0" + n : n);
+				case 0:  //2007-2-2 0:01:05
+				default:
+					return y + "-" + m + "-" + d + " " + h + ":" + n + ":" + s;
+				}
 			}
-		};
+		},
 		/**
-		 * IE5.01²»Ö§³Öapply,call·½·¨£¬ËùÒÔÔÚ´ËĞèÒª×Ô¶¨ÒåÀ´ĞŞÕıËüÃÇ
-		 * ±¾¿ò¼ÜÄ£ÄâOOPÑÏÖØÒÀÀµÕâÁ½¸ö¶«¶«£¬²»µÃ²»ÖØÊÓËüÃÇµÄ´æÔÚ£¬Í¬Ê±Ò²°Ñ¿ò¼Ü¶Ôä¯ÀÀÆ÷ºÍ
-		 * JSÒıÇæµÄ°æ±¾ÒªÇó½µµ½ÁË×ã¹»µÍµÄ³Ì¶È£¡^_^
+		 * IE5.01ä¸æ”¯æŒapply,callæ–¹æ³•ï¼Œæ‰€ä»¥åœ¨æ­¤éœ€è¦è‡ªå®šä¹‰æ¥ä¿®æ­£å®ƒä»¬
+		 * æœ¬æ¡†æ¶æ¨¡æ‹ŸOOPä¸¥é‡ä¾èµ–è¿™ä¸¤ä¸ªä¸œä¸œï¼Œä¸å¾—ä¸é‡è§†å®ƒä»¬çš„å­˜åœ¨ï¼ŒåŒæ—¶ä¹ŸæŠŠæ¡†æ¶å¯¹æµè§ˆå™¨å’Œ
+		 * JSå¼•æ“çš„ç‰ˆæœ¬è¦æ±‚é™åˆ°äº†è¶³å¤Ÿä½çš„ç¨‹åº¦ï¼^_^
 		 */
-		_p = Function[__proto];
-		if(!_p.apply){
-			_p.apply = function(thisObj, args){
+		"Function": {
+			apply: function(thisObj, args){
 				thisObj.__apply__ = this;
 				var a = [];
 				//if(args){
@@ -205,184 +291,286 @@ function createContext(name/*, libs*/){  //bootstrap
 				}
 				delete thisObj.__apply__;
 				return ret;
-			};
-		}
-		if(!_p.call){
-			_p.call = function(thisObj){
+			},
+			call: function(thisObj){
 				var args = [];  //copy all arguments but the first
 				for(var i = 1, len = arguments.length; i < len; i++){
 					args[i - 1] = arguments[i];
 				}
 				return this.apply(thisObj, args);
-			};
-		}
-		_p = null;
-	}
-	function _init(name, rt){
-		this.__name = name || "anonymous";  //ContextµÄÃû×Ö
-		this.__context__ = this;
-		this.runtime = rt || null;  //Õâ¸öÊÇ½«Òªµ¼³öµÄÈ«¾ÖÎ¨Ò»¶ÔÏó
-		this.application = null;  //Õë¶ÔÃ¿Ò»¸öÓ¦ÓÃµÄÎ¨Ò» application ¶ÔÏó
-		//this._super = null;  //µ±Ç°ÀàµÄ¸¸Àà
-	}
-	function _package(sPackage){
-		_pkg = sPackage;  //¼Ç×¡µ±Ç°ËùÔÚµÄ°ü
-	}
-	/**
-	 * Ä£ÄâÀàµÄ¶¨Òå
-	 * @param {String} className ÀàµÄÃû×Ö
-	 * @param {Class} superClass ¸¸Àà¶ÔÏó
-	 * @param {Function} classImp ÀàµÄÊµÏÖ´úÂë
-	 */
-	function _class(className, superClass, classImp){
-		var _s;
-		if(superClass === null){  //Ä¬ÈÏ¼Ì³Ğ JS µÄÔ­Éú¸ù¶ÔÏó
-			_s = null;  //±£Ö¤¸ùÀà _super ÊôĞÔÎª null
-			superClass = Object;  //[TODO]Èç¹û¿ò¼ÜÃ»ÓĞÀ©Õ¹Object£¬ÔòÎŞĞè¼Ì³ĞObject
-		}else{
-			if(superClass === ""){
-				superClass = _classes["alz.lang.AObject"];
 			}
-			_s = superClass[__proto];
 		}
-
-		//Àà¼°ÊôĞÔ¶¨Òå(¾²Ì¬ÊôĞÔ)
-		var clazz = __newClass();  //¶¨ÒåÀà
-		clazz._super = _s;  //°ó¶¨ _super ÊôĞÔµ½ÀàÉÏÃæ£¨Object.prototype£©
-		clazz._className = className;
-		clazz._clazzImp = classImp;
-		clazz.toString = function(){return "[class " + this._className + "]"};
-
-		//Ô­ĞÍ¼°ÊôĞÔ¶¨Òå£¨ËùÓĞÊµÀı¹²ÏíÕâĞ©ÊôĞÔ£©
-		__inDeclare = true;
-		var _p =
-		clazz[__proto] = new superClass();  //Í¨¹ıÔ­ĞÍÊµÏÖ¼Ì³Ğ
-		__inDeclare = false;
-		_p.constructor = clazz;  //_p._init;  //³õÊ¼»¯¹¹ÔìÆ÷
-		if(!_p.__proto__){
-			_p.__proto__ = _p;  //fixed for ie
-		}
-		_p._className = className;
-		_p._clazz = clazz;
-		_p._exts = [];  //ÀàµÄÀ©Õ¹´úÂë
-
-		//Àà°ó¶¨
-		alz[className] = clazz;  //½«Àà°ó¶¨µ½¸ù°üÉÏÃæ
-		_classes[_pkg + "." + className] = clazz;
-		if(_cxt){
-			this[className] = clazz;  //°ó¶¨µ½µ±Ç°ÉÏÏÂÎÄ»·¾³£¨×÷ÓÃÓò£©Ö®ÉÏ
-		}
-		//this.runtime._contextList[this.runtime._name][className] = clazz;  //°ó¶¨µ½ºËĞÄÉÏÏÂÎÄ»·¾³Ö®ÉÏ
-		//__global[className] = clazz;
-
-		//Ö´ĞĞÀàµÄÊµÏÖ´úÂë
-		if(typeof classImp == "function"){
-			classImp.apply(_p, [_s]);  //function(_super){};  //³õÊ¼»¯Àà¶ÔÏó
-		}
-		_p = null;
-		_s = null;
-		//clazz = null;
-		return clazz;
-	}
-	/**
-	 * ÉÏÏÂÎÄ»·¾³ÀàµÄ×Ô¾Ù´úÂë
-	 */
-	function bootstrap(){
-		initNative();
-		//±ê×¼µÄ_classÉùÃ÷ĞÎÊ½£¬²»¹ıÏÖÔÚ»¹²»ÊµÔÚÕæÊÇµÄÉÏÏÂÎÄ»·¾³ÏÂ
-//------------------------------------------------------------------------------
-_package("alz.core");
+	});
+}
 
 /**
- * ÃüÃû¿Õ¼äºÍÉÏÏÂÎÄ»·¾³µÄ¸ÅÄîÔÚÕâÀï²¢²»ÑÏ¸ñÇø·Ö£¬Õâ¸öÌØÊâµÄÀàµÄÖ÷ÒªÄ¿µÄ¾ÍÊÇ´´½¨
- * ¶à¸öÉÏÏÂÎÄ»·¾³¶ÔÏó²¢ÓÉ´Ë¹¹Ôì³öÒ»¸ö¸öµÄÃüÃû¿Õ¼äÀ´£¬²¢¼°ÓÉÉÏÏÂÎÄ»·¾³¶ÔÏóÇø±ğÓÚ
- * ÄäÃûº¯Êı¾Ö²¿×÷ÓÃÓòµÄ¿É²Ù×÷ĞÔ£¬Éè¼ÆÁËOOPÄ£ÄâÔ­Àí¡£
+ * å‘½åç©ºé—´å’Œä¸Šä¸‹æ–‡ç¯å¢ƒçš„æ¦‚å¿µåœ¨è¿™é‡Œå¹¶ä¸ä¸¥æ ¼åŒºåˆ†ï¼Œè¿™ä¸ªç‰¹æ®Šçš„ç±»çš„ä¸»è¦ç›®çš„å°±æ˜¯åˆ›å»º
+ * å¤šä¸ªä¸Šä¸‹æ–‡ç¯å¢ƒå¯¹è±¡å¹¶ç”±æ­¤æ„é€ å‡ºä¸€ä¸ªä¸ªçš„å‘½åç©ºé—´æ¥ï¼Œå¹¶åŠç”±ä¸Šä¸‹æ–‡ç¯å¢ƒå¯¹è±¡åŒºåˆ«äº
+ * åŒ¿åå‡½æ•°å±€éƒ¨ä½œç”¨åŸŸçš„å¯æ“ä½œæ€§ï¼Œè®¾è®¡äº†OOPæ¨¡æ‹ŸåŸç†ã€‚
  *
- * _package,_import,_classÈı¸öOOP¹Ø¼üÌØĞÔµÄÖØÒª³Ì¶ÈÊÇ·´¹ıÀ´µÄ¡£
+ * _package,_import,_classä¸‰ä¸ªOOPå…³é”®ç‰¹æ€§çš„é‡è¦ç¨‹åº¦æ˜¯åè¿‡æ¥çš„ã€‚
  */
+/*
+//æ ‡å‡†çš„_classå£°æ˜å½¢å¼ï¼Œä¸è¿‡ç°åœ¨è¿˜ä¸æ˜¯åœ¨çœŸå®çš„ä¸Šä¸‹æ–‡ç¯å¢ƒä¸‹
+_package("alz.core");
 _class("Context", null, function(){
-	this.__classes__ = _classes;
-	this.alz = alz;
-	this._init = _init;
-	this._import = function(className){
-		var clazz = _classes[className];
-		var name = className.split(".").pop();
-		if(!(name in this)){
-			this[name] = clazz;  //¶ÌÃû
-		}
-		if(!(className in this)){
-			this[className] = clazz;  //È«Ãû
-		}
-	};
-	this._package = _package;  //Ç°ÃæÒÑ¾­¶¨Òå£¬Ö»ĞèÒıÈë
-	this._class = _class;  //Ç°ÃæÒÑ¾­¶¨Òå£¬Ö»ĞèÒıÈë
+});
+*/
+function LibContext(name, rt){
+	this._init.apply(this, arguments);
+}
+(function(){
 	/**
-	 * Ä£Äâ½Ó¿ÚµÄ¶¨Òå
-	 * @param {String} name ½Ó¿ÚµÄÃû×Ö
-	 * @param {Interface} superInterface ¸¸½Ó¿Ú
-	 * @param {Function} interfaceImp ½Ó¿ÚµÄÊµÏÖ£¬¿ÉÒÔÊÇĞéÊµÏÖ
+	 * æ ¸å¿ƒç±»åŒ…å®šä¹‰
+	 * åœ¨è¿™é‡Œä¸ç›´æ¥å®šä¹‰ä¸º WebRuntime çš„æˆå‘˜ï¼Œä¸»è¦ç›®çš„æ˜¯ä¸ºäº†è§£å†³åœ¨å½“å‰çš„å‘½åç©ºé—´
+	 * å†…ä¸å¯ä»¥ç›´æ¥é€šè¿‡ alz å¼•ç”¨è„šæœ¬ç±»çš„é—®é¢˜ã€‚
+	 * å®šä¹‰åœ¨åŸå‹ä¸Šï¼Œæ˜¯ä¸ºäº†æ‰€æœ‰ä¸Šä¸‹æ–‡ç¯å¢ƒå…±äº«åŒä¸€ä¸ªå¯¹è±¡
 	 */
-	this._interface = function(name, superInterface, interfaceImp){
-		interfaceImp.__name__ = name;
-		this.alz[name] = interfaceImp;
-		this[name] = interfaceImp;
-	};
-	//´´½¨Ò»¸ö·½·¨²¢·µ»Ø
+	this.alz         = {};  //ä¿è¯æ‰€æœ‰å‘½åç©ºé—´ä¸‹æŒ‡å‘åŒä¸€ä¸ªæ ¹åŒ…
+	this.__classes__ = {};  //æ‰€æœ‰çš„ç±»
+	//var _exts      = {};  //æ‰€æœ‰ç±»çš„æ‰©å±•
+	/**
+	 * åˆ›å»ºå¹¶è¿”å›ç±»çš„åŸå‹æˆ–è€…è¯´ç±»å¯¹è±¡è‡ªèº«
+	 */
+	function createClass(){
+		//è¿”å›ä¸€ä¸ªå‡½æ•°å¯¹è±¡ç­‰ä»·äºåˆ›å»ºä¸€ä¸ªFunctionå®ä¾‹ï¼Œæ‰€ä»¥ä»¥åçš„æ¨¡æ‹Ÿæ¯ä¸ªç±»çš„æ„é€ å‡½æ•°æ‰
+		//ä¼šæ˜¯ä¸åŒçš„functionå¯¹è±¡ï¼Œå¦‚æœä½¿ç”¨ç›¸åŒçš„functionå¯¹è±¡OOæ¨¡æ‹Ÿåœ¨ç»§æ‰¿æ—¶å°†å­˜åœ¨è‡´å‘½çš„
+		//é—®é¢˜ï¼Œå…¶ä»–çš„åƒprototype,jQuery,mootoolsç­‰ï¼Œæ¨¡æ‹ŸOOçš„æ ¸å¿ƒæ€æƒ³éƒ½å’Œè¿™é‡Œæ˜¯ä¸€è‡´çš„ã€‚
+		//return new Function("this._init.apply(this, arguments);");  //anonymous code
+		return function(){  //"F" + new Date().getTime()
+			//å¦‚æœå¤„äºç±»å£°æ˜è¿‡ç¨‹ä¸­ï¼Œç›´æ¥è¿”å›ï¼Œä»…ä»…å»ºç«‹åŸå‹é“¾ï¼Œä¸éœ€è¦è°ƒç”¨å®é™…çš„æ„é€ å‡½æ•°
+			if(__inDeclare) return;
+
+			//è°ƒç”¨ä¸€éå®ç°çš„æ¥å£
+			var imps = this._clazz._imps;
+			for(var i = 0, len = imps.length; i < len; i++){
+				imps[i]._init.call(this);  //æ‰§è¡Œæ¥å£çš„æ„é€ å‡½æ•°
+			}
+			imps = null;
+
+			//æ£€æŸ¥æ„é€ å‡½æ•°æ˜¯å¦å­˜åœ¨ï¼ŒåŸºäºç±»çš„ä¸¥æ ¼æ€§åªåšæœ‰æ— çš„æ£€æŸ¥ï¼Œä¸åšæ˜¯å¦æ˜¯å‡½æ•°çš„æ£€æŸ¥ï¼Œ
+			//ä»¥åä¸ºäº†æé«˜æ€§èƒ½å¯ä»¥è€ƒè™‘å¿½ç•¥è¯¥æ£€æŸ¥
+			//if(typeof this._init == "function"){
+				//è°ƒç”¨OOPæ¨¡æ‹Ÿä¸­å®é™…çš„æ„é€ å‡½æ•°ï¼Œå¹¶ä¼ é€’å‚æ•°
+				this._init.apply(this, arguments);
+			/*}else{
+				throw "ç±» " + name + " å®šä¹‰ä¸­ç¼ºå°‘æ„é€ å‡½æ•° _init";
+			}*/
+
+			//åœ¨ä»¥åé«˜çº§çš„UIç»„ä»¶ç±»ä¸­this.createæ–¹æ³•æ˜¯ç±»å†…éƒ¨å±æ€§å®é™…æ„é€ çš„åœ°æ–¹ï¼Œæ„é€ å‡½æ•°å…¶
+			//å®åªæ˜¯ä¸€ä¸ªå±æ€§å£°æ˜çš„é›†ä¸­åœ°ï¼ŒçœŸæ­£çš„createåŠ¨ä½œåœ¨è¿™ä¸ªæ–¹æ³•å†…éƒ¨å®ç°ï¼Œå¹¶æœŸæœ›å®ƒä¸
+			//ä»…ä»…æ˜¯ä¸€ä¸ªå‚æ•°ã€‚
+			//å¦‚æœå‚æ•°ä¸ªæ•°ä¸ä¸º0ï¼Œæ‰§è¡Œ create æ–¹æ³•
+			if(arguments.length != 0 && this.create){  //this._className.indexOf("alz.ui.") == 0
+				this.create.apply(this, arguments);  //è°ƒç”¨createæ–¹æ³•å¹¶ä¼ é€’å‚æ•°
+			}
+		};
+	}
+	//åˆ›å»ºä¸€ä¸ªæ–¹æ³•å¹¶è¿”å›
 	function createMethod(name){
 		return function(){
 			return callMethod(this, name, arguments);
 		};
 	}
-	//Ê¹ÓÃÓÃÌØ¶¨µÄ²ÎÊıµ÷ÓÃÒ»¸öÖ¸¶¨Ãû³ÆµÄ·½·¨
+	//ä½¿ç”¨ç”¨ç‰¹å®šçš„å‚æ•°è°ƒç”¨ä¸€ä¸ªæŒ‡å®šåç§°çš„æ–¹æ³•
 	function callMethod(obj, name, args){
-		if(obj._exts !== obj._clazz[__proto]._exts){
+		if(obj._clazz._exts !== obj._clazz[__proto]._clazz._exts){
 			window.alert("callMethod error");
 		}
 		//op = object or prototype
-		for(var op = obj; op && op._exts; op = op._clazz._super){
-			var exts = op._exts;
+		for(var op = obj; op && op._clazz._exts; op = op._clazz._super){
+			var exts = op._clazz._exts;
 			if(name == "dispose"){
-				for(var i = exts.length - 1; i >= 0; i--){  //ÄæĞòÖ´ĞĞÎö¹¹·½·¨µÄÀ©Õ¹
-					if(name in exts[i]){
-						exts[i][name].apply(obj, args);
+				for(var i = exts.length - 1; i >= 0; i--){  //é€†åºæ‰§è¡Œææ„æ–¹æ³•çš„æ‰©å±•
+					var ext = exts[i];
+					if(name in ext){
+						ext[name].apply(obj, args);
 					}
 				}
 			}else{
-				for(var i = 0, len = exts.length; i < len; i++){  //°´Ë³ĞòÖ´ĞĞ·½·¨µÄÀ©Õ¹£¨¹¹Ôì¡¢Îö¹¹£©
-					if(name in exts[i]){
-						exts[i][name].apply(obj, args);
+				for(var i = 0, len = exts.length; i < len; i++){  //æŒ‰é¡ºåºæ‰§è¡Œæ–¹æ³•çš„æ‰©å±•ï¼ˆæ„é€ ã€ææ„ï¼‰
+					var ext = exts[i];
+					if(name in ext){
+						ext[name].apply(obj, args);
 					}
 				}
 			}
 			exts = null;
 		}
 	}
+	this._init = function(name, rt){
+		this.__name = name || "anonymous";  //Contextçš„åå­—
+		this.__context__ = this;
+		this.runtime = rt || null;  //è¿™ä¸ªæ˜¯å°†è¦å¯¼å‡ºçš„å…¨å±€å”¯ä¸€å¯¹è±¡
+		this.application = null;  //é’ˆå¯¹æ¯ä¸€ä¸ªåº”ç”¨çš„å”¯ä¸€ application å¯¹è±¡
+		//this._super = null;  //å½“å‰ç±»çš„çˆ¶ç±»
+	};
+	//è°ƒç”¨çˆ¶ç±»åŒåæ–¹æ³•çš„è¾…åŠ©å‡½æ•°
+	function __super__(obj, name, argv){
+		var s = obj._clazz._super;
+		if(name == "_init"){  //æ„é€ å‡½æ•°
+			/*
+			var arr = [];
+			for(var i = 2, len = arguments.length; i < len; i++){
+				arr.push(arguments[i]);
+			}
+			*/
+			var arr = Array.prototype.slice.call(arguments, 2);
+			s[name].apply(obj, arr);
+			arr = null;
+		}else{
+			if(arguments.length == 2){
+				s[name].apply(obj);
+			}else{
+				s[name].apply(obj, argv);
+			}
+		}
+	}
+	this._package = function(name){
+		__pkgName = name;  //è®°ä½å½“å‰æ‰€åœ¨çš„åŒ…
+	};
+	this._import = function(className){
+		var clazz = __all__[className];
+		var name = className.split(".").pop();
+		if(!(name in this)){
+			this[name] = clazz;  //çŸ­å
+		}
+		//if(!(className in this)){
+		//	this[className] = clazz;  //å…¨å
+		//}
+	};
 	/**
-	 * ÎªÀàÌá¹©Ò»¸öÀ©Õ¹»úÖÆ
-	 * @param {String} className ±»À©Õ¹µÄÀàµÄÃû×Ö
-	 * @param {Function} extImp À©Õ¹µÄÊµÏÖ´úÂë
-	 * [TODO]¿ÉÒÔ°´ÕÕÕâ¸öÀ©Õ¹µÄ¹¤×÷Ô­Àí£¬²¢ÇÒÍ¨¹ıÌæ»»Ô­ĞÍÉÏÏà¹ØµÄ·½·¨£¬ÎªÃ¿Ò»¸öÀà
-	 * Éè¼ÆÀ©Õ¹Ò»ÖÖ»úÖÆ¡£
+	 * æ¨¡æ‹Ÿç±»çš„å®šä¹‰
+	 * @param {String} className ç±»çš„åå­—
+	 * @param {Class} superClass çˆ¶ç±»å¯¹è±¡
+	 * @param {Function} classImp ç±»çš„å®ç°ä»£ç 
+	 */
+	this._class = function(className, superClass, classImp){
+		var _s, fullClassName = __pkgName + "." + className;
+		if(superClass === null){  //é»˜è®¤ç»§æ‰¿ JS çš„åŸç”Ÿæ ¹å¯¹è±¡
+			_s = null;  //ä¿è¯æ ¹ç±» _super å±æ€§ä¸º null
+			superClass = Object;  //[TODO]å¦‚æœæ¡†æ¶æ²¡æœ‰æ‰©å±•Objectï¼Œåˆ™æ— éœ€ç»§æ‰¿Object
+		}else{
+			if(superClass === ""){
+				superClass = this.__classes__["alz.lang.AObject"];
+			}
+			_s = superClass[__proto];
+		}
+
+		//ç±»åŠå±æ€§å®šä¹‰(é™æ€å±æ€§) ï¼ï¼ï¼ç±»å®šä¹‰ï¼Œéå®ä¾‹
+		var clazz = createClass();  //å®šä¹‰ç±»
+		clazz._super = _s;  //ç»‘å®š _super å±æ€§åˆ°ç±»ä¸Šé¢ï¼ˆObject.prototypeï¼‰
+		clazz._className = fullClassName;
+		clazz._clazzImp = classImp;  //ç±»çš„å®ç°ä»£ç 
+		clazz._exts = [];  //ç±»çš„æ‰©å±•ä»£ç 
+		clazz._imps = [];  //ç±»å®ç°çš„æ¥å£
+		clazz.toString = function(){return "[class " + this._className + "]"};
+
+		//åŸå‹åŠå±æ€§å®šä¹‰ï¼ˆæ‰€æœ‰å®ä¾‹å…±äº«è¿™äº›å±æ€§ï¼‰
+		__inDeclare = true;
+		var _p = clazz[__proto] = new superClass();  //é€šè¿‡åŸå‹å®ç°ç»§æ‰¿
+		__inDeclare = false;
+		_p.constructor = clazz;  //_p._init;  //åˆå§‹åŒ–æ„é€ å™¨
+		if(!_p.__proto__){
+			_p.__proto__ = _p;  //fixed for ie
+		}
+		_p._className = fullClassName;  //className
+		_p._clazz = clazz;
+
+		//ç±»ç»‘å®š
+		//ä¿å­˜èµ·æ¥ä¾¿äºç®¡ç†
+		this.alz[className] = clazz;  //å°†ç±»ç»‘å®šåˆ°æ ¹åŒ…ä¸Šé¢
+		__all__[fullClassName] = clazz;
+		this.__context__[className] = clazz;  //ç»‘å®šåˆ°å½“å‰ä¸Šä¸‹æ–‡ç¯å¢ƒï¼ˆä½œç”¨åŸŸï¼‰ä¹‹ä¸Š
+		this.__classes__[fullClassName] = clazz;
+		//this.runtime._contextList[this.runtime._name][className] = clazz;  //ç»‘å®šåˆ°æ ¸å¿ƒä¸Šä¸‹æ–‡ç¯å¢ƒä¹‹ä¸Š
+		//__global[className] = clazz;  //æš´éœ²åˆ°å…¨å±€å‘½åç©ºé—´ä¸‹
+
+		//æ‰§è¡Œç±»çš„å®ç°ä»£ç 
+		if(typeof classImp == "function"){
+			classImp.apply(_p, [_s, __super__]);  //function(_super){};  //åˆå§‹åŒ–ç±»å¯¹è±¡
+		}
+		//__profile.hackClass(clazz, _p);
+		_p = null;
+		_s = null;
+		//clazz = null;
+		return clazz;
+	};
+	this._clazz = LibContext;
+	this._clazz._super = null;
+	this._clazz._className = "alz.LibContext";
+	this._clazz._clazzImp = arguments.callee;
+	this._clazz._exts = [];
+	this._clazz._imps = [];
+	this._clazz.toString = function(){return "[class " + this._className + "]"};
+	/**
+	 * æ¨¡æ‹Ÿæ¥å£çš„å®šä¹‰
+	 * @param {String} name æ¥å£çš„åå­—
+	 * @param {Interface} superInterface çˆ¶æ¥å£
+	 * @param {Function} imp æ¥å£çš„å®ç°ï¼Œå¯ä»¥æ˜¯è™šå®ç°
+	 */
+	this._interface = function(name, superInterface, imp){
+		if(!/^I[A-Z]\w+$/.test(name)){
+			//runtime.error("æ¥å£åä¸ç¬¦åˆå‘½åè§„èŒƒ");
+			throw "æ¥å£åä¸ç¬¦åˆå‘½åè§„èŒƒ";
+		}
+		var fullClassName = __pkgName + "." + name;
+		imp.__name__ = name;
+		__all__[fullClassName] = imp;
+		__interfaces[fullClassName] = imp;
+		this.alz[name] = imp;
+		this[name] = imp;
+	};
+	/**
+	 * å®šä¹‰ç±»çš„æŠ½è±¡æ–¹æ³•ï¼Œæ¡†æ¶ä¼šä¿è¯å­ç±»å¿…é¡»å®ç°è¯¥æ–¹æ³•
+	 */
+	this._abstract = function(proto, name, methodImp){
+		proto[name] = methodImp || function(){};
+	};
+	this._implements = function(proto/*, interfaces*/){
+		if(arguments.length < 2){
+			window.alert("[_implements]arguments.length error");
+		}else{
+			var imps = proto._clazz._imps;
+			for(var i = 1, len = arguments.length; i < len; i++){
+				var obj = new arguments[i]();
+				imps.push(obj);
+				//å°†æ„é€ å‡½æ•°_initä¹‹å¤–çš„æ–¹æ³•æ‹·è´åˆ°åŸå‹ä¸Šé¢
+				for(var k in obj){
+					if(k != "_init"){
+						proto[k] = obj[k];
+					}
+				}
+			}
+			imps = null;
+		}
+	};
+	/**
+	 * ä¸ºç±»æä¾›ä¸€ä¸ªæ‰©å±•æœºåˆ¶
+	 * @param {String} className è¢«æ‰©å±•çš„ç±»çš„åå­—
+	 * @param {Function} extImp æ‰©å±•çš„å®ç°ä»£ç 
+	 * [TODO]å¯ä»¥æŒ‰ç…§è¿™ä¸ªæ‰©å±•çš„å·¥ä½œåŸç†ï¼Œå¹¶ä¸”é€šè¿‡æ›¿æ¢åŸå‹ä¸Šç›¸å…³çš„æ–¹æ³•ï¼Œä¸ºæ¯ä¸€ä¸ªç±»
+	 * è®¾è®¡æ‰©å±•ä¸€ç§æœºåˆ¶ã€‚
 	 * WebRuntime.regExt = function(clazz){};
 	 */
 	this._extension = function(className, extImp){
-		var name = _pkg + "." + className;
-		var clazz = _classes[name];
+		var name = __pkgName + "." + className;
+		var clazz = this.__classes__[name];
 		if(!clazz){
-			throw "Àà" + name + "»¹²»´æÔÚ£¬Çë¼ì²é°üºÍÀàÃûµÄ¶¨ÒåÊÇ·ñÕıÈ·";
+			throw "ç±»" + name + "è¿˜ä¸å­˜åœ¨ï¼Œè¯·æ£€æŸ¥åŒ…å’Œç±»åçš„å®šä¹‰æ˜¯å¦æ­£ç¡®";
 		}
 		//if(!(name in _exts)){
 		//	_exts[name] = [];
 		//}
 		var methods = {
-			"_init"  : 1,  //¹¹Ôìº¯Êı
-			"init"   : 1,  //³õÊ¼»¯º¯Êı
-			"dispose": 1   //Îö¹¹º¯Êı
+			"_init"  : 1,  //æ„é€ å‡½æ•°
+			"init"   : 1,  //åˆå§‹åŒ–å‡½æ•°
+			"dispose": 1   //ææ„å‡½æ•°
 		};
 		var p = clazz[__proto];
-		var exts = p._exts;  //_exts[name]
-		if(exts.length == 0){  //Èç¹û»¹Ã»ÓĞ±»À©Õ¹¹ı£¬±£´æÀ©Õ¹Ö®Ç°Ô­Ê¼µÄ¹Ø¼ü·½·¨
-			//ÖØ¶¨Òå¹Ø¼ü·½·¨£¬±£Ö¤ÄÜ¹»Ë³ÀûÖ´ĞĞÀ©Õ¹µÄ´úÂë
+		var exts = p._clazz._exts;  //_exts[name]
+		if(exts.length == 0){  //å¦‚æœè¿˜æ²¡æœ‰è¢«æ‰©å±•è¿‡ï¼Œä¿å­˜æ‰©å±•ä¹‹å‰åŸå§‹çš„å…³é”®æ–¹æ³•
+			//é‡å®šä¹‰å…³é”®æ–¹æ³•ï¼Œä¿è¯èƒ½å¤Ÿé¡ºåˆ©æ‰§è¡Œæ‰©å±•çš„ä»£ç 
 			var ext = {};
 			for(var k in methods){
 				if(k in p){
@@ -393,66 +581,90 @@ _class("Context", null, function(){
 			exts.push(ext);
 			ext = null;
 		}
-		var o = new extImp();  //´´½¨À©Õ¹µÄÒ»¸öÊµÀı£¨Ö»Ğè´´½¨Ò»¸ö£©
-		exts.push(o);  //×¢²áÀ©Õ¹
+		var o = new extImp();  //åˆ›å»ºæ‰©å±•çš„ä¸€ä¸ªå®ä¾‹ï¼ˆåªéœ€åˆ›å»ºä¸€ä¸ªï¼‰
+		exts.push(o);  //æ³¨å†Œæ‰©å±•
 		for(var k in o){
-			if(k in methods) continue;  //ºöÂÔ¹Ø¼ü·½·¨
-			p[k] = o[k];  //ÆäËûµÄ·½·¨Ö±½Ó°ó¶¨µ½Ô­ĞÍÉÏ
+			if(k in methods) continue;  //å¿½ç•¥å…³é”®æ–¹æ³•
+			p[k] = o[k];  //å…¶ä»–çš„æ–¹æ³•ç›´æ¥ç»‘å®šåˆ°åŸå‹ä¸Š
 		}
-		//Èç¹ûÊÇÀ©Õ¹µÄWebRuntimeÀà£¬±£Ö¤È«¾ÖÎ¨Ò»¶ÔÏóruntimeÄÜ¹»±»À©Õ¹
-		//[TO-DO]onContentLoadÖ®ºóÔÙÖ´ĞĞWebRuntimeµÄÀàÀ©Õ¹
+		//å¦‚æœæ˜¯æ‰©å±•çš„WebRuntimeç±»ï¼Œä¿è¯å…¨å±€å”¯ä¸€å¯¹è±¡runtimeèƒ½å¤Ÿè¢«æ‰©å±•
+		//[TO-DO]onContentLoadä¹‹åå†æ‰§è¡ŒWebRuntimeçš„ç±»æ‰©å±•
 		if(className == "WebRuntime"){
-			var rt = this.runtime;
-			if(typeof o._init == "function"){
-				if(rt._inited){
-					o._init.call(rt);
-				}else{
-					rt.addOnLoad(rt, o._init);
-				}
+			if(o._init){
+				o._init.call(this.runtime);
 			}
-			rt = null;
 		}
 		o = null;
 		exts = null;
 		p = null;
 	};
-	/**
-	 * ¶¨ÒåÀàµÄ³éÏó·½·¨£¬¿ò¼Ü»á±£Ö¤×ÓÀà±ØĞëÊµÏÖ¸Ã·½·¨
-	 */
-	this._abstract = function(proto, name, methodImp){
-		proto[name] = methodImp || function(){};
+	this.isArray = function(a){
+		return __toString.call(a) === "[object Array]";
 	};
-});
-//------------------------------------------------------------------------------
-		//[TODO]½ûÖ¹ÆäËûlibÎÄ¼şÒıÈëContextÀà£¬¿ÉÒÔ·ÀÖ¹ContextÀà±»ÀÄÓÃ
-		var className = "Context";
-		var clazz = _classes[_pkg + "." + className];
-		_cxt = new clazz(name, null);
-		_cxt[className] = clazz;  //°ó¶¨µ½µ±Ç°ÉÏÏÂÎÄ»·¾³£¨×÷ÓÃÓò£©Ö®ÉÏ
-		clazz = null;
-		return _cxt;
-		/*
-		var Context = __newClass();  //ÕâÆäÊµÊÇÒ»¸öÀà¶¨Òå
-		var _p = Context[__proto];
-		//contextImp.apply(_p);  //ÊµÏÖÔ­ĞÍÉÏµÄ·½·¨
-		_p.__apply__ = contextImp;
-		_p.__apply__(Context);
-		delete _p.__apply__;
-		delete _p;
-		//cxt.__name = name;
-		//cxt.runtime = null;
-		//contextImp.apply(cxt);
-		//this._init(name, null);
-		//----cxt._classes[fullName] = clazz;  //µ±Ç°Àà±¾Éí
-		//ÒıÈë Context Àà£¬±£Ö¤ÒÔºóÊ¹ÓÃºÍÆäËûÀàÒ»ÑùÊÇ¹æ·¶µÄ
-		//cxt.alz["alz.core.Context"] = Context;
-		//cxt.Context = Context;
-		//----cxt._import(fullName);  //´ÓµÚÒ»¸öÊµÀıÖĞÒıÈë
-		//runtime._contextList[name] = cxt;  //×¢²áÉÏÏÂÎÄ»·¾³
-		//ÇåÀíÉÏÏÂÎÄ»·¾³Àà
-		//delete clazz[__proto]._classes;
-		//delete this;
-		*/
+	this.isPlainObject = function(a){
+		if(!a || a === window || a === document || a === document.body){
+			return false;
+		}
+		if(this.isPrimitive(a)){
+			return false;
+		}
+		return "isPrototypeOf" in a && __toString.call(a) === "[object Object]";
+	};
+	this.isEmptyObject = function(o){
+		for(var a in o){
+			return false;
+		}
+		return true;
+	};
+	this.isWindow = function(a){
+		return a && typeof a === "object" && "setInterval" in a;
+	};
+	this.isPrimitive = function(b){
+		var a = typeof b;
+		return !!(b === undefined || b === null || a == "boolean" || a == "number" || a == "string");
+	};
+}).apply(LibContext.prototype);
+
+/*
+var Context = createClass();  //è¿™å…¶å®æ˜¯ä¸€ä¸ªç±»å®šä¹‰
+var _p = Context[__proto];
+//contextImp.apply(_p);  //å®ç°åŸå‹ä¸Šçš„æ–¹æ³•
+_p.__apply__ = contextImp;
+_p.__apply__(Context);
+delete _p.__apply__;
+delete _p;
+//cxt.__name = name;
+//cxt.runtime = null;
+//contextImp.apply(cxt);
+//this._init(name, null);
+//----cxt._classes[fullName] = clazz;  //å½“å‰ç±»æœ¬èº«
+//å¼•å…¥ Context ç±»ï¼Œä¿è¯ä»¥åä½¿ç”¨å’Œå…¶ä»–ç±»ä¸€æ ·æ˜¯è§„èŒƒçš„
+//cxt.alz["alz.core.Context"] = Context;
+//cxt.Context = Context;
+//----cxt._import(fullName);  //ä»ç¬¬ä¸€ä¸ªå®ä¾‹ä¸­å¼•å…¥
+//runtime._contextList[name] = cxt;  //æ³¨å†Œä¸Šä¸‹æ–‡ç¯å¢ƒ
+//æ¸…ç†ä¸Šä¸‹æ–‡ç¯å¢ƒç±»
+//delete clazz[__proto]._classes;
+//delete this;
+*/
+
+return {
+	//createContext: function(name/*, libs*/){},
+	/**
+	 * è¿™ä¸ªå‡½æ•°åªä¼šè¢«è°ƒç”¨ä¸€æ¬¡ï¼Œä»…ç”¨äºåˆ›å»ºæ ¸å¿ƒ LibContext å®ä¾‹ï¼Œå³ç¬¬ä¸€ä¸ªä¸Šä¸‹æ–‡ç¯å¢ƒ
+	 * å¯¹è±¡ï¼Œæ˜¯æ¡†æ¶çš„è‡ªä¸¾(bootstrap)å‡½æ•°
+	 */
+	regLib: function(name, appName, libImp){
+		//[TODO]ç¦æ­¢å…¶ä»–libæ–‡ä»¶å¼•å…¥LibContextç±»ï¼Œå¯ä»¥é˜²æ­¢LibContextç±»è¢«æ»¥ç”¨
+		var className = "LibContext";
+		var cxt = new LibContext(name);
+		//ä¿è¯auiå‘½åç©ºé—´ä¸‹å¯ä»¥è®¿é—®åˆ°
+		cxt.__context__[className] =  //ç»‘å®šåˆ°å½“å‰ä¸Šä¸‹æ–‡ç¯å¢ƒï¼ˆä½œç”¨åŸŸï¼‰ä¹‹ä¸Š
+		cxt.__classes__["alz." + className] = LibContext;
+		//__global[className] = LibContext;
+		libImp(cxt);
+		var clazz = cxt.__context__["WebRuntime"];
+		var rt = cxt.runtime = __global.runtime = new clazz();
+		rt.init(__global, cxt);
 	}
-	return bootstrap();
-}
+};

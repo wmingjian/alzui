@@ -53,7 +53,7 @@ _class("WindowSkinWIN2K", Component, function(){
 			"sbtn_height": 14,
 			"icon_width" : 16,
 			"sep_num"    : 5,
-			"top_use_opacity": false  //顶部上调区域是否需要使用透明度，受标题栏IMG标签影响
+			"top_use_opacity": false  //椤堕儴涓婅皟鍖哄煙鏄惁闇�瑕佷娇鐢ㄩ�忔槑搴︼紝鍙楁爣棰樻爮IMG鏍囩褰卞搷
 		};
 	};
 	this.create = function(parent){
@@ -69,7 +69,7 @@ _class("WindowSkinWIN2K", Component, function(){
 	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
-		this._xpath = ".mui-Window-win2k";
+		this._xpath = ".aui-Window-win2k";
 		for(var i = 0, len = this._cursors.length; i < len; i++){
 			var o = this._createElement2(this._self, "div", this._cursors[i]/*, {
 				"position"       : "absolute",
@@ -82,7 +82,7 @@ _class("WindowSkinWIN2K", Component, function(){
 			this._ee["_skin" + i] = o;
 		}
 		this._title = this._createElement2(this._self, "img", "", {
-			"src"        : runtime.getConfigData("pathimg") + "win-2k-title-bg.gif",
+			"src"        : "../alzui/res/images/win-2k-title-bg.gif",
 			"ondragstart": function(){return false;},
 			"onmousedown": function(ev){this._dlg._parent.onMouseDown(ev || window.event);}
 		});
@@ -91,6 +91,7 @@ _class("WindowSkinWIN2K", Component, function(){
 		this.setState("resizable");
 	};
 	this.dispose = function(){
+		if(this._disposed) return;
 		this._title.onmousedown = null;
 		this._title.ondragstart = null;
 		this._title._dlg = null;
@@ -102,19 +103,19 @@ _class("WindowSkinWIN2K", Component, function(){
 		//if(_super.resize.apply(this, arguments)) return true;
 		_super.resize.apply(this, arguments);
 		if(this._parent.getResizable()){
-			var w1 =  4;  //顶宽
-			var w2 =  4;  //中宽
-			var w3 =  5;  //底宽
-			var h0 =  4   //顶高
-			var h1 = 23;  //顶高
-			var h3 =  4;  //底高
+			var w1 =  4;  //椤跺
+			var w2 =  4;  //涓
+			var w3 =  5;  //搴曞
+			var h0 =  4   //椤堕珮
+			var h1 = 23;  //椤堕珮
+			var h3 =  4;  //搴曢珮
 		}else{
-			var w1 =  3;  //顶宽
-			var w2 =  3;  //中宽
-			var w3 =  4;  //底宽
-			var h0 =  3   //顶高
-			var h1 = 22;  //顶高
-			var h3 =  3;  //底高
+			var w1 =  3;  //椤跺
+			var w2 =  3;  //涓
+			var w3 =  4;  //搴曞
+			var h0 =  3   //椤堕珮
+			var h1 = 22;  //椤堕珮
+			var h3 =  3;  //搴曢珮
 		}
 		this.setElementRect(this._ee["_skin0"],    0 ,    0 ,     w1 ,      h1);
 		this.setElementRect(this._ee["_skin1"],   w1 ,    0 , w-2*w1 ,      h0);

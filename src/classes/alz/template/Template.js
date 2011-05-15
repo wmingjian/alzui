@@ -1,9 +1,9 @@
 _package("alz.template");
 
 /**
- * @param name Ä£°åÃû
- * @param content Ä£°åÄÚÈİ
- * @param etc ÅäÖÃĞÅÏ¢
+ * @param name æ¨¡æ¿å
+ * @param content æ¨¡æ¿å†…å®¹
+ * @param etc é…ç½®ä¿¡æ¯
  */
 _class("Template", "", function(){
 	this._init = function(name, content, etc){
@@ -56,8 +56,8 @@ _class("Template", "", function(){
 		return sb.join("");
 	};
 	/**
-	 * ½âÎöÄ£°å²¢Éú³ÉÒ»¸öÄäÃûº¯Êı´úÂë×Ö·û´®
-	 * @return {boolean} ½âÎö½á¹û(true=³É¹¦,false=Ê§°Ü)
+	 * è§£ææ¨¡æ¿å¹¶ç”Ÿæˆä¸€ä¸ªåŒ¿åå‡½æ•°ä»£ç å­—ç¬¦ä¸²
+	 * @return {boolean} è§£æç»“æœ(true=æˆåŠŸ,false=å¤±è´¥)
 	 */
 	this.parse = function(){
 		this._source = this._cleanWhiteSpace(this._source);
@@ -135,9 +135,9 @@ _class("Template", "", function(){
 		}
 		if(func != null){
 			this._func = func;
-			return true;  //½âÎö³É¹¦
+			return true;  //è§£ææˆåŠŸ
 		}
-		return false;  //½âÎöÊ§°Ü
+		return false;  //è§£æå¤±è´¥
 	};
 	this._emitStatement = function(stmtStr, state){
 		var parts = stmtStr.slice(1, -1).split(' ');

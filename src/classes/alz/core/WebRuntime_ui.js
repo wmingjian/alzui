@@ -1,38 +1,16 @@
 _package("alz.core");
 
-_import("alz.core.ActionManager");
+//_import("alz.core.ActionManager");
 _import("alz.mui.ToggleManager");
 _import("alz.mui.Workspace");
 _import("alz.mui.Dialog");
 
-_extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
-	this._init = function(){  //¼ÓÔØÖ®ºóµÄ³õÊ¼»¯¹¤×÷
+_extension("WebRuntime", function(){  //æ³¨å†Œ WebRuntime æ‰©å±•
+	this._init = function(){  //åŠ è½½ä¹‹åçš„åˆå§‹åŒ–å·¥ä½œ
 		this._domTemp = null;
 		this.toggleMgr = new ToggleManager();
 		//this.actionManager = new ActionManager();
 		this._workspace = new Workspace();
-		if(this._newWorkspace){
-			this._workspace.create(this.getBody());
-		}else{
-			this._workspace.bind(this.getBody());
-		}
-		this._workspace.setVisible(true);
-		if(this.debug){  //Èç¹û¿ªÆôµ÷ÊÔ¿ª¹Ø
-			this._testCaseWin = new Dialog();
-			this._testCaseWin._domCreate = true;
-			this._testCaseWin.create(this._workspace._self, "Test Case Listener");
-			this._testCaseWin.moveTo(500, 50);
-			this._testCaseWin.resize(500, 300);
-			this._testCaseWin.setClientBgColor("#FFFFFF");
-			this._testCaseWin.log = function(msg){
-				var div = this._createElement2(null, "div", "", {
-					"borderBottom": "1px solid #CCCCCC",
-					"innerHTML"   : msg
-				});
-				this._body.appendChild(div, this._body.childNodes[0]);
-				div = null;
-			};
-		}
 	};
 	this.dispose = function(){
 		if(this._workspace){
@@ -49,16 +27,56 @@ _extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
 		//this.actionManager = null;
 		this._domTemp = null;
 	};
-	this.createDomElement = function(html, parent){
+	this.onLoad = function(ev){
+		if(true || this._newWorkspace){
+			this._workspace.create(this.getBody());
+		}else{
+			this._workspace.bind(this.getBody());
+		}
+		this._workspace.setVisible(true);
+		if(this.debug){  //å¦‚æœå¼€å¯è°ƒè¯•å¼€å…³
+			this._testCaseWin = new Dialog();
+			this._testCaseWin._domCreate = true;
+			this._testCaseWin.create(this._workspace._self, "Test Case Listener");
+			this._testCaseWin.moveTo(500, 50);
+			this._testCaseWin.resize(500, 300);
+			this._testCaseWin.setClientBgColor("#FFFFFF");
+			this._testCaseWin.log = function(msg){
+				var div = this._createElement2(null, "div", "", {
+					"borderBottom": "1px solid #CCCCCC",
+					"innerHTML"   : msg
+				});
+				this._body.appendChild(div);
+				div = null;
+			};
+		}
+	};
+	/**
+	 * æ ¹æ®ä¸€æ®µHTMLä»£ç å­—ç¬¦ä¸²åˆ›å»ºä¸€ä¸ªDOMå¯¹è±¡
+	 * @param {String} html HTMLä»£ç å­—ç¬¦ä¸²
+	 * @return {Element} æ–°åˆ›å»ºçš„DOMå¯¹è±¡
+	 */
+	this.createDomElement = function(html, parent/*|exp*/){
 		if(!this._domTemp){
 			this._domTemp = this._doc.createElement("div");
 		}
 		this._domTemp.innerHTML = html;
 		var obj = this._domTemp.removeChild(this._domTemp.childNodes[0]);
-		if(parent){
+		if(typeof parent == "string" || typeof parent == "undefined"){
+			//return jQuery.find(exp, div)[0];
+			/*
+			var nodes = div.childNodes;
+			for(var i = 0, len = nodes.length; i < len; i++){
+				if(nodes[i].className == "main"){
+					return div.removeChild(nodes[i]);
+				}
+			}
+			return null;
+			*/
+		}else if(parent){  //HTMLElement
 			parent.appendChild(obj);
 			/*
-			//ÖÍºó¼ÓÔØÍ¼Æ¬
+			//æ»ååŠ è½½å›¾ç‰‡
 			var imgs = obj.getElementsByTagName("img");
 			for(var i = 0, len = imgs.length; i < len; i++){
 				imgs[i].src = imgs[i].getAttribute("src0");
@@ -75,12 +93,13 @@ _extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
 		var rect = {
 			x: element.scrollLeft,
 			y: element.scrollTop,
-			w: element.clientWidth,  //Math.max(element.clientWidth || element.scrollWidth)
+			//w: element.clientWidth,  //Math.max(element.clientWidth || element.scrollWidth)
+			w: Math.max(element.clientWidth, element.parentNode.clientWidth),
 			h: Math.max(element.clientHeight, element.parentNode.clientHeight)  //Math.max(element.clientHeight || element.scrollHeight)
 		};
 		//if(this.ff){}
-		rect.w = Math.max(element.clientWidth, element.parentNode.clientWidth);
-		rect.h = Math.max(element.clientHeight, element.parentNode.clientHeight);
+		//rect.w = Math.max(element.clientWidth, element.parentNode.clientWidth);
+		//rect.h = Math.max(element.clientHeight, element.parentNode.clientHeight);
 		return rect;
 	};
 	this.onResize = function(ev){
@@ -88,30 +107,32 @@ _extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
 		if(this._workspace){
 			this._workspace.resize(rect.w, rect.h);
 		}
-		if(typeof app_onResize != "undefined"){  //ÌáÇ°´¥·¢Ó¦ÓÃµÄresizeÊÂ¼ş
+		/*
+		if(typeof app_onResize != "undefined"){  //æå‰è§¦å‘åº”ç”¨çš„resizeäº‹ä»¶
 			app_onResize(rect.w, rect.h);
 		}
+		*/
 		if(this._appManager){
-			this._appManager.onResize(rect.w, rect.h);  //µ÷ÕûËùÓĞÓ¦ÓÃµÄ´óĞ¡
+			this._appManager.onResize(rect.w, rect.h);  //è°ƒæ•´æ‰€æœ‰åº”ç”¨çš„å¤§å°
 		}
 	};
 	/**
-	 * ¸ù¾İDOMÔªËØµÄID£¬²¢ÇÒÊ¹ÓÃ¸ÃDOMÔªËØ´´½¨Ò»¸ö½Å±¾×é¼ş
-	 * @param {String} id ½Å±¾×é¼şËù°ó¶¨µÄDOMÔªËØµÄID
+	 * æ ¹æ®DOMå…ƒç´ çš„IDï¼Œå¹¶ä¸”ä½¿ç”¨è¯¥DOMå…ƒç´ åˆ›å»ºä¸€ä¸ªè„šæœ¬ç»„ä»¶
+	 * @param {String} id è„šæœ¬ç»„ä»¶æ‰€ç»‘å®šçš„DOMå…ƒç´ çš„ID
 	 */
 	this.getComponentById = function(id){
 		return this.initComponent(null, id);
 	};
 	/**
-	 * ËùÓĞÍ¨¹ı¸Ãº¯Êı²Ù×÷¹ıµÄDOMÔªËØ¶¼»á°ó¶¨Ò»¸ö½Å±¾×é¼ş¶ÔÏó£¬²¢Í¨¹ı¸Ã½Å±¾×é¼ş¿ÉÒÔ
-	 * ·½±ãµÄ²Ù×÷DOMÔªËØµÄÊôĞÔ¡£
-	 * @param {Component} parent ¸¸×é¼ş
-	 * @param {String|Component} id ×é¼şÒª°ó¶¨µÄDOMÔªËØµÄid
-	 * -@param {Boolean} initChild ÊÇ·ñ³õÊ¼»¯×ÓDOMÔªËØ
+	 * æ‰€æœ‰é€šè¿‡è¯¥å‡½æ•°æ“ä½œè¿‡çš„DOMå…ƒç´ éƒ½ä¼šç»‘å®šä¸€ä¸ªè„šæœ¬ç»„ä»¶å¯¹è±¡ï¼Œå¹¶é€šè¿‡è¯¥è„šæœ¬ç»„ä»¶å¯ä»¥
+	 * æ–¹ä¾¿çš„æ“ä½œDOMå…ƒç´ çš„å±æ€§ã€‚
+	 * @param {Component} parent çˆ¶ç»„ä»¶
+	 * @param {String|Component} id ç»„ä»¶è¦ç»‘å®šçš„DOMå…ƒç´ çš„id
+	 * -@param {Boolean} initChild æ˜¯å¦åˆå§‹åŒ–å­DOMå…ƒç´ 
 	 */
 	this.initComponent = function(parent, id){
 		var obj = typeof id == "string" ? this.getElement(id) : id;
-		if(!obj) throw "Î´ÕÒµ½Ö¸¶¨idµÄDOMÔªËØ";
+		if(!obj) throw "æœªæ‰¾åˆ°æŒ‡å®šidçš„DOMå…ƒç´ ";
 		if(!obj._ptr){
 			var className, aui;
 			var sAui = obj.getAttribute("aui");
@@ -123,14 +144,14 @@ _extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
 					className = obj.getAttribute("tag");
 					if(!className){
 						className = "Component";
-						//throw "ÕÒµ½µÄDOMÔªËØÃ»ÓĞtagÊôĞÔ£¬²»ÄÜ°ó¶¨½Å±¾×é¼ş";
+						//throw "æ‰¾åˆ°çš„DOMå…ƒç´ æ²¡æœ‰tagå±æ€§ï¼Œä¸èƒ½ç»‘å®šè„šæœ¬ç»„ä»¶";
 					}else{
-						this._win.alert("Ê¹ÓÃDOMÔªËØµÄtagÊôĞÔ¾ö¶¨×é¼şÀàĞÍ");
+						this._win.alert("ä½¿ç”¨DOMå…ƒç´ çš„tagå±æ€§å†³å®šç»„ä»¶ç±»å‹");
 					}
 				}
 			}
 			if(!className){
-				className = "Component";  //Ä¬ÈÏÖµ
+				className = "Component";  //é»˜è®¤å€¼
 			}
 			var c = new alz[className]();
 			//c._domCreate = true;
@@ -142,7 +163,7 @@ _extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
 			//var color = this.getRandomColor();
 			//c._self.style.backgroundColor = color;
 			this._components.push(c);
-			if(obj.getAttribute("html") != "true"){  //Èç¹û³õÊ¼»¯×Ó×é¼şµÄ»°
+			if(obj.getAttribute("html") != "true"){  //å¦‚æœåˆå§‹åŒ–å­ç»„ä»¶çš„è¯
 				var nodes = obj.childNodes;
 				for(var i = 0, len = nodes.length; i < len; i++){
 					if(nodes[i].nodeType == 1 && nodes[i].getAttribute("aui")){  //NODE_ELEMENT
@@ -156,7 +177,7 @@ _extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
 		return obj._ptr;
 	};
 	/**
-	 * @param {String} id DOMÔªËØµÄIDÁĞ±í£¬¶ººÅ·Ö¸ô
+	 * @param {String} id DOMå…ƒç´ çš„IDåˆ—è¡¨ï¼Œé€—å·åˆ†éš”
 	 * @return {undefined}
 	 */
 	this.initComponents = function(id){
@@ -177,9 +198,9 @@ _extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
 		arr = null;
 	};
 	/**
-	 * ÏÔÊ¾Ò»¸öÄ£Ì¬¶Ô»°¿ò
-	 * @param {String} id ¶Ô»°¿òµÄID
-	 * @param {String} ownerId ¸Ã¶Ô»°¿òµÄËùÓĞÕßµÄ±àºÅ
+	 * æ˜¾ç¤ºä¸€ä¸ªæ¨¡æ€å¯¹è¯æ¡†
+	 * @param {String} id å¯¹è¯æ¡†çš„ID
+	 * @param {String} ownerId è¯¥å¯¹è¯æ¡†çš„æ‰€æœ‰è€…çš„ç¼–å·
 	 * @return {undefined}
 	 */
 	this.showModalDialog = function(id, ownerId){
@@ -188,7 +209,7 @@ _extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
 				var owner = this.getComponentById(ownerId);
 				this._workspace.getModalPanel().setOwner(owner);
 			}
-			var obj = this.getComponentById(id);  //¿ÉÄÜµÄ×é¼şÊÇ Popup,Dialog
+			var obj = this.getComponentById(id);  //å¯èƒ½çš„ç»„ä»¶æ˜¯ Popup,Dialog
 			obj.moveToCenter();
 			obj.showModal(true);
 		}/*else{

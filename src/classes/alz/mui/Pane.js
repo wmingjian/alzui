@@ -1,49 +1,94 @@
 _package("alz.mui");
 
+_import("alz.core.ActionManager");
 _import("alz.mui.Container");
-//_import("alz.action.ActionElement");
+_import("alz.action.ActionElement");
 _import("alz.action.FormElement");
 _import("alz.action.LinkLabel");
 _import("alz.action.ComboBox");
-//_import("alz.action.TextField");
+_import("alz.action.Select");
+_import("alz.action.TextField");
 _import("alz.action.Button");
 _import("alz.action.CheckBox");
 
+/**
+ * ÂèØÁã¨Á´ãÂ∑•‰ΩúÁöÑÈù¢ÊùøÁªÑ‰ª∂
+ */
 _class("Pane", Container, function(){
 	this._init = function(){
 		_super._init.call(this);
-		this._components = [];
+		//this._components = [];
+		this._actionManager = null;
+		this._app = null;
+		this._currentSender = null;
+		this._lastTime = 0;
+		//this._lastAct = "";
 	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
+		this._actionManager = new ActionManager();
+		this._actionManager.init(this);
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
+		/*
 		for(var i = 0, len = this._components.length; i < len; i++){
 			this._components[i].dispose();
 			this._components[i] = null;
 		}
 		this._components = [];
+		*/
+		this._app = null;
+		this._actionManager.dispose();
+		this._actionManager = null;
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){
 	};
+	this.getApp = function(){
+		return this._app;
+	};
+	this.setApp = function(v){
+		this._app = v;
+	};
+	this.getActionEngine = function(){
+		return this;
+	};
+	this.getCurrentSender = function(){
+		return this._currentSender;
+	};
 	/**
-	 * ≥ı ºªØ◊Èº˛÷–µƒ Action ∂Ø◊˜◊Èº˛
-	 * ÷ß≥÷µƒ Action ∂Ø◊˜◊Èº˛”–£∫
-	 *   ±Ìµ•  £∫ FORM
-	 *   ≥¨¡¥Ω”£∫ A
-	 *   ∞¥≈•  £∫ INPUT(type=button)
-	 *   ∏¥—°øÚ£∫ INPUT(type=checkbox)
-	 *   ¡–±ÌøÚ£∫ SELECT
+	 * ÂàùÂßãÂåñÁªÑ‰ª∂‰∏≠ÁöÑÂä®‰ΩúÂÖÉÁ¥†Ôºå‰ΩøËøô‰∫õÂÖÉÁ¥†ÂèØ‰ª•ÂìçÂ∫îÈªòËÆ§‰∫ã‰ª∂Ëß¶ÂèëÂÖ∂action
+	 * [TODO]Â¶Ç‰ΩïÈÅøÂÖçÂ∑≤ÁªèÂàùÂßãÂåñËøáÁöÑÂÖÉÁ¥†ÈáçÂ§çÂàùÂßãÂåñÔºü
+	 * @param {HTMLElement} element
+	 * @param {Object} owner
+	 * @param {Array} customTags Ëá™ÂÆö‰πâÊîØÊåÅactionÁöÑÊ†áÁ≠æ
 	 */
-	this.initComponents = function(element){
-		var tags = ["form", "a", "select", "input"];
+	this.initActionElements = function(element, owner, customTags){
+		owner = owner || this.getActionEngine();
+		this.initComponents();
+	};
+	/**
+	 * ÂàùÂßãÂåñÁªÑ‰ª∂‰∏≠ÁöÑ Action Âä®‰ΩúÁªÑ‰ª∂
+	 * ÊîØÊåÅÁöÑ Action Âä®‰ΩúÁªÑ‰ª∂ÊúâÔºö
+	 *   Ë°®Âçï  Ôºö FORM
+	 *   Ë∂ÖÈìæÊé•Ôºö A
+	 *   ÊåâÈíÆ  Ôºö INPUT(type=button)
+	 *   Â§çÈÄâÊ°ÜÔºö INPUT(type=checkbox)
+	 *   ÂàóË°®Ê°ÜÔºö SELECT
+	 * ÊîØÊåÅÂ¢ûÈáèÂàùÂßãÂåñËøêË°åÊñπÂºè
+	 */
+	this.initComponents = function(element, customTagList){
+		element = element || this._self;
+		customTagList = customTagList || [];
+		var customNodes = [];
+		var tags = ["form", "a", "select", "input"].concat(customTagList);
 		for(var i = 0, len = tags.length; i < len; i++){
 			var nodes = element.getElementsByTagName(tags[i]);
 			for(var j = 0, len1 = nodes.length; j < len1; j++){
 				var node = nodes[j];
-				if(node.getAttribute("_action")){
+				var act = node.getAttribute("_action");
+				if(act){
 					var component;
 					switch(tags[i]){
 					case "form":
@@ -72,21 +117,49 @@ _class("Pane", Container, function(){
 					//default:
 					//	break;
 					}
-					component.init(node);
-					//application._actionManager.add(component);
-					this._components.push(component);
+					component.bind(node, this._actionManager);
+					this._actionManager.add(component);
+					//this._components.push(component);
 				}
 				node = null;
 			}
 			nodes = null;
 		}
+		return customNodes;
 	};
 	/**
-	 * Action π§◊˜ƒ£–Õ
+	 * Action Â∑•‰ΩúÊ®°Âûã
 	 * [TODO]
-	 * 1)º∂¡™º§∑¢µƒ Action ∂Ø◊˜÷ª∞—◊Ó≥ıµƒ∂Ø◊˜—π»Î∂Ø◊˜’ª£¨’‚—˘ƒ‹πª±£÷§’˝»∑µƒ∂Ø◊˜ªÿ
-	 *   ÕÀª˙÷∆°£
+	 * 1)Á∫ßËÅîÊøÄÂèëÁöÑ Action Âä®‰ΩúÂè™ÊääÊúÄÂàùÁöÑÂä®‰ΩúÂéãÂÖ•Âä®‰ΩúÊ†àÔºåËøôÊ†∑ËÉΩÂ§ü‰øùËØÅÊ≠£Á°ÆÁöÑÂä®‰ΩúÂõû
+	 *   ÈÄÄÊú∫Âà∂„ÄÇ
 	 */
-	this.doAction = function(action){
+	this.doAction = function(act, sender){
+		var time = new Date().getTime();
+		if(time < this._lastTime + 500){
+			this._lastTime = time;
+			return false;
+		}
+		//if(time < this._lastTime + 800 && this._lastAct == act){
+		//	return false;
+		//}
+		this._lastTime = time;
+		//this._lastAct = act;
+		this._currentSender = sender;
+		var ret, key = "do_" + act;
+		if(key in this && typeof this[key] == "function"){
+			ret = this[key](act, sender);
+		}else{  //Ëá™Â∑±Â§ÑÁêÜ‰∏ç‰∫ÜÁöÑ‰∫§ÁªôAPPÂ§ÑÁêÜ
+			ret = this._app.doAction.apply(this._app, arguments);
+			//runtime.error("[Pane::doAction]Êú™ÂÆö‰πâÁöÑact=" + act);
+			//ret = false;
+		}
+		this._currentSender = null;
+		//[TODO]Â∫îËØ•Âú®Âä®ÁîªÊí≠ÂÆå‰πãÂêéËøêË°åÔºåÂ¶Ç‰Ωï‰øùËØÅÂë¢Ôºü
+		/*
+		runtime.startTimer(10, this, function(){
+			this._taskSchedule.run("page_unload");
+		});
+		*/
+		return typeof ret == "boolean" ? ret : false;
 	};
 });

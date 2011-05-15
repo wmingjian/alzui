@@ -1,0 +1,22 @@
+[OPTIONS]
+Auto Index=Yes
+Binary TOC=Yes
+Compiled file=alzui.chm
+Contents file=alzui.hhc
+Default Window=defalt
+Default topic=index.html
+Display compile progress=No
+Full-text search=Yes
+Index file=alzui.hhk
+Language=0x804 中文(中国)
+Title=alzui框架参考手册
+
+[WINDOWS]
+defalt="alzui框架参考手册","alzui.hhc","alzui.hhk","html/index.html","html/index.html",,,,,0x2120,,0x387e,[0,0,800,650],,,,,,,
+
+[FILES]
+lib/chm_lib.js
+res/css/style.css
+html/index.html
+html/ref/AjaxEngine.html
+html/ref/TemplateManager.html

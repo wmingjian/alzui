@@ -1,7 +1,7 @@
 _package("alz.mui");
 
 /**
- * ×´Ì¬°´Å¥·Ö×é
+ * çŠ¶æ€æŒ‰é’®åˆ†ç»„
  */
 _class("ToggleGroup", "", function(){
 	this._init = function(){

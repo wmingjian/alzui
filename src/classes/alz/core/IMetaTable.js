@@ -1,5 +1,8 @@
 _package("alz.core");
 
+/**
+ * 元表接口
+ */
 _interface("IMetaTable", "", function(_property){
 	_property(this, {
 		_hash: {},

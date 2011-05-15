@@ -1,0 +1,1 @@
+@php build.php tpl %1

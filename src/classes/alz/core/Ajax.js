@@ -3,7 +3,7 @@ _package("alz.core");
 _import("alz.core.AjaxEngine");
 
 /**
- * Òì²½Êı¾İµ÷ÓÃÒıÇæµÄ·â×°°æ£¬Ö÷ÒªÄ¿µÄÊÇÆÁ±Î²¢¼õÉÙruntime¶ÔÏóµÄÊ¹ÓÃ
+ * å¼‚æ­¥æ•°æ®è°ƒç”¨å¼•æ“çš„å°è£…ç‰ˆï¼Œä¸»è¦ç›®çš„æ˜¯å±è”½å¹¶å‡å°‘runtimeå¯¹è±¡çš„ä½¿ç”¨
  */
 _class("Ajax", "", function(){
 	this._init = function(){
@@ -11,19 +11,23 @@ _class("Ajax", "", function(){
 		this._ajax = runtime.getAjax();
 	};
 	this.dispose = function(){
+		if(this._disposed) return;
 		this._ajax = null;
 		//[memleak]this.__caller__ = null;
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){
 	};
-	//¾ßÌå²ÎÊıº¬Òå²Î¿¼AjaxEngine¶ÔÓ¦µÄ·½·¨
-	this.netInvoke = function(method, url, postData, type, agent, funName, cbArgs){
-		//[memleak]this.__caller__ = method + "," + url + "," + postData + "," + type + "," + agent + "," + funName + "," + cbArgs;
-		return this._ajax.netInvoke.apply(this._ajax, arguments);
+	//å…·ä½“å‚æ•°å«ä¹‰å‚è€ƒAjaxEngineå¯¹åº”çš„æ–¹æ³•
+	this.netInvoke = function(method, url, postData, type, agent, func, cbArgs){
+		//[memleak]this.__caller__ = method + "," + url + "," + postData + "," + type + "," + agent + "," + func + "," + cbArgs;
+		var ret = this._ajax.netInvoke.apply(this._ajax, arguments);
+		this.dispose();
+		return ret;
 	};
 	this.netInvokeQueue = function(queue, agent, callback){
 		this._ajax.netInvokeQueue.apply(this._ajax, arguments);
+		this.dispose();
 	};
 	this.abort = function(uniqueid){
 		this._ajax.abort(uniqueid);
