@@ -1,37 +1,66 @@
 _package("alz.core");
 
 _import("alz.core.EventTarget");
+_import("alz.template.TemplateManager");
 
 /**
  * [TODO]
- * 1)application ±äÁ¿ÔÚ runtime.createApp ·½·¨·µ»ØÖ®ºó±»¸²¸ÇÁË
+ * 1)application å˜é‡åœ¨ runtime.createApp æ–¹æ³•è¿”å›ä¹‹åè¢«è¦†ç›–äº†
  */
 _class("Application", EventTarget, function(){
 	/*
 	var __exts = [];
-	Application.regExt = function(fun){  //×¢²áÓ¦ÓÃµÄÀ©Õ¹
-		var o = new fun();
+	Application.regExt = function(func){  //æ³¨å†Œåº”ç”¨çš„æ‰©å±•
+		var o = new func();
 		__exts.push(o);
 		for(var k in o){
 			if(k == "_init") continue;  //[TODO]
-			if(k == "init" || k == "dispose") continue;  //ºöÂÔ¹¹Ôì»òÎö¹¹º¯Êı
-			Application.prototype[k] = o[k];  //°ó¶¨µ½Ô­ĞÍÉÏ
+			if(k == "init" || k == "dispose") continue;  //å¿½ç•¥æ„é€ æˆ–ææ„å‡½æ•°
+			Application.prototype[k] = o[k];  //ç»‘å®šåˆ°åŸå‹ä¸Š
 		}
 		o = null;
 	};
 	*/
+	/*
+	 * popup   å¼¹å‡ºå¼ç»„ä»¶é…ç½®ä¿¡æ¯
+	 * dialog  å¯¹è¯æ¡†ç»„ä»¶é…ç½®ä¿¡æ¯
+	 * pane    é¢æ¿ç»„ä»¶é…ç½®ä¿¡æ¯
+	 */
+	this.__conf = {};
+	/**
+	 * æ³¨å†Œé…ç½®æ•°æ®
+	 */
+	this.__conf__ = function(data){
+		for(var k in data){
+			var hash;
+			if(!(k in this.__conf)){
+				hash = this.__conf[k] = {};
+			}else{
+				hash = this.__conf[k];
+			}
+			for(var i = 0, len = data[k].length; i < len; i++){
+				var item = data[k][i];
+				hash[item.id] = item;
+			}
+		}
+	};
 	this._init = function(){
-		__context__.application = this;  //°ó¶¨µ½libÉÏÏÂÎÄ»·¾³ÉÏ
+		__context__.application = this;  //ç»‘å®šåˆ°libä¸Šä¸‹æ–‡ç¯å¢ƒä¸Š
 		_super._init.call(this);
-		this._appconf = null;  //Ó¦ÓÃÅäÖÃĞÅÏ¢
-		this._parentApp = null;  //¸¸Ó¦ÓÃ
+		this._context = __context__;
+		this._appconf = null;  //åº”ç”¨é…ç½®ä¿¡æ¯
+		this._parentApp = null;  //çˆ¶åº”ç”¨
 		this._historyIndex = -1;
-		this._params = null;  //´«µİ¸øÓ¦ÓÃµÄ²ÎÊı
-		this._workspace = null;  //¹¤×÷Çø×é¼ş
-		this._hotkey = {};  //ÈÈ¼ü
+		this._params = null;  //ä¼ é€’ç»™åº”ç”¨çš„å‚æ•°
+		this._workspace = null;  //å·¥ä½œåŒºç»„ä»¶
+		this._hotkey = {};  //çƒ­é”®
 		this._domTemp = null;
+		//this._template = null;  //æ¨¡ç‰ˆå¼•æ“
+		this._template = runtime.getTemplate();  //æ¨¡ç‰ˆå¼•æ“
+		this._contentPane = null;
+		this.__keydown = null;
 		/*
-		this._cache = {  //²Î¿¼ÁË prototype µÄÊµÏÖ
+		this._cache = {  //å‚è€ƒäº† prototype çš„å®ç°
 			findOrStore: function(value){
 				return this[value] = this[value] || function(){
 					return value.apply(null, [this].concat(runtime.toArray(arguments)));
@@ -39,7 +68,7 @@ _class("Application", EventTarget, function(){
 			}
 		};
 		*/
-		//Ö´ĞĞ¹¹ÔìÀ©Õ¹
+		//æ‰§è¡Œæ„é€ æ‰©å±•
 		//for(var i = 0, len = __exts.length; i < len; i++){
 		//	__exts[i]._init.call(this);
 		//}
@@ -47,31 +76,43 @@ _class("Application", EventTarget, function(){
 	this.init = function(){
 		//_super.init.apply(this, arguments);
 		this._workspace = runtime._workspace;
-		//×¢²áÏµÍ³ÈÈ¼ü
-		runtime.getDom().addEventListener(runtime.getDocument(), "keydown", function(ev){
-			ev = ev || runtime.getWindow().event;
-			if(ev.keyCode in this._hotkey){  //Èç¹û´æÔÚÈÈ¼ü£¬ÔòÖ´ĞĞ»Øµôº¯Êı
-				var ret, o = this._hotkey[ev.keyCode];
-				switch(o.type){
-				case 0: ret = o.agent(ev);break;
-				case 1: ret = o.agent[o.cb](ev);break;
-				case 2: ret = o.cb.apply(o.agent, [ev]);break;
+		if(!Application._hotkey){
+			//æ³¨å†Œç³»ç»Ÿçƒ­é”®
+			this.__keydown = function(ev){
+				ev = ev || runtime.getWindow().event;
+				var key = ev.keyCode;
+				if(key in this._hotkey){  //å¦‚æœå­˜åœ¨çƒ­é”®ï¼Œåˆ™æ‰§è¡Œå›æ‰å‡½æ•°
+					var ret, o = this._hotkey[key];
+					switch(o.type){
+					case 0: ret = o.agent(ev);break;
+					case 1: ret = o.agent[o.func](ev);break;
+					case 2: ret = o.func.apply(o.agent, [ev]);break;
+					}
+					o = null;
+					return ret;
 				}
-				o = null;
-				return ret;
-			}
-		}, this);
-		//Ö´ĞĞ³õÊ¼»¯À©Õ¹
+			};
+			runtime.getDom().addEventListener(runtime.getDocument(), "keydown", this.__keydown, this);
+			Application._hotkey = true;
+		}
+		//this._template = runtime.getTemplate();  //æ¨¡ç‰ˆå¼•æ“
+		//æ‰§è¡Œåˆå§‹åŒ–æ‰©å±•
 		//for(var i = 0, len = __exts.length; i < len; i++){
 		//	__exts[i].init.apply(this, arguments);
 		//}
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
-		//Ö´ĞĞÎö¹¹À©Õ¹
+		//æ‰§è¡Œææ„æ‰©å±•
 		//for(var i = 0, len = __exts.length; i < len; i++){
 		//	__exts[i].dispose.apply(this, arguments);
 		//}
+		if(this.__keydown){
+			this.__keydown = null;
+			runtime.getDom().removeEventListener(runtime.getDocument(), "keydown", this.__keydown);
+		}
+		this._contentPane = null;
+		this._template = null;
 		this._domTemp = null;
 		//runtime.getDocument().onkeydown = null;
 		for(var k in this._hotkey){
@@ -81,6 +122,7 @@ _class("Application", EventTarget, function(){
 		this._params = null;
 		this._parentApp = null;
 		this._appconf = null;
+		this._context = null;
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){
@@ -88,44 +130,67 @@ _class("Application", EventTarget, function(){
 	this.onContentLoad = function(){
 	};
 	/**
-	 * ×¢²áÏµÍ³ÈÈ¼ü
-	 * @param {Number} keyCode ÈÈ¼ü±àÂë
-	 * @param {Function} callback »Øµ÷º¯Êı
+	 * æ³¨å†Œç³»ç»Ÿçƒ­é”®
+	 * @param {Number} keyCode çƒ­é”®ç¼–ç 
+	 * @param {Object} agent ä»£ç†å¯¹è±¡
+	 * @param {Function} func å›è°ƒå‡½æ•°
 	 */
-	this.regHotKey = function(keyCode, agent, callback){
+	this.regHotKey = function(keyCode, agent, func){
 		var type;
 		if(typeof agent == "function"){
 			type = 0;
-		}else if(typeof agent == "object" && typeof callback == "string"){
+		}else if(typeof agent == "object" && typeof func == "string"){
 			type = 1;
-		}else if(typeof agent == "object" && typeof callback == "function"){
+		}else if(typeof agent == "object" && typeof func == "function"){
 			type = 2;
 		}else{
-			runtime.showException("»Øµ÷²ÎÊı´íÎó");
+			runtime.showException("å›è°ƒå‚æ•°é”™è¯¯");
 			return;
 		}
 		if(!this._hotkey[keyCode]){
 			this._hotkey[keyCode] = {
 				"type" : type,
 				"agent": agent,
-				"cb"   : callback
+				"func" : func
 			};
 		}
 	};
-	this.createDomElement = function(html){
+	this.createDomElement = function(html, doc){
+		doc = doc || this._doc;  //å¯èƒ½åœ¨ä¸åŒçš„documentå¯¹è±¡ä¸­æ‰§è¡Œ
 		if(!this._domTemp){
-			this._domTemp = window.document.createElement("div");
+			this._domTemp = doc.createElement("div");
+			//doc.documentElement.appendChild(this._domTemp);
 		}
-		this._domTemp.innerHTML = html;
-		return this._domTemp.removeChild(this._domTemp.childNodes[0]);
+		this._domTemp.innerHTML = html.replace(/^[\s\r\n]+/, "");
+		return this._domTemp.removeChild(this._domTemp.firstChild);  //childNodes[0]
 	};
 	this.setParentApp = function(v){
 		this._parentApp = v;
+	};
+	this.getAppManager = function(){
+		return runtime.getAppManager();
 	};
 	this.setHistoryIndex = function(v){
 		this._historyIndex = v;
 	};
 	this.getParams = function(){
 		return this._params;
+	};
+	this.setContentPane = function(v){
+		this._contentPane = v;
+	};
+	this.setContext = function(v){
+		this._context = v;
+	};
+	this.findClass = function(name){
+		if(name in this._context){
+			return this._context[name];
+		}else{
+			return null;
+		}
+	};
+	this.findConf = function(type, k){
+		var hash = this.__conf[type];
+		return hash[k in hash ? k : type];  //é»˜è®¤å€¼å’Œtypeå‚æ•°ä¸€ç›´
 	};
 });

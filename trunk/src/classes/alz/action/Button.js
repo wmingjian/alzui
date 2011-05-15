@@ -3,21 +3,23 @@ _package("alz.action");
 _import("alz.action.ActionElement");
 
 /**
- * input:buttonÔªËØµÄ·â×°
+ * input:buttonå…ƒç´ çš„å°è£…
  */
 _class("Button", ActionElement, function(){
+	this._init = function(){
+		_super._init.call(this);
+	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
 		var _this = this;
 		this._self.onclick = function(ev){
 			return _this.dispatchAction(this, ev || window.event);
 		};
-		//[TODO]ÒòÎªsetDisabledÖĞµÄÓÅ»¯¿¼ÂÇ£¬ÕâÀïÄ¿Ç°Ö»ÄÜÊ¹ÓÃÈç´Ë±¿×¾µÄ·½Ê½Çı¶¯
-		//setDisabled¹¤×÷£¬ÆäËûµØ·½Ïà¶Ô³ÉÊìµÄ·½Ê½ÊÇÌí¼ÓÇ¿ÖÆ¸üĞÂµÄ²ÎÊı¡£
+		//[TODO]å› ä¸ºsetDisabledä¸­çš„ä¼˜åŒ–è€ƒè™‘ï¼Œè¿™é‡Œç›®å‰åªèƒ½ä½¿ç”¨å¦‚æ­¤ç¬¨æ‹™çš„æ–¹å¼é©±åŠ¨
+		//setDisabledå·¥ä½œï¼Œå…¶ä»–åœ°æ–¹ç›¸å¯¹æˆç†Ÿçš„æ–¹å¼æ˜¯æ·»åŠ å¼ºåˆ¶æ›´æ–°çš„å‚æ•°ã€‚
 		var v = this._disabled;
 		this._disabled = null;
-		this.setDisabled(v);
-		v = null;
+		this.setDisabled(v);  //å¼ºåˆ¶æ›´æ–°
 		/*
 		var rows = this._self.rows;
 		for(var i = 0, len = rows.length; i < len; i++){
@@ -36,8 +38,7 @@ _class("Button", ActionElement, function(){
 	};
 	this.setDisabled = function(v){
 		_super.setDisabled.apply(this, arguments);
-		if(!this._disabled && this._self){
-			this._self.disabled = v;
+		if(this._self){
 			this._self.style.color = v ? "gray" : "";
 			//this._self.rows[0].className = v ? "OnDisable" : "normal";
 			/*if(v){

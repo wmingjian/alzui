@@ -8,7 +8,7 @@ _import("alz.mui.WindowSkinWIN2K");
 /*
 	<div class="head">
 		<img src="images/win-icon.gif" />
-		<label>´°Ìå×é¼ş±êÌâÀ¸ - Windown XP</label>
+		<label>çª—ä½“ç»„ä»¶æ ‡é¢˜æ  - Windown XP</label>
 		<div class="sysbtn">
 			<div class="icon-min"></div>
 			<div class="icon-max"></div>
@@ -17,7 +17,7 @@ _import("alz.mui.WindowSkinWIN2K");
 	</div>
 	<div class="head">
 		<img src="images/win-icon.gif" />
-		<label>´°Ìå×é¼ş±êÌâÀ¸ - Windown 2000</label>
+		<label>çª—ä½“ç»„ä»¶æ ‡é¢˜æ  - Windown 2000</label>
 		<div class="sysbtn">
 			<div class="icon-min"></div>
 			<div class="icon-max"></div>
@@ -26,7 +26,7 @@ _import("alz.mui.WindowSkinWIN2K");
 	</div>
 */
 _class("Window", Component, function(){
-	var TPL_WIN = '<div id="win2" class="mui-Window-win2k" _icon="images/win-icon.gif" _caption="alzuiµ÷ÊÔÆ÷ - Windown 2000" _align="none">'
+	var TPL_WIN = '<div id="win2" class="aui-Window-win2k" _icon="{$pathimg}win-icon.gif" _caption="alzuiè°ƒè¯•å™¨ - Windown 2000" _align="none">'
 		+ '<div class="body">'
 		//+ '<input type="checkbox" checked="checked" /> Resizable'
 		+ '</div></div>';
@@ -34,9 +34,9 @@ _class("Window", Component, function(){
 		+ '<img />'
 		+ '<label></label>'
 		+ '<div class="sysbtn">'
-		+ '<div class="icon-min" title="×îĞ¡»¯"></div>'
-		+ '<div class="icon-max" title="×î´ó»¯"></div>'
-		+ '<div class="icon-close" title="¹Ø±Õ"></div>'
+		+ '<div class="icon-min" title="æœ€å°åŒ–"></div>'
+		+ '<div class="icon-max" title="æœ€å¤§åŒ–"></div>'
+		+ '<div class="icon-close" title="å…³é—­"></div>'
 		+ '</div>'
 		+ '</div>';
 	this._init = function(){
@@ -50,14 +50,14 @@ _class("Window", Component, function(){
 		this._body = null;
 		this._skin = null;
 		this._borders = null;
-
 		this._resizable = true;
 		this._width = 0;
 		this._height = 0;
 	};
 	this.create = function(parent){
 		this.setParent2(parent);
-		var obj = runtime.createDomElement(TPL_WIN);
+		var tpl = tpl_replace(TPL_WIN, {"pathimg": "../alzui/res/images/"});
+		var obj = runtime.createDomElement(tpl);
 		if(parent){
 			parent.appendChild(obj);
 		}
@@ -98,7 +98,7 @@ _class("Window", Component, function(){
 		this._maxbtn.init(this._head.childNodes[2].childNodes[1], this);
 		this._closebtn = new SysBtn();
 		this._closebtn.init(this._head.childNodes[2].childNodes[2], this);
-		if(this._self.className == "mui-Window-winxp"){
+		if(this._self.className == "aui-Window-winxp"){
 			this._skin = new WindowSkinWINXP();
 		}else{
 			this._skin = new WindowSkinWIN2K();
@@ -107,6 +107,7 @@ _class("Window", Component, function(){
 		this._skin.create(this);
 	};
 	this.dispose = function(){
+		if(this._disposed) return;
 		this._skin.dispose();
 		this._skin = null;
 		this._minbtn.dispose();
@@ -202,7 +203,7 @@ _class("Window", Component, function(){
 		this._self.style.zIndex = runtime.getNextZIndex();
 		//this._head.setCapture(true);
 		var pos = runtime.dom.getPos1(ev, 1, this._self);
-		this._offsetX = pos.x;  //ev.offsetX;  //ns ä¯ÀÀÆ÷µÄÎÊÌâ
+		this._offsetX = pos.x;  //ev.offsetX;  //ns æµè§ˆå™¨çš„é—®é¢˜
 		this._offsetY = pos.y;  //ev.offsetY;
 		this.setCapture(true);
 		/*
@@ -218,7 +219,7 @@ _class("Window", Component, function(){
 	};
 	this.onMouseMove = function(ev){
 		var rect = runtime.dom.getViewPort(window.document.body);
-		//[TODO]ÊÇ·ñĞèÒª¿¼ÂÇBODYÔªËØµÄ±ß¿ò¿í¶È£¿
+		//[TODO]æ˜¯å¦éœ€è¦è€ƒè™‘BODYå…ƒç´ çš„è¾¹æ¡†å®½åº¦ï¼Ÿ
 		var x = rect.x + Math.min(rect.w - 10, Math.max(10, ev.clientX)) - this._offsetX/* - 2*/;
 		var y = rect.y + Math.min(rect.h - 10, Math.max(10, ev.clientY)) - this._offsetY/* - 2*/;
 		runtime.dom.moveTo(this._self, x, y);

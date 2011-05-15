@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>AjaxEngine 类</title>
+<link type="text/css" rel="stylesheet" href="../res/css/docs.css" />
+<script type="text/javascript" src="../lib/chm_lib.js"></script>
+</head>
+<body>
+<div class="wui-Document">
+<h1>AjaxEngine 类</h1>
+<p>提供对异步请求的支持，实现了对 XMLHttpRequest 的简单封装，内部使用单一的 XMLHttpRequest 对象通过请求队列机制实现对多个请求的异步工作模式。</p>
+
+<h2>方法：netInvoke</h2>
+
+<h3>语法</h3>
+<pre>obj.netInvoke(method, url, postData, type, agent[, funName]);</pre>
+<p>必选项 obj 参数为 AjaxEngine 对象。</p>
+
+<h3>参数</h3>
+<dl>
+	<dt><i>method</i></dt>
+	<dd>必选项。提交方法(GET|POST)</dd>
+	<dt><i>url</i></dt>
+	<dd>必选项。网络调用的url地址，如果是GET请求，可以有问号("?")后面的参数</dd>
+	<dt><i>postData</i></dt>
+	<dd>必选项。请求数据，可以是拼接好的字符串或者json对象，该数据通过请求体传送，如果没有数据请使用空字符串，不要使用null</dd>
+	<dt><i>type</i></dt>
+	<dd>必选项。返回值类型，允许的值有：text=文本字符串,json=JSON对象,xml=XMLDocument对象</dd>
+	<dt><i>agent</i></dt>
+	<dd>必选项。回调代理对象或者函数对象</dd>
+	<dt><i>funName</i></dt>
+	<dd>可选项。回调代理对象的回调方法名称</dd>
+</dl>
+
+<h3>说明</h3>
+<p>参数agent其实是可选的，如果没有agent和funName参数，该方法将启动同步请求模式，并直接返回请求之后的，WEB开发环境下建议不要使用同步机制，也就是说调用的时候不要让这个参数为空</p>
+
+<h3>示例</h3>
+<p>例1: agent 是 function 对象，funName 未定义</p>
+<pre>var ajax = new AjaxEngine();
+ajax.netInvoke("GET", "test1.html", "", "text", function(text){
+	//...
+});</pre>
+
+<p>例2: agent 是 function 对象，funName 也是 function 对象</p>
+<p><u>这种情况下 agent 是 onSuccess, funName 是 onFailure</u></p>
+<pre>var ajax = new AjaxEngine();
+ajax.netInvoke("GET", "test2.php?act=list", "", "json", function(data){
+	//... ---- onSuccess
+}, function(){
+	//... ---- onFailure
+});</pre>
+
+<p>例3: agent 是 object 对象，funName 未定义</p>
+<p><u>这种情况下 agent 必须实现 AjaxCallback 接口，也就是对象 agent 必须存在 onSuccess 和 onFailure 两个方法</u></p>
+<pre>var ajax = new AjaxEngine();
+var agent = {
+	onSuccess: function(data){
+		//...
+	},
+	onFailure: function(){
+		//...
+	}
+}
+ajax.netInvoke("GET", "test2.php?act=list", "", "json", agent);</pre>
+
+<p>例4: agent 是 object 对象，funName 是回调方法名称</p>
+<pre>var ajax = new AjaxEngine();
+var agent = {
+	callback: function(data){
+		//...
+	}
+}
+ajax.netInvoke("GET", "test2.php?act=list", "", "json", agent, "callback");</pre>
+
+<p>例5: agent 是 object 对象，funName 是匿名函数，匿名函数中的 this 被指代为 agent 对象</p>
+<pre>var ajax = new AjaxEngine();
+var agent = {
+	//...
+}
+ajax.netInvoke("POST", "test3.php", "act=add&name=abc", "json", agent, function(data){
+	//this.xxxx  // ---- 这个里的 this 就是 agent 对象
+});</pre>
+</div>
+</body>
+</html>

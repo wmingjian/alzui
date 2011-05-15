@@ -1,15 +1,16 @@
 _package("alz.mui");
 
 /**
- * ÃüÁîÀúÊ·¼ÍÂ¼
+ * å‘½ä»¤å†å²çºªå½•
  */
 _class("TextHistory", "", function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._historys = [];
-		this._curIndex = 0;  //ÀúÊ·¼ÇÂ¼µÄÎ»ÖÃ
+		this._curIndex = 0;  //å†å²è®°å½•çš„ä½ç½®
 	};
 	this.dispose = function(){
+		if(this._disposed) return;
 		for(var i = 0, len = this._historys.length; i < len; i++){
 			this._historys[i] = null;
 		}
@@ -19,7 +20,7 @@ _class("TextHistory", "", function(){
 	this.destroy = function(){
 	};
 	this.getText = function(num){
-		if(num == -1 && this._historys.length - 1 == 0){  //ÌØÊâ´¦ÀíÕâÖÖÇé¿ö
+		if(num == -1 && this._historys.length - 1 == 0){  //ç‰¹æ®Šå¤„ç†è¿™ç§æƒ…å†µ
 			return this._historys[0];
 		}else if(this._historys.length - 1 > 0){
 			var n = Math.max(0, Math.min(this._historys.length - 1, this._curIndex + num));

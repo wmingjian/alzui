@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>TemplateManager 类</title>
+<link type="text/css" rel="stylesheet" href="../res/css/docs.css" />
+<script type="text/javascript" src="../lib/chm_lib.js"></script>
+</head>
+<body>
+<div class="wui-Document">
+<h1>TemplateManager 类</h1>
+<p>提供对模板数据的管理支持，实现了对多种类型的前端模板的管理和方便的外部调用接口，达到分离前端开发过程中逻辑和界面的初步分离。</p>
+<p style="color:red;">[TODO]TrimPath 每次重复解析模板的性能问题还没有解决。</p>
+
+<h2>方法： addTemplate</h2>
+<p>添加一个模板到模板管理类中</p>
+
+<h3>语法</h3>
+<pre>obj.addTemplate(name, type, data);</pre>
+<p>必选项 obj 参数为 TemplateManager 对象。</p>
+
+<h3>参数</h3>
+<dl>
+	<dt><i>name</i></dt>
+	<dd>必选项。要添加的模板的名称</dd>
+	<dt><i>type</i></dt>
+	<dd>必选项。模板的类型，参见说明</dd>
+	<dt><i>data</i></dt>
+	<dd>必选项。模板内容</dd>
+</dl>
+
+<h3>返回值</h3>
+<p>原始的模板内容</p>
+
+<h3>说明</h3>
+<p>模板的类型</p>
+<p>html = 纯 HTML 代码</p>
+<p>tpl  = 符合 /\{[\$=]\w+\}/ 规则的简易模板</p>
+<p>asp  = 仿 ASP 语法的模板</p>
+<p>tmpl = 整合的 trimpath 模板</p>
+
+<h2>方法： getTemplate</h2>
+<p>获取指定名称的模板的原始内容</p>
+
+<h3>语法</h3>
+<pre>obj.getTemplate(name);</pre>
+<p>必选项 obj 参数为 TemplateManager 对象。</p>
+
+<h3>参数</h3>
+<dl>
+	<dt><i>name</i></dt>
+	<dd>必选项。要获取的模板的名称</dd>
+</dl>
+
+<h3>返回值</h3>
+<p>原始的模板内容</p>
+
+<h2>方法： invoke</h2>
+<p>调用模板并返回根据模板生成的HTML代码字符串</p>
+
+<h3>语法</h3>
+<pre>obj.invoke(name[, args0[, args1[, ...]]]);</pre>
+<p>必选项 obj 参数为 TemplateManager 对象。</p>
+
+<h3>参数</h3>
+<dl>
+	<dt><i>name</i></dt>
+	<dd>必选项。要调用的模板的名称</dd>
+	<dt><i>args n</i></dt>
+	<dd>可选项。传递给模板的参数，和普通的函数调用的参数规则一致</dd>
+</dl>
+
+<h3>返回值</h3>
+<p>字符串格式的HTML代码片断</p>
+
+<h3>说明</h3>
+<p>在具体的实现中，每一个模板都被解析为一个匿名的function对象，这里的调用实际就是调用了这个匿名的函数对象，参数也是传递给了这个匿名的函数对象。</p>
+
+<h3>示例</h3>
+<pre>var template = new TemplateManager();
+template.invoke("mail_add.tpl", {name:"test1"});</pre>
+
+<h2>方法： render</h2>
+<p>使用指定的模板和附加参数渲染一个DOM元素</p>
+
+<h3>语法</h3>
+<pre>obj.render(element, name[, args0[, args1[, ...]]]);</pre>
+<p>必选项 obj 参数为 TemplateManager 对象。</p>
+
+<h3>参数</h3>
+<dl>
+	<dt><i>element</i></dt>
+	<dd>必选项。要渲染的DOM元素</dd>
+	<dt><i>name</i></dt>
+	<dd>必选项。渲染过程使用的模板的名称</dd>
+	<dt><i>args n</i></dt>
+	<dd>可选项。传递给模板的参数，和普通的函数调用的参数规则一致</dd>
+</dl>
+
+<h3>说明</h3>
+<p>在具体的实现中，每一个模板都被解析为一个匿名的function对象，这里的调用实际就是调用了这个匿名的函数对象，参数也是传递给了这个匿名的函数对象。</p>
+
+<h3>示例</h3>
+<pre>var template = new TemplateManager();
+template.render($("div1"), "mail_add.tpl", {name:"test1"});</pre>
+
+<h2>方法： parse</h2>
+<p>将类似 ASP 代码的模板解析为一个 JS 函数的代码形式</p>
+
+<h3>语法</h3>
+<pre>obj.parse(code);</pre>
+<p>必选项 obj 参数为 TemplateManager 对象。</p>
+
+<h3>参数</h3>
+<dl>
+	<dt><i>code</i></dt>
+	<dd>必选项。模板的内容</dd>
+</dl>
+
+<h2>方法： toJsString</h2>
+<p>将字符串转换成可以被字符串表示符号(",')括起来已表示原来字符串意义的字符串</p>
+
+<h3>语法</h3>
+<pre>obj.toJsString(str);</pre>
+<p>必选项 obj 参数为 TemplateManager 对象。</p>
+
+<h3>参数</h3>
+<dl>
+	<dt><i>str</i></dt>
+	<dd>必选项。要转换的字符串内容</dd>
+</dl>
+</div>
+</body>
+</html>

@@ -2,6 +2,9 @@ _package("alz.mui");
 
 _import("alz.mui.Component");
 
+/**
+ * 银光按钮组件
+ */
 _class("SilverButton", Component, function(){
 	var _css = {
 		"normal":{"background-position":"0 0"     ,"_cite":{"background-position":"right -30px" ,"color":"#333"   }},
@@ -40,6 +43,7 @@ _class("SilverButton", Component, function(){
 		this._self.onmouseout = function(){this._ptr.setState("normal");};
 	};
 	this.dispose = function(){
+		if(this._disposed) return;
 		this._cite = null;
 		this._btn = null;
 		this._self.onclick = null;

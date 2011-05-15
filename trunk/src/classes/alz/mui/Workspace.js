@@ -3,6 +3,9 @@ _package("alz.mui");
 _import("alz.mui.Container");
 _import("alz.mui.ModalPanel");
 
+/**
+ * å·¥ä½œåŒºç»„ä»¶
+ */
 _class("Workspace", Container, function(){
 	this._init = function(){
 		_super._init.call(this);
@@ -12,10 +15,16 @@ _class("Workspace", Container, function(){
 		this._fixed = null;
 		this._testFixDiv = null;
 		this._modalPanel = null;
-		this._popup = null;
 		this._captureComponent = null;
 		this._tipMouse = null;
+		this._activePopup = null;
 		this._activeDialog = null;
+	};
+	this.create = function(parent){
+		this.setParent2(parent);
+		var obj = this._createElement2(parent, "div", "wui-Workspace wui-PaneApp");
+		this.init(obj);
+		return obj;
 	};
 	this.__init = function(obj, domBuildType){
 		_super.__init.apply(this, arguments);
@@ -51,8 +60,8 @@ _class("Workspace", Container, function(){
 	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
-		//ÔÚÕâÀï°ó¶¨¹¤×÷ÇøËùÓĞ¿ÉÄÜÓÃµ½µÄÊÂ¼ş
-		//¡­¡­
+		//åœ¨è¿™é‡Œç»‘å®šå·¥ä½œåŒºæ‰€æœ‰å¯èƒ½ç”¨åˆ°çš„äº‹ä»¶
+		//â€¦â€¦
 		/*
 		runtime.addEventListener(this._self, "resize", function(ev){
 			window.alert();
@@ -62,12 +71,12 @@ _class("Workspace", Container, function(){
 	this.dispose = function(){
 		if(this._disposed) return;
 		this._activeDialog = null;
+		this._activePopup = null;
 		this._tipMouse = null;
 		this._captureComponent = null;
-		this._popup = null;
 		if(this._modalPanel){
 			this._modalPanel.dispose();
-			this._modalPanel = null;  //Ä£Ì¬¶Ô»°¿òÓÃµÄÄ£Ì¬Ãæ°å
+			this._modalPanel = null;  //æ¨¡æ€å¯¹è¯æ¡†ç”¨çš„æ¨¡æ€é¢æ¿
 		}
 		this._testFixDiv = null;
 		//this._self.onselectstart = null;
@@ -78,45 +87,38 @@ _class("Workspace", Container, function(){
 	};
 	this.setStyleProperty = function(name, value){
 		if(this._self.tagName == "BODY" && (name == "width" || name == "height")){
-			return;  //ºöÂÔ¶Ô style ÊôĞÔ width,height µÄÉèÖÃ
+			return;  //å¿½ç•¥å¯¹ style å±æ€§ width,height çš„è®¾ç½®
 		}
 		_super.setStyleProperty.apply(this, arguments);
 	};
 	this.resize = function(w, h){
+		if(!this._inited) return;  //[TODO]
 		_super.resize.call(this, w, h);
 		if(this._modalPanel && this._modalPanel.getVisible()){
-			this._modalPanel.resize(w, h);  //µ÷ÕûÄ£Ì¬Ãæ°åµÄ´óĞ¡
+			this._modalPanel.resize(w, h);  //è°ƒæ•´æ¨¡æ€é¢æ¿çš„å¤§å°
 		}
 	};
 	this.getModalPanel = function(){
 		return this._modalPanel;
 	};
-	this.setPopup = function(v, pos){
-		try{
+	this.setActiveDialog = function(v){
+		this._activeDialog = v;
+	};
+	this.setActivePopup = function(v){
+		if(this._activePopup === v) return;
+		if(this._activePopup){
+			//[TODO]è¿˜åŸè’™æ¿
+			this._activePopup.setVisible(false);
+			//this._activePopup.setZIndex(1);
+		}
 		if(v){
-			if(this._popup){
-				this._popup.setVisible(false);
-				//this._popup.setZIndex(1);
-				this._popup = null;
-			}
-			this._popup = v;
-			this._popup.setZIndex(10);
-			this._popup.setVisible(true);
-			this._popup.moveTo(pos.x, pos.y);
-		}else{  //»¹Ô­ÃÉ°å
-			this._popup.setVisible(false);
-			//this._popup.setZIndex(1);
-			this._popup = null;
+			v.setZIndex(10);
+			v.setVisible(true);
 		}
-		}catch(ex){
-			this._win._alert(ex.description);
-		}
+		this._activePopup = v;
 	};
 	this.setCaptureComponent = function(v){
 		this._captureComponent = v;
-	};
-	this.setActiveDialog = function(v){
-		this._activeDialog = v;
 	};
 	this.eventHandle = function(ev){
 		var ret;
@@ -146,11 +148,11 @@ _class("Workspace", Container, function(){
 		return ret;
 	};
 	this.onMouseDown = function(ev){
-		if(this._popup){
-			switch(this._popup._className){
+		if(this._activePopup){
+			switch(this._activePopup._className){
 			case "Popup":
-				if(this._popup.getVisible()){
-					this.setPopup(null);
+				if(this._activePopup.getVisible()){
+					this.setActivePopup(null);
 				}
 				break;
 			case "Dialog":
@@ -162,8 +164,8 @@ _class("Workspace", Container, function(){
 	this.onMouseUp = function(ev){
 	};
 	/**
-	 * Æ«ÒÆÁ¿µÄĞŞÕıÒÀÀµÓÚ getPos ·½·¨µÄÕıÈ·ĞÔ£¬Èç¹û±¾Éí¼ÆËã¾Í²»ÕıÈ·£¬ĞŞÕı½á¹ûÒ²½«²»¶Ô
-	 * [TODO]ÔÚµÚÒ»´ÎonMouseMoveÊÂ¼şÖĞÖ´ĞĞĞŞÕıÆ«ÒÆÁ¿µÄ¼ÆËã
+	 * åç§»é‡çš„ä¿®æ­£ä¾èµ–äº getPos æ–¹æ³•çš„æ­£ç¡®æ€§ï¼Œå¦‚æœæœ¬èº«è®¡ç®—å°±ä¸æ­£ç¡®ï¼Œä¿®æ­£ç»“æœä¹Ÿå°†ä¸å¯¹
+	 * [TODO]åœ¨ç¬¬ä¸€æ¬¡onMouseMoveäº‹ä»¶ä¸­æ‰§è¡Œä¿®æ­£åç§»é‡çš„è®¡ç®—
 	 */
 	/*
 	this._mousemoveForFixed = function(ev){
@@ -188,7 +190,7 @@ _class("Workspace", Container, function(){
 			this._fixedY = pos.y + ev.offsetY - this._fixedOff.y;
 			//window.alert("&&&&" + this._fixedX + "," + this._fixedY);
 			this._fixed = "fixed";
-			this.onMouseMove = this._mousemoveForNormal;  //×ª»»³ÉÕı³£µÄÊÂ¼ş
+			this.onMouseMove = this._mousemoveForNormal;  //è½¬æ¢æˆæ­£å¸¸çš„äº‹ä»¶
 		}else{  //fixed
 			ev.cancelBubble = true;
 		}
@@ -225,12 +227,12 @@ _class("Workspace", Container, function(){
 		obj = null;
 	};
 	this._mousemoveForNormal = function(ev){
-		if(runtime._debug){  //Èç¹ûµ÷ÊÔ×´Ì¬µÄ»°£¬¸üĞÂ MouseEvent µÄĞÅÏ¢
+		if(runtime._debug){  //å¦‚æœè°ƒè¯•çŠ¶æ€çš„è¯ï¼Œæ›´æ–° MouseEvent çš„ä¿¡æ¯
 			if(!this._tipMouse){
-				this._tipMouse = this._createElement2(this._self, !runtime.ns ? "div" : "textarea", "", {  //NS ÓĞĞÔÄÜÎÊÌâ£¬¸ÄÓÃ textarea
+				this._tipMouse = this._createElement2(this._self, !runtime.ns ? "div" : "textarea", "", {  //NS æœ‰æ€§èƒ½é—®é¢˜ï¼Œæ”¹ç”¨ textarea
 					"position"       : "absolute",
 					"border"         : "1px solid #AAAAAA",
-					"font"           : "12px ËÎÌå",
+					"font"           : "12px å®‹ä½“",
 					"zIndex"         : "1000"/*,
 					"backgroundColor": "buttonface",
 					"filter"         : "Alpha(Opacity=90)"*/

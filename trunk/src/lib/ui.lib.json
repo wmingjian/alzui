@@ -1,0 +1,63 @@
+{
+	name:"ui",
+	title:"UI基础库",
+	libs:"core",
+	app:"",
+	/*
+	var _tmpl = {
+		"dialog": "<div html=\"true\" aui=\"{align:'top',height:18;}\" style=\"width:100%;height:18px;background-color:activecaption;border:0px;padding:0px;\">"
+			+ "<label style=\"position:absolute;height:14px;background-color:gray;left:4px;top:4px;font:bold 12px 宋体;line-height:100%;color:white;text-align:left;cursor:default;padding-top:2px;\">{$caption}</label>"
+			+ "<img style=\"position:absolute;width:16px;height:14px;top:4px;right:4px;vertical-align:middle;background-color:buttonface;\" src=\"{$pathAui}lib/src/AWindow_closeup.gif\" />"
+			+ "</div>"
+			+ "<div id=\"dlgBody\" aui=\"{align:'client'}\" style=\"position:absolute;top:21px;width:100%;height:300px;background-color:#666666;border:0px;padding:0px;\"></div>"
+	};
+	*/
+	tpl:[
+		"dialog.tpl"
+	],
+	classes:[
+		"alz.mui.ToggleGroup",
+		"alz.mui.ToggleManager",
+		"alz.mui.SelectionManager",
+		"alz.mui.Component",
+		"alz.action.ActionElement",
+		"alz.action.BitButton",
+		"alz.action.ComboBox_1",
+		"alz.action.LinkLabel",
+		"alz.action.TextField",
+		"alz.action.Button",
+		"alz.action.CheckBox",
+		"alz.action.ComboBox",
+		"alz.action.Select",
+		"alz.action.FormElement",
+		"alz.mui.ListItem",
+		"alz.mui.ListBox",
+		"alz.mui.DataRow",
+		"alz.mui.DataTable",
+		"alz.mui.TextHistory",
+		"alz.mui.TextItem",
+		"alz.mui.LineEdit",
+		"alz.mui.Console",
+		"alz.mui.Iframe",
+		"alz.mui.BitButton",
+		"alz.mui.ToggleButton",
+		"alz.mui.ToolBar",
+		"alz.mui.ModalPanel",
+		"alz.mui.Container",
+		"alz.mui.Panel",
+		"alz.mui.Pane",
+		"alz.mui.Workspace",
+		"alz.mui.DropDown",
+		"alz.mui.Popup",
+		"alz.mui.Menu",
+		"alz.mui.TableView",
+		"alz.mui.Dialog",
+		"alz.mui.TabPage",
+		"alz.mui.WindowSkinWINXP",
+		"alz.mui.WindowSkinWIN2K",
+		"alz.mui.SysBtn",
+		"alz.mui.Window",
+		"alz.mui.ToolWin",
+		"alz.core.WebRuntime_ui"
+	]
+}

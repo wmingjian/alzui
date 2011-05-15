@@ -1,14 +1,18 @@
 _package("alz.core");
 
-_class("LibManager", "", function(){
+_import("alz.core.ManagerBase");
+
+_class("LibManager", ManagerBase, function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._hash = {};
 		this._libs = [];
-		this._libExt = ".lib.js";  //¿âÎÄ¼şÄ¬ÈÏµÄºó×ºÃû
+		this._libExt = ".lib.js";  //åº“æ–‡ä»¶é»˜è®¤çš„åç¼€å
 	};
+	//this.create = function(context){_super.create.apply(this, arguments);};
 	this.dispose = function(){
-		//Ğ¶ÔØ¿âÄ£¿é
+		if(this._disposed) return;
+		//å¸è½½åº“æ¨¡å—
 		/*
 		var arr = this._config["lib"].replace(/#/g, "").split(",");
 		for(var i = 0, len = arr.length; i < len; i++){
@@ -42,7 +46,7 @@ _class("LibManager", "", function(){
 			"init": function(){},
 			"dispose": function(){}
 		};
-		if(typeof lib == "function"){  //»ù´¡¿âcore.lib,ui.libÒÑ¾­¸ÄÔìÎªfunction¶ÔÏó
+		if(typeof lib == "function"){  //åŸºç¡€åº“core.lib,ui.libå·²ç»æ”¹é€ ä¸ºfunctionå¯¹è±¡
 			library.init = lib;
 		}else if(typeof lib == "object"){
 			if(typeof lib.init == "function"){
@@ -57,7 +61,7 @@ _class("LibManager", "", function(){
 		library = null;
 	};
 	/**
-	 * Ö´ĞĞºÍ³õÊ¼»¯ÎÄ¼şÒ»Æğ¼ÓÔØ²¢ÇÒÉĞÎ´³õÊ¼»¯µÄ¿â´úÂë
+	 * æ‰§è¡Œå’Œåˆå§‹åŒ–æ–‡ä»¶ä¸€èµ·åŠ è½½å¹¶ä¸”å°šæœªåˆå§‹åŒ–çš„åº“ä»£ç 
 	 */
 	this.initLoadLib = function(){
 		for(var i = 0, len = this._libs.length; i < len; i++){

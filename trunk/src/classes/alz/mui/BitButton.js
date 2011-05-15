@@ -3,7 +3,7 @@ _package("alz.mui");
 _import("alz.mui.Component");
 
 /**
- * 带图标的按钮组件
+ * 甯﹀浘鏍囩殑鎸夐挳缁勪欢
  */
 _class("BitButton", Component, function(){
 	this._init = function(){
@@ -69,14 +69,9 @@ _class("BitButton", Component, function(){
 	this.setDisabled = function(v){
 		_super.setDisabled.apply(this, arguments);
 		this.setEnableEvent(!v);
-		if(!this._disabled){
-			if(v){
-				this._self.style.filter = "gray";
-				this._label.disabled = true;
-			}else{
-				this._self.style.filter = "";
-				this._label.disabled = false;
-			}
+		if(this._self){
+			this._self.style.filter = v ? "gray" : "";
+			this._label.disabled = v;
 		}
 	};
 });

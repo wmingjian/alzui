@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template name="dlg_debug.tpl" type="html">
+	<div id="dlg_debug" _align="none" aui="Component" style="position:absolute;display:none;right:0px;top:0px;width:640px;height:480px;background-color:#FFFFFF;border:2px solid gray;padding:2px;z-index:100;">
+		<h1 style="height:22px;font:bold 12px 宋体;line-height:22px;background-color:#DDDDDD;">调试对话框</h1>
+		<div>
+			<div style="border:1px solid gray;height:320px;overflow:auto;">
+				<div id="panel2" style="float:left;width:120px;height:100%;background-color:#EEEEEE;font:12px 宋体;"></div>
+				<div id="panel1" style="margin-left:120px;height:100%;overflow:auto;font:12px 宋体;"></div>
+			</div>
+			<input id="debug_btn1" type="button" value="执行" />
+			<textarea id="debug_code1" wrap="off" style="position:absolute;left:1px;bottom:0px;width:635px;height:100px;font:12px 宋体;"></textarea>
+		</div>
+	</div>
+</template>

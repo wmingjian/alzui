@@ -2,6 +2,9 @@ _package("alz.mui");
 
 _import("alz.mui.Component");
 
+/**
+ * å¯¹è¯æ¡†ç»„ä»¶
+ */
 _class("Dialog", Component, function(){
 	this._init = function(){
 		_super._init.call(this);
@@ -36,14 +39,14 @@ _class("Dialog", Component, function(){
 			+ "</div>"
 			+ "<div class=\"body\" aui=\"{align:'client'}\"></div>";
 		str = str.replace(/\{\$caption\}/g, this._caption);
-		str = str.replace(/\{\$pathAui\}/g, runtime.pathAui);
+		str = str.replace(/\{\$pathAui\}/g, runtime._pathAui);
 		this._self.innerHTML = str;
 		this.bind(obj);
 		//this.setOpacity(0.7);
 	};
 	this.bind = function(obj){
 		_super.bind.apply(this, arguments);
-		//this.fixedOffset();  //¼ÆËã×ø±êĞŞÕıµÄÆ«ÒÆÁ¿
+		//this.fixedOffset();  //è®¡ç®—åæ ‡ä¿®æ­£çš„åç§»é‡
 		var nodes = this._dom.selectNodes(this._self, "*");
 		this._skin = nodes[0];
 		this._head = nodes[1];
@@ -59,24 +62,24 @@ _class("Dialog", Component, function(){
 			this._btnClose.ondragstart = function(ev){return false;};
 			this._btnClose.onmousedown = function(ev){
 				ev = ev || this._dlg._win.event;
-				//this.src = runtime.pathAui + "lib/images/AWindow_closedown.gif";
+				//this.src = runtime._pathAui + "lib/images/AWindow_closedown.gif";
 				this.style.backgroundPosition = "-48px -14px";
 				if(runtime.ie) this.setCapture();
 				this.onMouseMove = function(ev){
 					ev = ev || this._dlg._win.event;
 					var target = ev.srcElement || ev.target;
 					if(target == this){
-						//this.src = runtime.pathAui + "lib/images/AWindow_closedown.gif";
+						//this.src = runtime._pathAui + "lib/images/AWindow_closedown.gif";
 						this.style.backgroundPosition = "-48px -14px";
 					}else{
-						//this.src = runtime.pathAui + "lib/images/AWindow_closeup.gif";
+						//this.src = runtime._pathAui + "lib/images/AWindow_closeup.gif";
 						this.style.backgroundPosition = "-48px 0px";
 					}
 				};
 				this.onMouseUp = function(ev){
 					ev = ev || this._dlg._win.event;
 					var target = ev.srcElement || ev.target;
-					//this.src = runtime.pathAui + "lib/images/AWindow_closeup.gif";
+					//this.src = runtime._pathAui + "lib/images/AWindow_closeup.gif";
 					this.style.backgroundPosition = "-48px 0px";
 					this.onMouseMove = null;
 					this.onMouseUp = null;
@@ -84,7 +87,7 @@ _class("Dialog", Component, function(){
 						this.releaseCapture();
 					}
 					if(target == this){
-						this._dlg.close();  //¹Ø±Õ¶Ô»°¿ò
+						this._dlg.close();  //å…³é—­å¯¹è¯æ¡†
 					}
 				};
 				ev.cancelBubble = true;
@@ -173,7 +176,7 @@ _class("Dialog", Component, function(){
 		obj.style.height = h + "px";
 	};
 	/**
-	 * [TODO]TT²î³öÀ´µÄÕâÁ½ÏñËØ¿ÉÄÜÊÇÓÉÓÚ BODY µÄÄ¬ÈÏ±ß¿ò¿í¶È¼ÆËã²»×¼È·µ¼ÖÂµÄ
+	 * [TODO]TTå·®å‡ºæ¥çš„è¿™ä¸¤åƒç´ å¯èƒ½æ˜¯ç”±äº BODY çš„é»˜è®¤è¾¹æ¡†å®½åº¦è®¡ç®—ä¸å‡†ç¡®å¯¼è‡´çš„
 	 */
 	/*
 	this.fixedOffset = function(){
@@ -217,13 +220,13 @@ _class("Dialog", Component, function(){
 		//var pos = this._dom.getPos(ev.srcElement, this._self);
 		//window.document.title = pos.x + "+" + ev.offsetX + "=" + (pos.x + ev.offsetX) + "#" + ev.clientX
 		//								+ "|" + pos.y + "+" + ev.offsetY + "=" + (pos.y + ev.offsetY) + "#" + ev.clientY;
-		this._offsetX = ev.offsetX;  //ns ä¯ÀÀÆ÷µÄÎÊÌâ
+		this._offsetX = ev.offsetX;  //ns æµè§ˆå™¨çš„é—®é¢˜
 		this._offsetY = ev.offsetY;
 		if(runtime._workspace._fixed != "fixed"){
 			if(runtime._workspace._mousemoveForFixed){
 				runtime._workspace._mousemoveForFixed(this, ev);
 			}
-			/* Ö±½ÓÊ¹ÓÃÄ¬ÈÏÖµ£¬¿ÉÒÔÊ¡È¥×Ô¶¯ĞŞÕı¹ı³Ì£¬µ«ÊÇ²»ÄÜ±£Ö¤Ò»¶¨ÊÇÍ¨ÓÃµÄ
+			/* ç›´æ¥ä½¿ç”¨é»˜è®¤å€¼ï¼Œå¯ä»¥çœå»è‡ªåŠ¨ä¿®æ­£è¿‡ç¨‹ï¼Œä½†æ˜¯ä¸èƒ½ä¿è¯ä¸€å®šæ˜¯é€šç”¨çš„
 			if(runtime.ie || runtime.safari){
 				runtime._workspace._fixedX = 0;
 				runtime._workspace._fixedY = 0;

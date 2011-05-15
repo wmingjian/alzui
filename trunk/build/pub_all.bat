@@ -1,0 +1,1 @@
+@php build.php all %1

@@ -1,5 +1,12 @@
 _package("alz.core");
 
+/**
+ * @class DOMUtil
+ * @extends alz.lang.AObject
+ * @desc 关于DOM操作的一些工具方法的集合
+ * @example
+var _dom = new DOMUtil();
+ */
 _class("DOMUtil", "", function(){
 	this._init = function(){
 		_super._init.call(this);
@@ -8,11 +15,15 @@ _class("DOMUtil", "", function(){
 		this._domTemp = null;
 		this._css = null;
 	};
+	/**
+	 * @method dispose
+	 * @desc 析构方法
+	 */
 	this.dispose = function(){
 		if(this._disposed) return;
 		this._css = null;
 		this._domTemp = null;
-		//�������DOMԪ�غͽű�����İ󶨹�ϵ
+		//解除所有DOM元素和脚本对象的绑定关系
 		for(var i = 0, len = this._nodes.length; i < len; i++){
 			this._nodes[i].dispose();
 			this._nodes[i] = null;
@@ -36,7 +47,7 @@ _class("DOMUtil", "", function(){
 		if(parent){
 			parent.appendChild(obj);
 			/*
-			//�ͺ����ͼƬ
+			//滞后加载图片
 			var imgs = obj.getElementsByTagName("img");
 			for(var i = 0, len = imgs.length; i < len; i++){
 				imgs[i].src = imgs[i].getAttribute("src0");
@@ -47,9 +58,13 @@ _class("DOMUtil", "", function(){
 		return obj;
 	};
 	/**
-	 * ���� el ����� refElement ��λ�ã�һ��Ҫ��֤ refElement ���� el
-	 * [TODO]��μ�����Զ�λ��Ԫ�أ�������ⲿ��λ��
+	 * @method getPos
+	 * @param {Element} el DOM元素
+	 * @param {Element} refElement el的容器元素
+	 * @desc 计算 el 相对于 refElement 的位置，一定要保证 refElement 包含 el
+	 * [TODO]如何计算绝对定位的元素？相对于外部的位置
 	 */
+	/*
 	this.getPos = function(el, refElement){
 		try{
 		var pos = {x: 0, y: 0};
@@ -67,12 +82,12 @@ _class("DOMUtil", "", function(){
 				y += isNaN(b) ? 0 : b;
 				//s += ",borderLeftWidth=" + a + ",borderTopWidth=" + b;
 			}
-			/*
+			/ *
 			if(o != el && runtime.getBoxModel() == 0){
 				x += this.parseNum(o.tagName, style.paddingLeft);
 				y += this.parseNum(o.tagName, style.paddingTop);
 			}
-			*/
+			* /
 			if(o != refElement){
 				pos.x += o.offsetLeft + (o != el ? x : 0);
 				pos.y += o.offsetTop + (o != el ? y : 0);
@@ -99,11 +114,49 @@ _class("DOMUtil", "", function(){
 		}
 		return pos;
 	};
+	*/
+	this.getPos = function(el, refElement){
+		try{
+		var pos = {x: 0, y: 0};
+		for(var o = el; o; o = o.offsetParent){
+			var s = "tagName=" + o.tagName + ",className=" + o.className;
+			var x = 0, y = 0, a, b;
+			if(o != el && o != refElement){
+				var border = this.getBorder(o);
+				a = border.left;
+				b = border.top;
+				x += a;
+				y += b;
+			}
+			if(o != refElement){
+				pos.x += o.offsetLeft + (o != el ? x : 0);
+				pos.y += o.offsetTop + (o != el ? y : 0);
+			}else{
+				var border = this.getBorder(o);
+				a = border.left;
+				b = border.top;
+				pos.x += a;
+				pos.y += b;
+				break;
+			}
+			if(o.tagName == "BODY" || o.tagName == "HTML") break;
+		}
+		}catch(ex){
+			window.alert(ex.message);
+		}
+		return pos;
+	};
+	/**
+	 * @method getPos1
+	 * @param {Event} ev 事件对象
+	 * @param {Number} type 事件类型
+	 * @param {Element} refElement 事件target的父容器
+	 * @return {Object}
+	 * @desc 相对于refElement容器，计算事件发生的坐标位置
+	 */
 	this.getPos1 = function(ev, type, refElement){
 		var pos = type == 1 ? (
-			runtime._host.env == "ie"
-			? {"x": ev.offsetX, "y": ev.offsetY}
-			: {"x": ev.layerX, "y": ev.layerY}
+			runtime.ie ? {"x": ev.offsetX, "y": ev.offsetY} : {"x": ev.layerX, "y": ev.layerY}
 		) : {"x": 0, "y": 0};
 		refElement = refElement || runtime.getDocument().body;
 		var obj = ev.srcElement || ev.target;
@@ -115,9 +168,14 @@ _class("DOMUtil", "", function(){
 		return pos;
 	};
 	/**
-	 * ͳһ IE �� Moz ϵ��������Ĳ���
+	 * 统一 IE 和 Moz 系列浏览器的差异
+	 * @method parseNum
+	 * @param {String} v
+	 * @return {Number}
+	 * @desc 把 v 转换成十进制表示的数字
 	 */
-	this.parseNum = function(tag, v){
+	this.parseNum = function(/*tag, */v){
+		/*
 		switch(v){
 		case "medium":
 			return tag == "DIV" ? 0 : 2;
@@ -129,15 +187,24 @@ _class("DOMUtil", "", function(){
 			var a = parseInt(v);
 			return isNaN(a) ? 0 : a;
 		}
+		*/
+		var a = parseInt(v, 10);
+		return isNaN(a) ? 0 : a;
 	};
 	/**
-	 * ͳһ IE �� Moz ϵ��������Ĳ���
+	 * 统一 IE 和 Moz 系列浏览器的差异
 	 */
 	this.getPropertyValue = function(style, name){
 		//return runtime.ie ? style[name] : style.getPropertyValue(name);
-		//return runtime._host.env == "ie" ? style[name] : (style.getPropertyValue(name) || style.getPropertyCSSValue(name));
+		//return runtime.ie ? style[name] : (style.getPropertyValue(name) || style.getPropertyCSSValue(name));
 		return style[name];
 	};
+	/**
+	 * @method getStyle
+	 * @param {Element} el
+	 * @return {Object}
+	 * @desc 获取 el 元素的所有样式
+	 */
 	this.getStyle = function(el){
 		var style, view = runtime.getDocument().defaultView;
 		if(view && view.getComputedStyle){
@@ -145,14 +212,79 @@ _class("DOMUtil", "", function(){
 		}else if(el.currentStyle){
 			style = el.currentStyle;
 		}else{
-			throw "�޷���̬��ȡDOM��ʵ����ʽ����";
+			throw "无法动态获取DOM的实际样式属性";
 		}
 		return style;
 	};
+	/**
+	 * @method getWH
+	 * @param {Element} el DOM元素
+	 * @return {Object}
+	 * @desc 获取 el 的宽高
+	 */
+	this.getWH = function(el){
+		var style = this.getStyle(el),
+			width = this.parseNum(style["width"]),
+			height = this.parseNum(style["height"]);
+		return {
+			w: width,
+			h: height
+		};
+	};
+	/**
+	 * @method getPadding
+	 * @param {Element} el DOM元素
+	 * @desc 获取 el 的四个padding值
+	 */
+	this.getPadding = function(el){
+		var style = this.getStyle(el),
+			top = this.parseNum(style["paddingTop"]),
+			right = this.parseNum(style["paddingRight"]),
+			bottom = this.parseNum(style["paddingBottom"]),
+			left = this.parseNum(style["paddingLeft"]);
+		return {
+			top: top,
+			right: right,
+			bottom: bottom,
+			left: left
+		};
+	};
+	/**
+	 * @method getBorder
+	 * @param {Element} el DOM元素
+	 * @desc 获取 el 的四个border值
+	 */
+	this.getBorder = function(el){
+		var style = this.getStyle(el),
+			top = this.parseNum(style["borderTopWidth"]),
+			right = this.parseNum(style["borderRightWidth"]),
+			bottom = this.parseNum(style["borderBottomWidth"]),
+			left = this.parseNum(style["borderLeftWidth"]);
+		return {
+			top: top,
+			right: right,
+			bottom: bottom,
+			left: left
+		};
+	};
+	/**
+	 * @method getStyleProperty
+	 * @param {Element} el DOM元素
+	 * @param {String} name 样式名称
+	 * @return {Number}
+	 * @desc  获取 el 元素的 name 样式值
+	 */
 	this.getStyleProperty = function(el, name){
 		var style = this.getStyle(el);
 		return this.parseNum(el.tagName, this.getPropertyValue(style, name) || el.style[name]);
 	};
+	/**
+	 * @method setStyleProperty
+	 * @param {Element} el DOM元素
+	 * @param {Strinng} name 样式名称
+	 * @param {Object} value 样式值
+	 * @desc  设置 el 元素的 name 样式值为 value
+	 */
 	this.setStyleProperty = function(el, name, value){
 		el.style[name] = value;
 	};
@@ -179,12 +311,18 @@ _class("DOMUtil", "", function(){
 			window.alert(ex.message);
 		}
 	};
+	/**
+	 * @method getObj
+	 * @param {Element} el DOM元素
+	 * @return {alz.mui.Component}
+	 * @desc 获取绑定了 el 的Component实例
+	 */
 	this.getObj = function(el){
 		var clazz = __context__.__classes__["alz.mui.Component"];
 		var component = new clazz();
 		component._domCreate = true;
-		this._components.push(component);  //ע�� component
-		component.bind(el);  //�� DOM Ԫ��
+		this._components.push(component);  //注册 component
+		component.bind(el);  //绑定 DOM 元素
 		return component;
 	};
 	this.getObj = function(el){
@@ -199,10 +337,19 @@ _class("DOMUtil", "", function(){
 		}
 		return obj;
 	};
+	/**
+	 * @method getObj1
+	 * @param {Element} el DOM元素
+	 * @return {BoxElement}
+	 * @desc 获取绑定了 el 的BoxElement实例
+	 */
 	this.getObj1 = function(el){
 		var obj;
-		if(!("__ptr__" in el)){
-			//obj = new BoxElement(el, this);
+		if("__ptr__" in el && el.__ptr__){
+			obj = el.__ptr__;
+		}else{
+			obj = new BoxElement(el, this);
+			/*
 			obj = {
 				_self: el,
 				dispose: function(){
@@ -211,9 +358,8 @@ _class("DOMUtil", "", function(){
 				}
 			};
 			el.__ptr__ = obj;
+			*/
 			this._nodes.push(obj);
-		}else{
-			obj = el.__ptr__;
 		}
 		return obj;
 	};
@@ -235,6 +381,12 @@ _class("DOMUtil", "", function(){
 		v = Math.max(0, v);
 		this.setStyleProperty(el, "height", v + "px");
 	};
+	/**
+	 * @method getWidth
+	 * @param {Element} el DOM元素
+	 * @return {Number}
+	 * @desc   获得 el 的可见宽度
+	 */
 	this.getWidth = function(el){
 		var obj = this.getObj1(el);
 		//if(!("_width" in obj)){
@@ -249,6 +401,12 @@ _class("DOMUtil", "", function(){
 		return obj._width;
 		//obj = null;
 	};
+	/**
+	 * @method getHeight
+	 * @param  {Element} el DOM元素
+	 * @return {Number}
+	 * @desc   获得 el 的可见高度
+	 */
 	this.getHeight = function(el){
 		var obj = this.getObj1(el);
 		//if(!("_height" in obj)){
@@ -263,6 +421,12 @@ _class("DOMUtil", "", function(){
 		return obj._height;
 		//obj = null;
 	};
+	/**
+	 * @method setWidth
+	 * @param {Element} el DOM元素
+	 * @param {Number} v 宽度值[可选]
+	 * @desc 设置 el 的 width 样式值
+	 */
 	this.setWidth = function(el, v){
 		var obj = this.getObj1(el);
 		if(!("_width" in obj)) obj._width = 0;
@@ -275,6 +439,12 @@ _class("DOMUtil", "", function(){
 		//}
 		obj = null;
 	};
+	/**
+	 * @method setHeight
+	 * @param {Element} el DOM元素
+	 * @param {Number} v 高度值[可选]
+	 * @desc 设置 el 的 height 样式值
+	 */
 	this.setHeight = function(el, v){
 		var obj = this.getObj1(el);
 		if(!("_height" in obj)) obj._height = 0;
@@ -286,6 +456,13 @@ _class("DOMUtil", "", function(){
 		}
 		obj = null;
 	};
+	/**
+	 * @method getInnerWidth
+	 * @param  {Element} el DOM元素
+	 * @param  {Number} v 宽度值[可选]
+	 * @return {Number}
+	 * @desc   获取 el 元素的 width 样式值
+	 */
 	this.getInnerWidth = function(el, v){
 		var obj = this.getObj1(el);
 		if(!v) v = obj._width;
@@ -295,6 +472,13 @@ _class("DOMUtil", "", function(){
 		if(isNaN(innerWidth)) runtime.log("DomUtil::getInnerWidth isNaN(innerWidth)");
 		return innerWidth;
 	};
+	/**
+	 * @method getInnerHeight
+	 * @param  {Element} el DOM元素
+	 * @param  {Number} v 高度值[可选]
+	 * @return {Number}
+	 * @desc   获取 el 元素的 height 样式值
+	 */
 	this.getInnerHeight = function(el, v){
 		var obj = this.getObj1(el);
 		if(!v) v = obj._height || el.offsetHeight;
@@ -303,6 +487,13 @@ _class("DOMUtil", "", function(){
 		if(isNaN(innerHeight)) runtime.log("DomUtil::getInnerHeight isNaN(innerHeight)");
 		return innerHeight;
 	};
+	/**
+	 * @method getOuterWidth
+	 * @param  {Element} el DOM元素
+	 * @param  {Number} v 宽度值[可选]
+	 * @return {Number}
+	 * @desc   获取 el 元素的占位宽度，包括 margin
+	 */
 	this.getOuterWidth = function(el, v){
 		var obj = this.getObj1(el);
 		if(!v) v = this.getWidth(el);
@@ -311,6 +502,13 @@ _class("DOMUtil", "", function(){
 		if(isNaN(outerWidth)) window.alert("DomUtil::getOuterWidth isNaN(outerWidth)");
 		return outerWidth;
 	};
+	/**
+	 * @method getOuterHeight
+	 * @param  {Element} el DOM元素
+	 * @param  {Number} v 宽度值[可选]
+	 * @return {Number}
+	 * @desc   获取 el 元素的占位高度，包括 margin
+	 */
 	this.getOuterHeight = function(el, v){
 		var obj = this.getObj1(el);
 		if(!v) v = this.getHeight(el);
@@ -319,6 +517,7 @@ _class("DOMUtil", "", function(){
 		if(isNaN(outerHeight)) window.alert("DomUtil::getOuterHeight isNaN(outerHeight)");
 		return outerHeight;
 	};
+	/*
 	this.getWidth = function(el){
 		if(!el._ptr) this.getObj(el);
 		return el._ptr.getWidth();
@@ -340,26 +539,35 @@ _class("DOMUtil", "", function(){
 	this.getInnerWidth = function(el){
 		if(!el._ptr) this.getObj(el);
 		return el._ptr.getInnerWidth();
-		/*
+		/ *
 		//if(runtime.getBoxModel() == 1){
 			return Math.max(0, el.offsetWidth - this.getStyleProperty(el, "borderLeftWidth") - this.getStyleProperty(el, "paddingLeft") - this.getStyleProperty(el, "paddingRight") - this.getStyleProperty(el, "borderRightWidth"));
 		//}
-		*/
+		* /
 	};
 	this.getInnerHeight = function(el){
 		if(!el._ptr) this.getObj(el);
 		return el._ptr.getInnerHeight();
 	};
+	*/
+	/**
+	 * @method resize
+	 * @param  {Element} el DOM元素
+	 * @param  {Number} w 宽度值
+	 * @param  {Number} h 高度值
+	 * @param  {Boolean} reDoSelf 是否调整自身大小
+	 * @desc   调整大小
+	 */
 	this.resize = function(el, w, h, reDoSelf){
 		if(!el._ptr) this.getObj(el);
-		if(reDoSelf) el._ptr.resize(w, h);  //�Ƿ���������Ĵ�С
+		if(reDoSelf) el._ptr.resize(w, h);  //是否调整自身的大小
 		//if(el.getAttribute("id") != "") window.alert(el.id);
 		var nodes = el.childNodes;
 		//if(el.getAttribute("html") == "true") window.alert("123");
 		if(el.getAttribute("aui") != "" &&
 			!(el.getAttribute("noresize") == "true" ||
 				el.getAttribute("html") == "true") &&
-			nodes.length > 0){  //���� head ��Ԫ��
+			nodes.length > 0){  //忽略 head 内元素
 			var ww = this.getInnerWidth(el);
 			var hh = this.getInnerHeight(el);
 			for(var i = 0, len = nodes.length; i < len; i++){
@@ -375,14 +583,35 @@ _class("DOMUtil", "", function(){
 			}
 		}
 	};
+	/**
+	 * @method resizeElement
+	 * @param  {Element} el DOM元素
+	 * @param  {Number} w 宽度值
+	 * @param  {Number} h 高度值
+	 * @desc   重置 el 宽高
+	 */
 	this.resizeElement = function(el, w, h){
 		el.style.width = Math.max(0, w) + "px";
 		el.style.height = Math.max(0, h) + "px";
 	};
+	/**
+	 * @method moveElement
+	 * @param  {Element} el DOM元素
+	 * @param  {Number} x x坐标
+	 * @param  {Number} y y坐标
+	 * @desc   把 el 移动到(x, y)位置
+	 */
 	this.moveElement = function(el, x, y){
 		el.style.left = Math.max(0, x) + "px";
 		el.style.top = Math.max(0, y) + "px";
 	};
+	/**
+	 * @method moveTo
+	 * @param  {Element} el DOM元素
+	 * @param  {Number} x x坐标
+	 * @param  {Number} y y坐标
+	 * @desc   把 el 移动到x, y)位置
+	 */
 	this.moveTo = function(el, x, y){
 		var obj = this.getObj1(el);
 		if(!("_left" in obj)) obj._left = 0;
@@ -392,10 +621,16 @@ _class("DOMUtil", "", function(){
 		obj._top = y;
 		this.setStyleProperty(el, "top", y + "px");
 	};
+	/**
+	 * @method setOpacity
+	 * @param  {Element} el DOM元素
+	 * @param  {Number} v 不透明度
+	 * @desc   设置 el 的不透明度
+	 */
 	this.setOpacity = function(el, v){
 		var obj = this.getObj1(el);
 		if(!("_opacity" in obj)) obj._opacity = 0;
-		if(obj._opacity != v){
+		if(obj._opacity != v || v === 0){
 			v = Math.max(0, Math.min(1, v));
 			obj._opacity = v;
 			switch(runtime._host.env){
@@ -416,9 +651,21 @@ _class("DOMUtil", "", function(){
 		}
 		obj = null;
 	};
+	/**
+	 * @method selectNodes
+	 * @param  {Element} el DOM元素
+	 * @param  {String} xpath xpath
+	 * @desc   用xpath选取 el 的子节点
+	 */
 	this.selectNodes = function(el, xpath){
 		return runtime.ie ? el.childNodes : el.selectNodes(xpath);
 	};
+	/**
+	 * @method getViewPort
+	 * @param  {Element} el DOM元素
+	 * @return {Object}
+	 * @desc   获取 el 的矩形信息，包括x，y，宽度和高度等。
+	 */
 	this.getViewPort = function(el){
 		/*return {
 			"x": 0,
@@ -439,23 +686,25 @@ _class("DOMUtil", "", function(){
 		return rect;
 	};
 	/**
-	 * @param el Ҫ���¼���DOMԪ��
-	 * @param type �¼����ͣ��������funΪ�¼�����������ò�����������
-	 * @param fun �¼���Ӧ���������¼���������
-	 * @param obj �ص������е�thisָ���������û�иò�����ȱʡΪel
+	 * @method addEventListener
+	 * @param {Element} el 要绑定事件侦听的DOM元素
+	 * @param {String} type 事件类型，如果参数func为事件监听对象，则该参数将被忽略
+	 * @param {Function|Object} func 事件响应函数或事件侦听对象
+	 * @param obj 回调函数中的this指代对象，如果没有该参数，默认为el
+	 * @desc 添加事件侦听器
 	 */
 	//[memleak]DOMUtil.__hash__ = {};
 	//[memleak]DOMUtil.__id__ = 0;
-	this.addEventListener = function(el, type, fun, obj){
+	this.addEventListener = function(el, type, func, obj){
 		//[memleak]el.__hashid__ = "_" + (DOMUtil.__id__++);
-		//[memleak]DOMUtil.__hash__[el.__hashid__] = {el:el,type:type,fun:fun,obj:obj};
-		switch(typeof fun){
+		//[memleak]DOMUtil.__hash__[el.__hashid__] = {el:el,type:type,func:func,obj:obj};
+		switch(typeof func){
 		case "function":
 			el.__callback = (function(cb, obj){
 				return function(ev){
-					return cb.call(obj, ev || window.event);  //��֤�ص������е�this�ǵ�ǰDOM������߶�Ӧ�Ľű����
+					return cb.call(obj, ev || window.event);  //保证回调函数中的this是当前DOM对象或者对应的脚本组件
 				};
-			})(fun, obj || el);
+			})(func, obj || el);
 			if(el.attachEvent){
 				el.attachEvent("on" + type, el.__callback);
 			}else{
@@ -465,10 +714,10 @@ _class("DOMUtil", "", function(){
 		case "object":
 			el.__callback = (function(listener, obj){
 				return function(ev){
-					return listener[ev.type].call(obj, ev || window.event);  //��֤�ص������е�this�ǵ�ǰDOM������߶�Ӧ�Ľű����
+					return listener[ev.type].call(obj, ev || window.event);  //保证回调函数中的this是当前DOM对象或者对应的脚本组件
 				};
-			})(fun, obj || el);
-			for(var k in fun){
+			})(func, obj || el);
+			for(var k in func){
 				if(el.attachEvent){
 					el.attachEvent("on" + k, el.__callback);
 				}else{
@@ -478,10 +727,17 @@ _class("DOMUtil", "", function(){
 			break;
 		}
 	};
-	this.removeEventListener = function(el, type, fun){
+	/**
+	 * @method removeEventListener
+	 * @param {Element} el 要取消事件侦听的DOM元素
+	 * @param {String} type 事件类型，如果参数func为事件监听对象，则该参数将被忽略
+	 * @param {Function|Object} func 事件响应函数或事件侦听对象
+	 * @desc 取消事件侦听
+	 */
+	this.removeEventListener = function(el, type, func){
 		if(!el.__callback) return;
 		//[memleak]delete DOMUtil.__hash__[el.__hashid__];
-		switch(typeof fun){
+		switch(typeof func){
 		case "function":
 			if(el.detachEvent){
 				el.detachEvent("on" + type, el.__callback);
@@ -490,7 +746,7 @@ _class("DOMUtil", "", function(){
 			}
 			break;
 		case "object":
-			for(var k in fun){
+			for(var k in func){
 				if(el.detachEvent){
 					el.detachEvent("on" + k, el.__callback);
 				}else{
@@ -501,6 +757,34 @@ _class("DOMUtil", "", function(){
 		}
 		el.__callback = null;
 	};
+	/**
+	 * @method trigger
+	 * @param {Element} el 要触发事件的目标元素
+	 * @param {String} type 事件类型
+	 * @desc 触发 type 事件
+	 */
+	this.trigger = function(el, type){
+		try{
+			if(el.dispatchEvent){
+				var evt = document.createEvent('Event');
+				evt.initEvent(type, true, true);
+				el.dispatchEvent(evt);
+			}else if(el.fireEvent){
+				el.fireEvent("on" + type);
+			}else{
+				el[ type ]();
+			}
+		}catch(ex){
+			window.alert(ex);
+		}
+	};
+	/**
+	 * @method contains
+	 * @param {Element} el DOM元素
+	 * @param {Element} obj DOM元素
+	 * @return {Boolean}
+	 * @desc el 元素是否包含 obj 元素
+	 */
 	this.contains = function(el, obj){
 		if(el.contains){
 			return el.contains(obj);
@@ -512,6 +796,9 @@ _class("DOMUtil", "", function(){
 			return false;
 		}
 	};
+	/**
+	 * @method parseRule
+	 */
 	this.parseRule = function(hash, arr, style){
 		var key = arr[0];
 		if(key in hash){
@@ -521,7 +808,7 @@ _class("DOMUtil", "", function(){
 				var arr1 = key.split("_");
 				this.parseRule(hash[arr1[0]]["__state"], arr1.slice(1), style);
 			}else{
-				//����css��ʽ
+				//精简css样式
 				var map = {"cssText":1,"length":1,"parentRule":1,"background-image":1};
 				var style0 = {};
 				if(arr.length == 1){
@@ -530,9 +817,8 @@ _class("DOMUtil", "", function(){
 						style0[k] = style[k];
 					}
 				}
-
 				var obj = {};
-				obj["__nodes"] = [];  //ʹ�������ʽ��Ԫ��
+				obj["__nodes"] = [];  //使用这个样式的元素
 				//obj["__selectorText"] = arr.slice(1).join(" ");
 				obj["__style"] = style0;
 				obj["__state"] = {};
@@ -543,25 +829,35 @@ _class("DOMUtil", "", function(){
 			this.parseRule(hash[key], arr.slice(1), style);
 		}
 	};
+	/**
+	 * @method parseCss
+	 */
 	this.parseCss = function(rules){
 		var hash = {};
 		for(var i = 0, len = rules.length; i < len; i++){
-			if(rules[i].type == 2) continue;
-			//rules[i].selectorText + "{" + rules[i].style.cssText + "}"
-			this.parseRule(hash, rules[i].selectorText.split(" "), rules[i].style);
+			var rule = rules[i];
+			if(rule.type == 2) continue;
+			//rule.selectorText + "{" + rule.style.cssText + "}"
+			this.parseRule(hash, rule.selectorText.split(" "), rule.style);
 		}
 		return hash;
 	};
+	/**
+	 * @method cssKeyToJsKey
+	 * @param {String} str CSS样式名称
+	 * @desc 把CSS样式名称转换为JS表示法
+	 */
 	this.cssKeyToJsKey = function(str){
 		return str.replace(/-([a-z])/g, function(_0, _1){
 			return _1.toUpperCase();
 		});
 	};
 	/**
-	 * Ӧ��json��ʽ��css��ʽ����DOMԪ�ص����
-	 * @param {HTMLELement} el Ҫ���Ƶ�DOMԪ��
-	 * @param {JsonCssData} css json��ʽ��CSS����
-	 * @param {String} className ��ʽ����
+	 * @method applyCssStyle
+	 * @param {Element} el 要控制的DOM元素
+	 * @param {JsonCssData} css json格式的CSS数据
+	 * @param {String} className 样式名称(class属性值)
+	 * @desc 应用json格式的css样式控制DOM元素的外观
 	 */
 	this.applyCssStyle = function(el, css, className){
 		var style = css[(el.className == "error" ? "error-" : "") + className];

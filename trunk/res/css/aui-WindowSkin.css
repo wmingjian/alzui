@@ -1,0 +1,65 @@
+/* 窗体皮肤组件 - 主框架阴影 */
+.aui-WindowSkin{position:absolute;overflow:hidden;/*width:100%;height:100%;border-spacing:0;border-collapse:collapse;border:0*/}
+/*.aui-WindowSkin td{position:absolute;overflow:hidden;border:0;padding:0}*/
+.aui-WindowSkin .t{position:absolute;overflow:hidden;height:11px}
+.aui-WindowSkin .m{position:absolute;overflow:hidden}
+.aui-WindowSkin .b{position:absolute;overflow:hidden;height:11px}
+.aui-WindowSkin .t-l{position:absolute;overflow:hidden;width:11px;background:url(../images/win-skin.gif) no-repeat}
+.aui-WindowSkin .t-c{position:absolute;overflow:hidden;background:url(../images/win-skin-h.gif) repeat-x}
+.aui-WindowSkin .t-r{position:absolute;overflow:hidden;width:11px;background:url(../images/win-skin.gif) no-repeat}
+.aui-WindowSkin .m-l{position:absolute;overflow:hidden;width:6px;background:url(../images/win-skin-v.gif) repeat-y}
+.aui-WindowSkin .m-c{position:absolute;overflow:hidden;vertical-align:top;padding:0;margin:0}
+.aui-WindowSkin .m-r{position:absolute;overflow:hidden;width:6px;background:url(../images/win-skin-v.gif) repeat-y}
+.aui-WindowSkin .b-l{position:absolute;overflow:hidden;width:11px;background:url(../images/win-skin.gif) no-repeat}
+.aui-WindowSkin .b-c{position:absolute;overflow:hidden;background:url(../images/win-skin-h.gif) repeat-x}
+.aui-WindowSkin .b-r{position:absolute;overflow:hidden;width:11px;background:url(../images/win-skin.gif) no-repeat}
+.w1 .t-l{background-position:0 0}
+.w1 .t-c{background-position:0 0}
+.w1 .t-r{background-position:-22px 0}
+.w1 .m-l{background-position:0 0}
+.w1 .m-c{background-color:#F5F5F5}
+.w1 .m-r{background-position:-16px 0}
+.w1 .b-l{background-position:0 -22px}
+.w1 .b-c{background-position:0px -11px}
+.w1 .b-r{background-position:-22px -22px}
+
+.w2 .t-l{background-position:-33px 0}
+.w2 .t-c{background-position:0 -22px}
+.w2 .t-r{background-position:-55px 0}
+.w2 .m-l{background-position:0 0}
+.w2 .m-c{background-color:#FFFFFF}
+.w2 .m-r{background-position:-16px 0}
+.w2 .b-l{background-position:-33px -22px}
+.w2 .b-c{background-position:0px -33px}
+.w2 .b-r{background-position:-55px -22px}
+
+.w3 .t-l{background-position:-66px 0}
+.w3 .t-c{background-position:0 -44px}
+.w3 .t-r{background-position:-88px 0}
+.w3 .m-l{background-position:0 0}
+.w3 .m-c{background-color:#FFFFFF}
+.w3 .m-r{background-position:-16px 0}
+.w3 .b-l{background-position:-66px -22px}
+.w3 .b-c{background-position:0px -55px}
+.w3 .b-r{background-position:-88px -22px}
+
+/*
+<div _align="client" _layout="BorderLayout" class="aui-WindowSkin w1">
+	<div _align="top" _layout="BorderLayout" class="t">
+		<div _align="left" class="t-l"></div>
+		<div _align="client" class="t-c"></div>
+		<div _align="right" class="t-r"></div>
+	</div>
+	<div _align="client" _layout="BorderLayout" class="m">
+		<div _align="left" class="m-l"></div>
+		<div _align="right" class="m-r"></div>
+		<div _align="client" _layout="BorderLayout" class="m-c">
+		</div>
+	</div>
+	<div _align="bottom" _layout="BorderLayout" class="b">
+		<div _align="left" class="b-l"></div>
+		<div _align="client" class="b-c"></div>
+		<div _align="right" class="b-r"></div>
+	</div>
+</div>
+*/

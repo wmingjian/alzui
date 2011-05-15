@@ -2,7 +2,7 @@ _package("alz.core");
 
 _import("alz.core.ActionManager");
 
-_extension("Application", function(){  //注册 Application 扩展(action)
+_extension("Application", function(){  //娉ㄥ唽 Application 鎵╁睍(action)
 	this._init = function(){
 		this._actionManager = null;
 	};
@@ -14,7 +14,7 @@ _extension("Application", function(){  //注册 Application 扩展(action)
 		this._actionManager.dispose();
 		this._actionManager = null;
 	};
-	//实现动作接口: {initActionElements:null,doAction:null}
+	//瀹炵幇鍔ㄤ綔鎺ュ彛: {initActionElements:null,doAction:null}
 	this.initActionElements = function(element, owner){
 		element = element || (this._contentPane ? this._contentPane._self : window.document);
 		owner = owner || this;

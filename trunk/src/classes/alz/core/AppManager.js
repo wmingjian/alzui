@@ -3,15 +3,21 @@ _package("alz.core");
 _import("alz.core.LibLoader");
 _import("alz.core.Application");
 
+/**
+ * åº”ç”¨ç®¡ç†è€…ç±»
+ */
 _class("AppManager", "", function(){
 	this._init = function(){
 		_super._init.call(this);
-		this._confList = {};  //APPÅäÖÃÊı¾İ
+		this._confList = {};  //APPé…ç½®æ•°æ®
+		this._activeAppConf = null;  //å½“å‰çš„åº”ç”¨é…ç½®
 		this._hash = {};
 		this._list = [];
 		this._mainApp = null;
 	};
-	//³õÊ¼»¯ËùÓĞÓ¦ÓÃ
+	/**
+	 * åˆå§‹åŒ–æ‰€æœ‰åº”ç”¨
+	 */
 	this.init = function(){
 		for(var i = 0, len = this._list.length; i < len; i++){
 			if(this._list[i].init){
@@ -34,11 +40,17 @@ _class("AppManager", "", function(){
 			//this._hash[k].dispose();
 			delete this._hash[k];
 		}
+		this._activeAppConf = null;
+		for(var k in this._confList){
+			delete this._confList[k];
+		}
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){
 	};
-	//µ÷ÕûËùÓĞÓ¦ÓÃµÄ´óĞ¡
+	/**
+	 * è°ƒæ•´æ‰€æœ‰åº”ç”¨çš„å¤§å°
+	 */
 	this.onResize = function(w, h){
 		for(var i = 0, len = this._list.length; i < len; i++){
 			if(this._list[i].onResize){
@@ -52,49 +64,64 @@ _class("AppManager", "", function(){
 	this.setConfList = function(list){
 		for(var i = 0, len = list.length; i < len; i++){
 			if(list[i].id in this._confList){
-				window.alert("[warning]appid(" + list[i].id + ")ÖØ¸´");
+				window.alert("[warning]appid(" + list[i].id + ")é‡å¤");
 			}
 			list[i].appnum = 0;
 			this._confList[list[i].id] = list[i];
 		}
 	};
 	this.getMainApp = function(){
-		//return this._mainApp;
-		return this._list[0];
+		return this._mainApp;
+		//return this._list[0];
 	};
 	this.setMainApp = function(v){
 		this._mainApp = v;
 	};
 	/**
-	 * ´´½¨²¢×¢²áÒ»¸öÓ¦ÓÃµÄÊµÀı
-	 * @param {String} appClassName Òª´´½¨µÄÓ¦ÓÃµÄÀàÃû
-	 * @param {Application} parentApp ¿ÉÑ¡£¬ËùÊôµÄ¸¸Àà
-	 * @param {Number} len ÔÚÀúÊ·¼ÇÂ¼ÖĞµÄÎ»ÖÃ
+	 * æ³¨å†Œä¸€ä¸ªåº”ç”¨
 	 */
-	this.createApp = function(appClassName, parentApp, len){
+	this.regApp = function(name, conf){
+		if(name in this._confList){
+			runtime.error("[AppManager::regApp]åº”ç”¨é‡åname=" + name + "ï¼Œæ³¨å†Œå¤±è´¥");
+			return;
+		}
+		this._confList[name] = conf;
+		if(conf.active){
+			this._activeAppConf = conf;
+		}
+	};
+	/**
+	 * åˆ›å»ºå¹¶æ³¨å†Œä¸€ä¸ªåº”ç”¨çš„å®ä¾‹
+	 * @param {String} appClassName è¦åˆ›å»ºçš„åº”ç”¨çš„ç±»å
+	 * @param {Application} parentApp å¯é€‰ï¼Œæ‰€å±çš„çˆ¶ç±»
+	 * @param {Number} len åœ¨å†å²è®°å½•ä¸­çš„ä½ç½®
+	 */
+	this.createApp = function(context, appClassName, parentApp, len){
 		var conf = this.getAppConfByClassName(appClassName);
 		if(conf){
 			if(conf.appnum == 1){
-				runtime.getWindow().alert("¼ò»¯°æÖĞÃ¿¸öAppÀàÖ»ÄÜ´´½¨Ò»¸öÊµÀı");
+				runtime.getWindow().alert("ç®€åŒ–ç‰ˆä¸­æ¯ä¸ªAppç±»åªèƒ½åˆ›å»ºä¸€ä¸ªå®ä¾‹");
 				return null;
 			}
 			conf.appnum++;
 		}
-		//ĞèÒª±£Ö¤¶àÓÚÒ»¸ö²ÎÊı£¬×èÖ¹create·½·¨×Ô¶¯Ö´ĞĞ
-		var app = new __classes__[appClassName]();
+		//éœ€è¦ä¿è¯å¤šäºä¸€ä¸ªå‚æ•°ï¼Œé˜»æ­¢createæ–¹æ³•è‡ªåŠ¨æ‰§è¡Œ
+		var clazz = this.getClazzByName(appClassName);
+		var app = new clazz();
+		app.setContext(context);
 		if(arguments.length == 3 && parentApp){
-			app.setParentApp(parentApp);  //ÉèÖÃ¸¸Àà
-			app.setHistoryIndex(len);  //ÉèÖÃËùÔÚÀúÊ·¼ÇÂ¼µÄÎ»ÖÃ
+			app.setParentApp(parentApp);  //è®¾ç½®çˆ¶ç±»
+			app.setHistoryIndex(len);  //è®¾ç½®æ‰€åœ¨å†å²è®°å½•çš„ä½ç½®
 		}else if(app.getMainWindow){
 			var appManager = app.getMainWindow().runtime._appManager;
-			parentApp = appManager._list[0] || null;
+			parentApp = appManager.getMainApp() || null;
 			app.setParentApp(parentApp);
 			//if(parentApp){
-			//	app.setHistoryIndex(parentApp.historyManager.getLength());
+			//	app.setHistoryIndex(parentApp._history.getLength());
 			//}
 			appManager = null;
 		}
-		//×¢²áAPP
+		//æ³¨å†ŒAPP
 		if(conf){
 			this._hash[conf.id] = app;
 		}
@@ -103,57 +130,113 @@ _class("AppManager", "", function(){
 		conf = null;
 		return app;
 	};
+	this.getClazzByName = function(name){
+		for(var k in __classes__){
+			if(k.split(".").pop() == name){
+				return __classes__[k];
+			}
+		}
+		return null;
+	};
 	this.getAppConf = function(appid){
 		return this._confList[appid];
 	};
 	this.getAppConfByClassName = function(className){
 		for(var k in this._confList){
-			if(this._confList[k].className == className){
-				return this._confList[k];
+			var conf = this._confList[k];
+			if(conf.className == className){
+				return conf;
 			}
 		}
 		return null;
 	};
 	this.getAppByClassName = function(className){
 		for(var i = 0, len = this._list.length; i < len; i++){
-			if(this._list[i]._className == className){
-				return this._list[i];
+			var item = this._list[i];
+			if(item._className == className || item._className.indexOf("." + className) != -1){
+				return item;
 			}
 		}
 		return null;
 	};
-	this.loadAppLibs = function(libName, app, agent, fun){
-		var n = app.historyManager.getLength();
-		var libs = this._confList[libName].lib.split(",");
-		var arr = [];
+	this._processFiles = function(conf){
+		var styles = conf.css.split(",");
+		var head = document.getElementsByTagName("head")[0];
+		for(var i = 0, len = styles.length; i < len; i++){
+			var obj = document.createElement("link");
+			obj.type = "text/css";
+			obj.rel = "stylesheet";
+			obj.href = conf.pathcss + styles[i];
+			head.appendChild(obj);
+		}
+		var libs = [];
+		if(conf.tpl){
+			libs = libs.concat(conf.tpl.split(","));
+		}
+		if(conf.lib){
+			libs = libs.concat(conf.lib.split(","));
+		}
+		var files = [];  //æ•°ç»„ç»“æ„: [{type:"lib",name:"",inApp:false},...]
 		for(var i = 0, len = libs.length; i < len; i++){
-			var name = libs[i];
-			if(/\.js$/.test(name)){  //Ö±½Ó¼ÓÔØjsÎÄ¼ş
-				runtime.dynamicLoadFile("js", app._pathJs, [name]);
-			}else if(/\.lib$/.test(name)){  //¼ÓÔØlibÎÄ¼ş
-				name = name.replace(/\.lib$/, "");
-				var name0 = name;
-				if(name0.substr(0, 1) == "#") name0 = name0.substr(1);
-				if(!(name0 in runtime._libManager._hash)){
-					arr.push(name);
+			var f = libs[i];
+			if(/\.js$/.test(f)){  //ç›´æ¥åŠ è½½jsæ–‡ä»¶
+				runtime.dynamicLoadFile("js", f.indexOf("http://") == 0 ? "" : app._pathJs, [f]);
+			}else if(/\.(tpl|lib)$/.test(f)){  //åŠ è½½lib,tplæ–‡ä»¶
+				var arr = f.split(".");
+				var name = arr[0];  //name.replace(/\.lib$/, "");  //è¿‡æ»¤æ‰libåç¼€å
+				var type = arr[1];  //ç±»å‹ï¼Œåç¼€å
+				var inApp = name.substr(0, 1) == "#";
+				if(inApp){  //è¿‡æ»¤æ‰åå­—å¼€å¤´å¯èƒ½å­˜åœ¨çš„"#"
+					name = name.substr(1);
+				}
+				if(!(name in runtime._libManager._hash)){
+					files.push({"type": type, "name": name, "inApp": true/*inApp*/});
 				}
 			}
 		}
-		var libLoader = new LibLoader();
-		libLoader.init(arr, runtime._config["codeprovider"], this, function(name, lib){
-			//runtime._libLoader.loadLibScript(name, this, function(lib){
-			//});
-			if(lib){
-				if(typeof lib == "function"){
-					lib.call(runtime, app, n);
-				}else{  //typeof lib.init == "function"
-					lib.init.call(runtime, app, n);
+		return files;
+	};
+	/**
+	 * åŠ è½½ä¸€ä¸ªlibæ‰€ä¾èµ–çš„å…¶ä»–libå’Œtplèµ„æº
+	 */
+	this.loadAppLibs =
+	this.loadAppFiles = function(libName, app, agent, func){
+		var n = app ? app._history.getLength() - 1 : 0;
+		var conf = this._confList[libName];
+		var files = this._processFiles(conf);
+		//åŠ è½½tplæ–‡ä»¶
+		/*
+		if("tpl" in conf){
+			runtime.dynamicLoadFile("js", runtime.getConfigData("pathlib"), [conf["tpl"]]);
+		}
+		*/
+		if(files.length == 0){
+			return false;
+		}else{
+			var libLoader = new LibLoader();
+			//runtime.getConfigData("codeprovider")
+			libLoader.init(files, conf, this, function(lib, libConf, loaded){
+				//runtime._libLoader.loadLibScript(lib0, this, function(lib){
+				//});
+				if(!loaded){
+					if(lib.type == "lib"){
+						if(typeof libConf == "function"){
+							libConf.call(runtime, app, n);
+						}else{  //typeof libConf.init == "function"
+							libConf.init.call(runtime, app, n);
+						}
+					}
+				}else{  //å…¨éƒ¨åŠ è½½
+					if(lib.type == "lib"){
+						func.apply(agent, [this.getAppByClassName(conf.className)]);
+						libLoader.dispose();
+						libLoader = null;
+					}else{  //lib.type == "tpl"
+						//window.alert("load tpl callback");
+					}
 				}
-			}else{  //È«²¿¼ÓÔØ
-				fun.apply(agent);
-				libLoader.dispose();
-				libLoader = null;
-			}
-		});
+			});
+			return true;
+		}
 	};
 });

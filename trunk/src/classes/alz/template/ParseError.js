@@ -1,5 +1,8 @@
 _package("alz.template");
 
+/**
+ * 模板解析异常类
+ */
 _class("ParseError", "", function(){
 	this._init = function(name, line, message){
 		_super._init.call(this);

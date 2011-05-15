@@ -5,7 +5,7 @@ _import("alz.mui.TextHistory");
 _import("alz.mui.TextItem");
 
 /**
- * ĞĞ±à¼­Æ÷×é¼ş
+ * è¡Œç¼–è¾‘å™¨ç»„ä»¶
  * <div id="d1" class="LineEdit">&gt;window.<span class="cursor">a</span>lert("aaaa");</div>
  */
 _class("LineEdit", Component, function(){
@@ -35,16 +35,16 @@ _class("LineEdit", Component, function(){
 	var KEY_CH_Z      = 90;
 	var KEY_F1        = 110;  //
 	var KEY_F2        = 111;  //
-	var KEY_F3        = 112;  //!!!ÏµÍ³ËÑË÷¼ü
-	var KEY_F4        = 113;  //!!!Drop µØÖ·À¸
-	var KEY_F5        = 114;  //!!!Ë¢ĞÂ
-	var KEY_F6        = 115;  //!!!ÊäÈë½¹µã×ªÈëµØÖ·À¸
+	var KEY_F3        = 112;  //!!!ç³»ç»Ÿæœç´¢é”®
+	var KEY_F4        = 113;  //!!!Drop åœ°å€æ 
+	var KEY_F5        = 114;  //!!!åˆ·æ–°
+	var KEY_F6        = 115;  //!!!è¾“å…¥ç„¦ç‚¹è½¬å…¥åœ°å€æ 
 	var KEY_F7        = 116;  //
 	var KEY_F8        = 117;  //
 	var KEY_F9        = 118;  //
 	var KEY_F10       = 119;  //
 	var KEY_F11       = 120;  //
-	var KEY_F12       = 121;  //!!!ÊäÈë½¹µã×ªÈë²Ëµ¥
+	var KEY_F12       = 121;  //!!!è¾“å…¥ç„¦ç‚¹è½¬å…¥èœå•
 	var KEY_xxx       = 229;
 	//var count = 0;
 	this._number = "0123456789)!@#$%^&*(";
@@ -75,7 +75,7 @@ _class("LineEdit", Component, function(){
 		rng.setEndPoint("StartToStart", selection.createRange());
 		this._pos = rng.text.length;
 		window.document.title = this._pos;
-		rng.collapse(false);  //ÒÆµ½ºóÃæ
+		rng.collapse(false);  //ç§»åˆ°åé¢
 		rng.select();
 		rng = null;
 	}
@@ -86,8 +86,8 @@ _class("LineEdit", Component, function(){
 		this._app = null;
 		this._timer = 0;
 		this._pos = 0;
-		this._history = new TextHistory();  //ÀúÊ·¼ÇÂ¼¹ÜÀí
-		this._cursorType = "gray";  //Ä¬ÈÏÎªgray
+		this._history = new TextHistory();  //å†å²è®°å½•ç®¡ç†
+		this._cursorType = "gray";  //é»˜è®¤ä¸ºgray
 		this._items = [];
 		this._activeItem = null;
 		this._start = 0;
@@ -159,6 +159,7 @@ _class("LineEdit", Component, function(){
 		this.setIomode("in");
 	};
 	this.dispose = function(){
+		if(this._disposed) return;
 		this._activeItem = null;
 		for(var i = 0, len = this._items.length; i < len; i++){
 			this._items[i].dispose();
@@ -313,7 +314,7 @@ _class("LineEdit", Component, function(){
 			}
 			if(this._iomode == "in"){
 				//try{
-				//	this._self.focus();  //(Í¨¹ı½¹µãµÄ×ª»»,)ÖØĞÂ¶¨Î»¹â±êµÄÎ»ÖÃ
+				//	this._self.focus();  //(é€šè¿‡ç„¦ç‚¹çš„è½¬æ¢,)é‡æ–°å®šä½å…‰æ ‡çš„ä½ç½®
 				//}catch(ex){
 				//}
 				this._activeItem.update();
@@ -349,15 +350,15 @@ _class("LineEdit", Component, function(){
 		return true;
 	};
 	/**
-	 * ÍùĞĞ±à¼­Æ÷ÀïÃæ´òÓ¡Ò»¶ÎÎÄ±¾
-	 * @param {String} str Òª´òÓ¡µÄÎÄ¼şÄÚÈİ
-	 * @param {String} type ÎÄ±¾µÄÀàĞÍ
-	 *             sys ÏµÍ³ĞÅÏ¢
-	 *             dbg µ÷ÊÔĞÅÏ¢
-	 *             in  ±ê×¼ÊäÈë
-	 *             out ±ê×¼Êä³ö
-	 *             err ´íÎóÊä³ö
-	 *             log ÈÕÖ¾ĞÅÏ¢
+	 * å¾€è¡Œç¼–è¾‘å™¨é‡Œé¢æ‰“å°ä¸€æ®µæ–‡æœ¬
+	 * @param {String} str è¦æ‰“å°çš„æ–‡ä»¶å†…å®¹
+	 * @param {String} type æ–‡æœ¬çš„ç±»å‹
+	 *             sys ç³»ç»Ÿä¿¡æ¯
+	 *             dbg è°ƒè¯•ä¿¡æ¯
+	 *             in  æ ‡å‡†è¾“å…¥
+	 *             out æ ‡å‡†è¾“å‡º
+	 *             err é”™è¯¯è¾“å‡º
+	 *             log æ—¥å¿—ä¿¡æ¯
 	 */
 	this.print = function(str, type){
 		if(typeof str == "undefined") window.alert(str);
@@ -402,7 +403,7 @@ _class("LineEdit", Component, function(){
 			return false;
 		}
 	};
-	//²åÈëÒ»¶Î²»º¬»Ø³µ·ûµÄ×Ö·û´®
+	//æ’å…¥ä¸€æ®µä¸å«å›è½¦ç¬¦çš„å­—ç¬¦ä¸²
 	this.insertText = function(str){
 		if(this.incCol(str.length)){
 			if(this._col == this.getText().length + str.length){
@@ -412,7 +413,7 @@ _class("LineEdit", Component, function(){
 			}
 		}
 	};
-	//ÊÂ¼ş´¦Àíº¯Êı
+	//äº‹ä»¶å¤„ç†å‡½æ•°
 	this.onKeyPress = function(ev, sender){
 		var ch = String.fromCharCode(ev.keyCode);
 		var v = sender.value;
@@ -423,18 +424,18 @@ _class("LineEdit", Component, function(){
 			this._history.append(text);
 			this.print(text, "in");
 			this._parent.getCallback()(text);
-		}else if(ch == "."){  //×Ô¶¯Íê³É¹¦ÄÜ
+		}else if(ch == "."){  //è‡ªåŠ¨å®ŒæˆåŠŸèƒ½
 			if(this._app){
 				var nameChain = this._app.getNameChain(this.getFrontText());
 				this._app.showFunTip(nameChain);
 				//var name = nameChain || "#global";
 			}
-		}else if(ch == "("){  //Óï·¨ÌáÊ¾¹¦ÄÜ
+		}else if(ch == "("){  //è¯­æ³•æç¤ºåŠŸèƒ½
 		}/*else if(ch == "\t"){
 			window.alert(111);
 		}*/
 	};
-	//Ê¹ÓÃinputÔªËØµÄÊµÏÖ
+	//ä½¿ç”¨inputå…ƒç´ çš„å®ç°
 	this.onKeyDown1 = function(ev, sender){
 		var redraw = true;
 		var kc = ev.keyCode;
@@ -479,7 +480,7 @@ _class("LineEdit", Component, function(){
 		}
 		return true;
 	};
-	//²»Ê¹ÓÃinputÔªËØµÄÊµÏÖ
+	//ä¸ä½¿ç”¨inputå…ƒç´ çš„å®ç°
 	this.onKeyDown = function(ev, sender){
 		//var redraw = true;
 		var ret;
@@ -490,9 +491,9 @@ _class("LineEdit", Component, function(){
 				return tip.onKeyDown(ev, sender);
 			}
 		}
-		if(kc >= KEY_CH_0 && kc <= KEY_CH_9){  //Èç¹ûÊÇÊı×Ö(»òÏàÓ¦ÌØÊâ×Ö·û)
+		if(kc >= KEY_CH_0 && kc <= KEY_CH_9){  //å¦‚æœæ˜¯æ•°å­—(æˆ–ç›¸åº”ç‰¹æ®Šå­—ç¬¦)
 			this.insertText(this.getNumber(kc - KEY_CH_0 + (ev.shiftKey ? 10 : 0)));
-		}else if(kc >= KEY_CH_A && kc <= KEY_CH_Z){  //Èç¹ûÊÇ×ÖÄ¸
+		}else if(kc >= KEY_CH_A && kc <= KEY_CH_Z){  //å¦‚æœæ˜¯å­—æ¯
 			this.insertText(this.getChar(kc - KEY_CH_A + (ev.shiftKey ? 26 : 0)));
 		}else if(kc == 61){
 			this.insertText(ev.shiftKey ? "+" : "=");
@@ -532,7 +533,7 @@ _class("LineEdit", Component, function(){
 				this._col = this._start;
 			}
 			break;
-		case KEY_ENTER:  //È·¶¨ÊäÈë£¬¶øÎŞÂÛ¹â±êÔÚÄÄÀï
+		case KEY_ENTER:  //ç¡®å®šè¾“å…¥ï¼Œè€Œæ— è®ºå…‰æ ‡åœ¨å“ªé‡Œ
 			if(this._col > this._start){
 				var text = this.getText().substr(this._start);
 				this._history.append(text);
@@ -544,24 +545,24 @@ _class("LineEdit", Component, function(){
 				//this.reset();
 				/*
 				var row = this._rows[this._row];
-				var str = row._text.substr(this._col);  //±£´æĞĞÎ²±»½Ø¶ÏµÄ×Ö·û´®
-				row.setText(row._text.substring(0, this._col) + "\n");  //ÔÚ´Ë¶ÏĞĞ
-				this._row++;  //Ö¸ÏòÏÂÒ»ĞĞ
-				this.insertRow(this._row, str);  //²åÈëÒ»¿ÕĞĞ²¢¸³ÖµÎªÉÏĞĞ½ØÎ²×Ö·û´®
-				this._col = 0;  //ÁĞ¶¨Î»ÓÚĞÂĞĞ¿ªÊ¼´¦
+				var str = row._text.substr(this._col);  //ä¿å­˜è¡Œå°¾è¢«æˆªæ–­çš„å­—ç¬¦ä¸²
+				row.setText(row._text.substring(0, this._col) + "\n");  //åœ¨æ­¤æ–­è¡Œ
+				this._row++;  //æŒ‡å‘ä¸‹ä¸€è¡Œ
+				this.insertRow(this._row, str);  //æ’å…¥ä¸€ç©ºè¡Œå¹¶èµ‹å€¼ä¸ºä¸Šè¡Œæˆªå°¾å­—ç¬¦ä¸²
+				this._col = 0;  //åˆ—å®šä½äºæ–°è¡Œå¼€å§‹å¤„
 				*/
 			}
 			break;
 		case KEY_BACKSPACE:
-			if(this._col > this._start){  //Èç¹ûÃ»ÓĞÔÚ¿ªÊ¼´¦
+			if(this._col > this._start){  //å¦‚æœæ²¡æœ‰åœ¨å¼€å§‹å¤„
 				this._activeItem.removeChar(-1);
 				this._col--;
 			}
-			ev.returnValue = 0;  //·ÀÖ¹chromeµÈä¯ÀÀÆ÷µÄºóÍË
+			ev.returnValue = 0;  //é˜²æ­¢chromeç­‰æµè§ˆå™¨çš„åé€€
 			ev.cancelBubble = true;
-			return false;  //×èÖ¹Ò³ÃæºóÍË
+			return false;  //é˜»æ­¢é¡µé¢åé€€
 		case KEY_DEL:
-			if(this._col < this.getText().length){  //Èç¹ûÃ»ÓĞÔÚĞĞÄ©
+			if(this._col < this.getText().length){  //å¦‚æœæ²¡æœ‰åœ¨è¡Œæœ«
 				this._activeItem.removeChar();
 			}
 			break;
@@ -580,18 +581,18 @@ _class("LineEdit", Component, function(){
 			}
 			return false;
 		case KEY_RIGHT:
-			//if(this.isEndLine(this._row)){  //Èç¹ûÊÇ×îºóÒ»ĞĞµÄ»°
+			//if(this.isEndLine(this._row)){  //å¦‚æœæ˜¯æœ€åä¸€è¡Œçš„è¯
 				if(this._col < this.getText().length){  //this._rows[this._row].getLength()
 					this._activeItem.setCursor(this._activeItem.getCursor() + 1);
 					this.incCol(1);
 				}else{
-					return;  //ÒÑÔÚ±à¼­ÎÄ±¾µÄ×îÄ©¶Ë
+					return;  //å·²åœ¨ç¼–è¾‘æ–‡æœ¬çš„æœ€æœ«ç«¯
 				}
 			/*
 			}else{
 				if(this._col < this.getText().length - 1){  //this._rows[this._row].getLength() - 1
 					this.incCol(1);
-				}else{  //¹â±êÒÆµ½ÏÂÒ»ĞĞ¿ªÊ¼
+				}else{  //å…‰æ ‡ç§»åˆ°ä¸‹ä¸€è¡Œå¼€å§‹
 					this._col = 0;
 					this._row++;
 				}
@@ -602,7 +603,7 @@ _class("LineEdit", Component, function(){
 			/*
 			if(this._row > 0){
 				var len = this._rows[this._row - 1].getLength();
-				if(this._col > len - 1){  //Èç¹û´óÓÚÉÏÒ»ĞĞµÄ³¤¶È
+				if(this._col > len - 1){  //å¦‚æœå¤§äºä¸Šä¸€è¡Œçš„é•¿åº¦
 					this._col = len - 1;
 				}
 				this._row--;
@@ -614,15 +615,15 @@ _class("LineEdit", Component, function(){
 			break;
 		case KEY_DOWN:
 			/*
-			if(!this.isEndLine(this._row)){  //Èç¹û²»ÊÇ×îºóÒ»ĞĞ
+			if(!this.isEndLine(this._row)){  //å¦‚æœä¸æ˜¯æœ€åä¸€è¡Œ
 				var len = this._rows[this._row + 1].getLength();
-				if(this.isEndLine(this._row + 1)){  //Èç¹ûÏÂÒ»ĞĞÊÇ×îºóÒ»ĞĞ
+				if(this.isEndLine(this._row + 1)){  //å¦‚æœä¸‹ä¸€è¡Œæ˜¯æœ€åä¸€è¡Œ
 					if(this._col > len - 1){
 						this._col = len;
 					}
 				}else{
 					if(this._col > len - 1){
-						this._col = len - 1;  //Èç¹û´óÓÚÏÂÒ»ĞĞµÄ³¤¶È
+						this._col = len - 1;  //å¦‚æœå¤§äºä¸‹ä¸€è¡Œçš„é•¿åº¦
 					}
 				}
 				this._row++;
@@ -643,16 +644,16 @@ _class("LineEdit", Component, function(){
 			return false;
 		case KEY_F1:
 		case KEY_F2:
-		case KEY_F3:  //!!!ÏµÍ³ËÑË÷¼ü
-		case KEY_F4:  //!!!Drop µØÖ·À¸
-		case KEY_F5:  //!!!Ë¢ĞÂ
-		case KEY_F6:  //!!!ÊäÈë½¹µã×ªÈëµØÖ·À¸
+		case KEY_F3:  //!!!ç³»ç»Ÿæœç´¢é”®
+		case KEY_F4:  //!!!Drop åœ°å€æ 
+		case KEY_F5:  //!!!åˆ·æ–°
+		case KEY_F6:  //!!!è¾“å…¥ç„¦ç‚¹è½¬å…¥åœ°å€æ 
 		case KEY_F7:
 		case KEY_F8:
 		case KEY_F9:
 		case KEY_F10:
 		case KEY_F11:
-		case KEY_F12:  //!!!ÊäÈë½¹µã×ªÈë²Ëµ¥
+		case KEY_F12:  //!!!è¾“å…¥ç„¦ç‚¹è½¬å…¥èœå•
 			return;
 		default:
 			window.alert(kc);

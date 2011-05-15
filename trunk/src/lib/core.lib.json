@@ -1,0 +1,27 @@
+{
+	name:"core",
+	title:"框架核心库",
+	libs:"",
+	app:"",
+	classes:[
+		//"alz.core.XPathQuery",
+		"alz.core.DOMUtil",
+		"alz.core.BoxElement",
+		"alz.layout.AbstractLayout",
+		"alz.layout.BorderLayout",
+		"alz.core.AjaxEngine",
+		"alz.core.Ajax",
+		"alz.core.AbstractModel",
+		"alz.template.TrimPath",
+		"alz.template.Template",
+		"alz.template.ParseError",
+		"alz.template.TemplateManager",
+		"alz.core.Plugin",
+		"alz.core.PluginManager",
+		"alz.core.ActionStack",
+		"alz.core.ActionManager",
+		"alz.core.ActionCollection",
+		"alz.core.ProductManager",
+		"alz.core.WebRuntime_core"
+	]
+}

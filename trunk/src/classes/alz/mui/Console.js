@@ -4,7 +4,7 @@ _import("alz.mui.Component");
 _import("alz.mui.LineEdit");
 
 /**
- * ¿ØÖÆÌ¨×é¼ş
+ * æ§åˆ¶å°ç»„ä»¶
  */
 _class("Console", Component, function(){
 	this._init = function(){
@@ -29,7 +29,7 @@ _class("Console", Component, function(){
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
 		//<div class="aui-LineEdit">&gt;<input class="input" type="text" value="" /></div>
-		//this.setFont("12px ËÎÌå");
+		//this.setFont("12px å®‹ä½“");
 		/*
 		this._lastLine = this._createElement2("div", "aui-LineEdit", {
 			"backgroundColor": "#888888",
@@ -63,6 +63,7 @@ _class("Console", Component, function(){
 		this._lineEdit.setIomode("out");
 	};
 	this.dispose = function(){
+		if(this._disposed) return;
 		this._interpret = null;
 		if(this._lineEdit){
 			this._lineEdit.dispose();
@@ -111,7 +112,7 @@ _class("Console", Component, function(){
 		this._prompt = this._interpret.getPrompt();
 		//this.print(this._interpret.getPrompt(), "sys");
 	};
-	//Ä¬ÈÏµÄ½âÊÍÆ÷½Ó¿Ú
+	//é»˜è®¤çš„è§£é‡Šå™¨æ¥å£
 	this.interpret = function(text){
 		this.print(text);
 	};
@@ -126,10 +127,10 @@ _class("Console", Component, function(){
 			//this._lastLine.removeChild(this._lastLine.lastChild);
 		}
 	};
-	this.start = function(agent, fun){
+	this.start = function(agent, func){
 		var _this = this;
 		this.getLineInput(function(text){
-			fun.call(agent, text);
+			func.call(agent, text);
 			_this.getLineInput(arguments.callee);
 		});
 	};
@@ -169,9 +170,9 @@ _class("Console", Component, function(){
 		return line;
 	};
 	/**
-	 * ÍùshellÎÄ±¾ÆÁÄ»ÉÏ´òÓ¡Ò»¶ÎÎÄ±¾
-	 * @param {String} str Òª´òÓ¡µÄÎÄ¼şÄÚÈİ
-	 * @param {String} type ÎÄ±¾µÄÀàĞÍ
+	 * å¾€shellæ–‡æœ¬å±å¹•ä¸Šæ‰“å°ä¸€æ®µæ–‡æœ¬
+	 * @param {String} str è¦æ‰“å°çš„æ–‡ä»¶å†…å®¹
+	 * @param {String} type æ–‡æœ¬çš„ç±»å‹
 	 */
 	this.print = function(str, type){
 		type = type || "sys";
@@ -180,7 +181,7 @@ _class("Console", Component, function(){
 		}
 		this._lineEdit.print(str, type);
 	};
-	//[TODO]XUL»·¾³ÏÂ²»Æğ×÷ÓÃ
+	//[TODO]XULç¯å¢ƒä¸‹ä¸èµ·ä½œç”¨
 	this.scrollToBottom = function(){
 		this._self.scrollTop = this._self.scrollHeight;
 	};

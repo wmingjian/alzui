@@ -3,7 +3,7 @@ _package("alz.mui");
 _import("alz.mui.Component");
 
 /**
- * Ñ¡Ïî¿¨×é¼ş
+ * é€‰é¡¹å¡ç»„ä»¶
  */
 _class("TabPage", Component, function(){
 	this._init = function(){
@@ -15,8 +15,8 @@ _class("TabPage", Component, function(){
 	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
-		this._head = this._createElement2(this._self, "div", "mui-TabPage-Head");
-		this._body = this._createElement2(this._self, "div", "mui-TabPage-Body");
+		this._head = this._createElement2(this._self, "div", "aui-TabPage-Head");
+		this._body = this._createElement2(this._self, "div", "aui-TabPage-Body");
 		this._body.innerHTML =
 				'<table width="95%" border="1" cellspacing="0" cellpadding="2" bordercolor="#869FA1"><tbody></tbody></table>'
 			+ '<table width="95%" border="1" cellspacing="0" cellpadding="2" bordercolor="#869FA1"><tbody></tbody></table>'

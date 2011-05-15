@@ -1,7 +1,9 @@
 _package("alz.lang");
 
 /**
- * ¸ùÀà AObject
+ * @class AObject
+ * @extends Object
+ * @desc æ ¹ç±» AObject
  */
 _class("AObject", null, function(){
 	//[memleak]AObject.__hash__ = {};
@@ -13,6 +15,10 @@ _class("AObject", null, function(){
 		//[memleak]this.__hashid__ = "_" + (AObject.__id__++);
 		//[memleak]AObject.__hash__[this.__hashid__] = this;
 	};
+	/**
+	 * @method dispose
+	 * @desc ææ„æ–¹æ³•
+	 */
 	this.dispose = function(){
 		//[memleak]delete AObject.__hash__[this.__hashid__];
 		this._disposed = true;
@@ -20,8 +26,9 @@ _class("AObject", null, function(){
 	this.destroy = function(){
 	};
 	/**
-	 * »ñÈ¡¶ÔÏóµÄ×Ö·û´®±íÊ¾
+	 * @method toString
 	 * @return {String}
+	 * @desc å¯¹è±¡çš„å­—ç¬¦ä¸²å½¢å¼ï¼Œä¸º[object xxx]
 	 */
 	this.toString = function(){
 		if(this._className){
@@ -29,43 +36,48 @@ _class("AObject", null, function(){
 		}
 		return "[object Object]";
 	};
-	//ÔËĞĞÊ±·½·¨£¬¿ÉÒÔÔÚ¶¨ÖÆ¿ò¼ÜÊ±£¬ÊÊµ±µÄËõ¼õµôÒ»Ğ©·½·¨
+	//è¿è¡Œæ—¶æ–¹æ³•ï¼Œå¯ä»¥åœ¨å®šåˆ¶æ¡†æ¶æ—¶ï¼Œé€‚å½“çš„ç¼©å‡æ‰ä¸€äº›æ–¹æ³•
 	/**
-	 * »ñÈ¡¶ÔÏó¶ÔÓ¦µÄÀà
+	 * è·å–å¯¹è±¡å¯¹åº”çš„ç±»
 	 * @return {Class}
 	 */
 	this.getClass = function(){
 		//return this._class;
 		//return eval(this._className);
-		//return __class__;  //error!!!²»ÊÇÉÏÏÂÎÄ»·¾³ÖĞµÄÕâ¸öÀà£¬ÊÇthis._className¶ÔÓ¦µÄÀà
-		return __classes__[this._className];  //±ÜÃâÊ¹ÓÃeval·½·¨
+		//return __class__;  //error!!!ä¸æ˜¯ä¸Šä¸‹æ–‡ç¯å¢ƒä¸­çš„è¿™ä¸ªç±»ï¼Œæ˜¯this._classNameå¯¹åº”çš„ç±»
+		//return __classes__[this._className];  //é¿å…ä½¿ç”¨evalæ–¹æ³•
+		return this._clazz;
 		//return runtime._classManager.getClassByName(this._className).getClazz();
 	};
 	/**
-	 * »ñÈ¡¶ÔÏó¶ÔÓ¦µÄ¸¸Àà
+	 * è·å–å¯¹è±¡å¯¹åº”çš„çˆ¶ç±»
 	 * @return {Class}
 	 */
 	this.getSuperClass = function(){
 		return this.getClass()._super.getClass();
 	};
 	/**
-	 * »ñÈ¡¶ÔÏóµÄÀàÃû
+	 * @method getClassName
 	 * @return {String}
+	 * @desc è·å–å¯¹è±¡çš„ç±»å
 	 */
 	this.getClassName = function(){
 		return this._className;
 	};
 	/**
-	 * ÉèÖÃ¶ÔÏóµÄÀàÃû
-	 * @param {Object} v ÀàÃû
+	 * @method setClassName
+	 * @param {Object} v ç±»å
+	 * @return {String} v
+	 * @desc è®¾ç½®å¯¹è±¡çš„ç±»å
 	 */
 	this.setClassName = function(v){
 		this._className = v;
 	};
 	/**
-	 * »ñÈ¡¶ÔÏóµÄÊôĞÔ
-	 * @param {String} name ÊôĞÔÃû
+	 * @method getProperty
+	 * @param {String} name å±æ€§å
 	 * @return {Object}
+	 * @desc è·å–å¯¹è±¡çš„æŒ‡å®šçš„å±æ€§å€¼
 	 */
 	this.getProperty = function(name){
 		var key = "get" + name.capitalize();
@@ -75,9 +87,10 @@ _class("AObject", null, function(){
 		throw new Error("No such property, " + name);
 	};
 	/**
-	 * ÉèÖÃ¶ÔÏóµÄÊôĞÔ
-	 * @param {String} name ÊôĞÔÃû
-	 * @param {Object} value ÊôĞÔÖµ
+	 * @method setProperty
+	 * @param {String} name å±æ€§å
+	 * @param {Object} value å±æ€§å€¼
+	 * @desc è®¾ç½®å¯¹è±¡çš„æŒ‡å®šçš„å±æ€§
 	 */
 	this.setProperty = function(name, value){
 		var key = "set" + name.capitalize();
@@ -87,16 +100,16 @@ _class("AObject", null, function(){
 			throw new Error("No such property, " + name);
 		}
 	};
-	//Ä£Äâ instanceof, typeof ²Ù×÷·û
+	//æ¨¡æ‹Ÿ instanceof, typeof æ“ä½œç¬¦
 	/**
-	 * ÅĞ¶Ïµ±Ç°¶ÔÏóÊÇ·ñÄ³¸öÀàµÄÊµÀı
-	 * ¸ù¾İ prototype Á´¹¤×÷
-	 * @param {Class|String} clazz Àà»òÕßÀàµÄÃû³Æ
+	 * @method instanceOf
+	 * @param {Class|String} clazz ç±»æˆ–è€…ç±»çš„åç§°
 	 * @return {Boolean}
+	 * @desc åˆ¤æ–­å½“å‰å¯¹è±¡æ˜¯å¦æŸä¸ªç±»çš„å®ä¾‹ï¼Œæ ¹æ® prototype é“¾å·¥ä½œ
 	 */
 	this.instanceOf = function(clazz){
 		/*
-		//Ô­Ê¼µÄËã·¨£¬Í¨¹ı±È½Ï×Ö·û´®ÊµÏÖ£¬Ğ§ÂÊÏà¶Ô½ÏµÍ
+		//åŸå§‹çš„ç®—æ³•ï¼Œé€šè¿‡æ¯”è¾ƒå­—ç¬¦ä¸²å®ç°ï¼Œæ•ˆç‡ç›¸å¯¹è¾ƒä½
 		for(var p = this; p && p.getClassName() != "alz.lang.Object"; p = p.getClass()._super){
 			if(!p._clazz) window.alert("p._clazz");
 			if(!p._clazz._super) window.alert("p._clazz._super");
@@ -107,15 +120,15 @@ _class("AObject", null, function(){
 			clazz = __classes__[clazz];
 			//clazz = runtime._classManager.getClassByName(this._className).getClazz();
 		}
-		//²éÕÒ _clazz._super Á´
+		//æŸ¥æ‰¾ _clazz._super é“¾
 		for(var obj = this; obj; obj = obj._clazz._super){
 			if(obj._clazz == clazz) return true;
 		}
 		return false;
 	};
 	/**
-	 * »ñÈ¡µ±Ç°¶ÔÏóµÄÀàĞÍ
-	 * @return {String} ¶ÔÏóÀàĞÍµÄ×Ö·û´®±íÊ¾
+	 * è·å–å½“å‰å¯¹è±¡çš„ç±»å‹
+	 * @return {String} å¯¹è±¡ç±»å‹çš„å­—ç¬¦ä¸²è¡¨ç¤º
 	 */
 	this.typeOf = function(){
 		return this._className;

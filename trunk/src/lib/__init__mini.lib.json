@@ -1,0 +1,22 @@
+{
+	name:"__init__mini",
+	title:"框架基础库",
+	libs:"",
+	app:"",
+	classes:[
+		//"alz.changelog",
+		"alz.init",
+		"alz.lang.AObject",
+		"alz.lang.Exception",
+		"alz.core.ManagerBase",
+		"alz.core.LibManager",
+		"alz.core.ScriptLoader",
+		"alz.core.IframeLoader",
+		"alz.core.LibLoader",
+		"alz.core.EventTarget",
+		"alz.core.Application",
+		"alz.core.AppManager",
+		"alz.core.WebRuntime",
+		"alz.core.WebRuntime_init"
+	]
+}

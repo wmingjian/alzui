@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>CodingStyle</title>
+</head>
+<body class="t6">
+<table>
+ <tr>
+ <td style="vertical-align:top; padding-left:5px">
+ <div id="wikiheader">
+ <span style="font-size:120%;font-weight:bold">CodingStyle</span>
+ &nbsp;
+ <div>
+
+
+
+ <div id="wikiauthor" style="float:right">
+ Updated <span title="Thu Jul  1 05:25:12 2010">
+ Jul 1, 2010</span>
+
+ by <a style="white-space: nowrap" href="/u/@VhJRR11VAhRCXAZ9/">luolong...@gmail.com</a>
+
+ </div>
+ </div>
+ </div>
+
+ <div id="wikicontent">
+ <div class="vt" id="wikimaincol">
+ <h2><a name="Coding_Style_Guidelines"></a>KindEditor Coding Style Guidelines<a href="#Coding_Style_Guidelines" class="section_anchor"></a></h2><h3><a name="General"></a>General<a href="#General" class="section_anchor"></a></h3><p>1. 所有文本文件统一使用UTF-8 无BOM编码，换行使用Windows格式（\r\n）。 </p><p>2. 所有字符串一般情况下使用单引号（&#x27;）定义，如果字符串中单引号比双引号多则用双引号（&quot;），基本原则是尽量减少斜线转义字符。 </p><p>Right: </p><pre class="prettyprint">str = &#x27;abc&#x27;;
+str = &#x27;&lt;div class=&quot;abc&quot;&gt;&lt;/div&gt;&#x27;;
+str = &quot;&#x27;&quot;;</pre><p>Wrong: </p><pre class="prettyprint">str = &quot;abc&quot;;
+str = &quot;&lt;div class=\&quot;abc\&quot;&gt;&lt;/div&gt;&quot;;
+str = &#x27;\&#x27;&#x27;;</pre><p>3. 尽量使用<a href=""></a>,{},/regex/,function () {}，而不是new Array(), new Object(), new RegExp(), new Function()。 </p><p>Right: </p><pre class="prettyprint">var arr = [],
+    obj = {},
+    reg = /\w+/g,
+    fn = function () { alert(1); };</pre><p>Wrong: </p><pre class="prettyprint">var arr = new Array(),
+    obj = new Object(),
+    reg = new RegExp(&#x27;\w+&#x27;, &#x27;g&#x27;),
+    fn = new Function(&#x27;alert(1)&#x27;);</pre><p>4. 整个程序只允许有三个全局变量（K、KE、KindEditor），如果页面已经有K、KE全局变量就跳过，不会修改相应变量值。 </p><h3><a name="Names"></a>Names<a href="#Names" class="section_anchor"></a></h3><p><table class="wikitable"><tr><td style="border: 1px solid #ccc; padding: 5px;"> 文件名 </td><td style="border: 1px solid #ccc; padding: 5px;"> lowercase </td><td style="border: 1px solid #ccc; padding: 5px;"> node.js, dialog.js </td></tr> <tr><td style="border: 1px solid #ccc; padding: 5px;"> 类名 </td><td style="border: 1px solid #ccc; padding: 5px;"> K.lowercase </td><td style="border: 1px solid #ccc; padding: 5px;"> K.node, K.dialog </td></tr> <tr><td style="border: 1px solid #ccc; padding: 5px;"> 全局变量名 </td><td style="border: 1px solid #ccc; padding: 5px;"> K.UPPER_CASE </td><td style="border: 1px solid #ccc; padding: 5px;"> K.IE, K.VERSION </td></tr> <tr><td style="border: 1px solid #ccc; padding: 5px;"> 全局函数 </td><td style="border: 1px solid #ccc; padding: 5px;"> K.camelCase </td><td style="border: 1px solid #ccc; padding: 5px;"> K.trim, K.inArray </td></tr> <tr><td style="border: 1px solid #ccc; padding: 5px;"> 类方法 </td><td style="border: 1px solid #ccc; padding: 5px;"> camelCase </td><td style="border: 1px solid #ccc; padding: 5px;"> node.attr, node.removeAttr </td></tr> <tr><td style="border: 1px solid #ccc; padding: 5px;"> 类成员变量 </td><td style="border: 1px solid #ccc; padding: 5px;"> camelCase </td><td style="border: 1px solid #ccc; padding: 5px;"> range.startContainer, node.children </td></tr> <tr><td style="border: 1px solid #ccc; padding: 5px;"> 模块里的一级局部变量 </td><td style="border: 1px solid #ccc; padding: 5px;"> <tt>_</tt>camelCase </td><td style="border: 1px solid #ccc; padding: 5px;"> <tt>_</tt>trim, <tt>_</tt>inArray </td></tr> <tr><td style="border: 1px solid #ccc; padding: 5px;"> 局部变量 </td><td style="border: 1px solid #ccc; padding: 5px;"> camelCase </td><td style="border: 1px solid #ccc; padding: 5px;"> str, nodeName </td></tr> </table></p><h3><a name="Indentation"></a>Indentation<a href="#Indentation" class="section_anchor"></a></h3><p>1. Use tabs, not spaces. </p><p>2. 一次缩进用一个TAB。 </p><p>Right: </p><pre class="prettyprint">function main() {
+    return 0;
+}</pre><p>Wrong: </p><pre class="prettyprint">function main() {
+        return 0;
+}</pre><h3><a name="Space"></a>Space<a href="#Space" class="section_anchor"></a></h3><p>1. Do not place spaces around unary operators. </p><p>Right: </p><pre class="prettyprint">i++;</pre><p>Wrong: </p><pre class="prettyprint">i ++;</pre><p>2. Do place spaces around binary and ternary operators. </p><p>Right: </p><pre class="prettyprint">y = m * x + b;
+f(a, b);
+c = a | b;
+return condition ? 1 : 0;</pre><p>Wrong: </p><pre class="prettyprint">y=m*x+b;
+f(a,b);
+c = a|b;
+return condition ? 1:0;</pre><p>3. Do not place spaces before comma and semicolon. </p><p>Right: </p><pre class="prettyprint">for (var i = 0; i &lt; 10; i++) {
+    doSomething();
+}
+
+f(a, b);</pre><p>Wrong: </p><pre class="prettyprint">for (var i = 0 ; i &lt; 10 ; i++) {
+    doSomething();
+}
+
+f(a , b) ;</pre><p>4. Place spaces between control statements and their parentheses. </p><p>Right: </p><pre class="prettyprint">if (condition) {
+    doIt();
+}
+
+for (var i = 0, len = arr.length; i &lt; len; i++) {
+    doIt();
+}</pre><p>Wrong: </p><pre class="prettyprint">if(condition){
+    doIt();
+}
+
+for(var i = 0, len = arr.length; i &lt; len; i++){
+    doIt();
+}</pre><p>5. Do not place spaces between a function and its parentheses, or between a parenthesis and its content. </p><p>Right: </p><pre class="prettyprint">f(a, b);</pre><p>Wrong: </p><pre class="prettyprint">f (a, b);
+f( a, b );</pre><h3><a name="Line_breaking"></a>Line breaking<a href="#Line_breaking" class="section_anchor"></a></h3><p>1. 同时定义多个变量时，只使用一个var。 </p><p>Right: </p><pre class="prettyprint">var a,
+    b = {},
+    c = [],
+    d = function () {
+    };</pre><p>Wrong: </p><pre class="prettyprint">var a;
+var b = {};
+var c = [];
+var d = function () {};</pre><p>2. An else if statement should be written as an if statement when the prior if concludes with a return statement. </p><p>Right: </p><pre class="prettyprint">if (condition) {
+    ...
+    return someValue;
+}
+if (condition) {
+    ...
+}</pre><p>Wrong: </p><pre class="prettyprint">if (condition) {
+    ...
+    return someValue;
+} else if (condition) {
+    ...
+}</pre><h3><a name="Braces"></a>Braces<a href="#Braces" class="section_anchor"></a></h3><p>1. 函数定义：开始花括号放在行尾。 </p><p>Right: </p><pre class="prettyprint">function main() {
+    ...
+}</pre><p>Wrong: </p><pre class="prettyprint">function main()
+{
+    ...
+}</pre><p>2. One-line control clauses should not use braces unless comments are included or a single statement spans multiple lines. </p><p>Right: </p><pre class="prettyprint">if (condition) {
+    doIt();
+}
+
+if (condition) {
+    myFunction(reallyLongParam1, reallyLongParam2, ...
+        reallyLongParam5);
+}</pre><p>Wrong: </p><pre class="prettyprint">if (condition) doIt();
+
+if (condition)
+    doIt();
+
+if (condition)
+    myFunction(reallyLongParam1, reallyLongParam2, ...
+        reallyLongParam5);</pre><h3><a name="true_and_false"></a>true and false<a href="#true_and_false" class="section_anchor"></a></h3><p>1. Tests for true/false should all be done without equality comparisons. </p><p>Right: </p><pre class="prettyprint">if (condition) {
+    doIt();
+}
+
+if (!condition) {
+    return;
+}</pre><p>Wrong: </p><pre class="prettyprint">if (condition == true) {
+    doIt();
+}
+
+if (condition == false) {
+    return;
+}</pre><h3><a name="type_checks"></a>type checks<a href="#type_checks" class="section_anchor"></a></h3><ul><li>String: typeof object === &quot;string&quot; </li><li>Number: typeof object === &quot;number&quot; </li><li>Boolean: typeof object === &quot;boolean&quot; </li><li>Object: typeof object === &quot;object&quot; </li><li>Element: object.nodeType </li><li>null: object === null </li><li>null or undefined: object == null </li><li>undefined: </li><ul><li>Global Variables: typeof variable === &quot;undefined&quot; </li><li>Local Variables: variable === undefined </li><li>Properties: object.prop === undefined </li></ul></ul><h3><a name="regexp"></a>regexp<a href="#regexp" class="section_anchor"></a></h3><p>All RegExp operations should be done using .test() and .exec(). &quot;string&quot;.match() is no longer used. </p><h3><a name="Reference"></a>Reference<a href="#Reference" class="section_anchor"></a></h3><ul><li><a href="http://webkit.org/coding/coding-style.html" rel="nofollow">http://webkit.org/coding/coding-style.html</a> </li><li><a href="http://docs.jquery.com/JQuery_Core_Style_Guidelines" rel="nofollow">http://docs.jquery.com/JQuery_Core_Style_Guidelines</a> </li><li><a href="http://o.dojotoolkit.org/developer/StyleGuide" rel="nofollow">http://o.dojotoolkit.org/developer/StyleGuide</a> </li></ul>
+ </div>
+ </div>
+ </td><tr>
+</table>
+</div>
+</div>
+</body>
+</html>

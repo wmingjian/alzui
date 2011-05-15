@@ -1,0 +1,25 @@
+{
+	name:"ui_action",
+	title:"ACTION库",
+	libs:"core,ui",
+	app:"",
+	tpl:[],
+	classes:[
+		//"alz.mui.ThemeManager",
+		"alz.template.TemplateManager",
+		"alz.template.TrimPath",
+		"alz.template.Template",
+		"alz.template.ParseError",
+		//"alz.mui.Component",
+		"alz.core.ActionStack",
+		"alz.core.ActionManager",
+		"alz.action.ActionElement",
+		"alz.action.LinkLabel",
+		"alz.action.Button",
+		"alz.action.CheckBox",
+		"alz.action.ComboBox",
+		"alz.action.FormElement",
+		//"alz.mui.Pane",
+		//"alz.core.Application_action"
+	]
+}

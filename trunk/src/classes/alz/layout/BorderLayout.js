@@ -26,21 +26,22 @@ _class("BorderLayout", AbstractLayout, function(){
 		//this._self.style.backgroundColor = runtime.getColor();
 		var nodes = obj.childNodes;
 		for(var i = 0, len = nodes.length; i < len; i++){
-			if(nodes[i].nodeType != 1) continue;  //NODE_ELEMENT
-			if(nodes[i].tagName in TAGS) continue;
-			if(nodes[i].className in CLASSES) continue;
-			if(nodes[i].style.display == "none") continue;
-			var align = nodes[i].__ptr__ && nodes[i].__ptr__._align || nodes[i].getAttribute("_align");
+			var node = nodes[i];
+			if(node.nodeType != 1) continue;  //NODE_ELEMENT
+			if(node.tagName in TAGS) continue;
+			if(node.className in CLASSES) continue;
+			if(node.style.display == "none") continue;
+			var align = node.__ptr__ && node.__ptr__._align || node.getAttribute("_align");
 			if(!align){
-				runtime.log("[WARNING]Ê¹ÓÃ²¼¾ÖµÄ½áµã(tagName=" + nodes[i].tagName + ",class=" + nodes[i].className + ")È±ÉÙ_alignÊôÐÔ£¬Ä¬ÈÏÎª_align=top");
+				runtime.log("[WARNING]ä½¿ç”¨å¸ƒå±€çš„ç»“ç‚¹(tagName=" + node.tagName + ",class=" + node.className + ")ç¼ºå°‘_alignå±žæ€§ï¼Œé»˜è®¤ä¸º_align=top");
 				align = "top";
 			}
 			if(align == "none") continue;
 			if(align == "client"){
 				if(this._clientNode){
-					runtime.log("[WARNING]Ê¹ÓÃ²¼¾ÖµÄ½áµãÖ»ÄÜÓÐÒ»¸ö_align=clientµÄ×Ó½áµã");
+					runtime.log("[WARNING]ä½¿ç”¨å¸ƒå±€çš„ç»“ç‚¹åªèƒ½æœ‰ä¸€ä¸ª_align=clientçš„å­ç»“ç‚¹");
 				}
-				this._clientNode = nodes[i];
+				this._clientNode = node;
 				this._clientNode.style.position = "relative";  //[TODO]
 				//this._clientNode.style.overflowX = "hidden";
 				//this._clientNode.style.overflowY = "auto";
@@ -51,29 +52,30 @@ _class("BorderLayout", AbstractLayout, function(){
 					}else if(align == "left" || align == "right"){
 						this._direction = "horizontal";
 					}else{
-						runtime.log("[WARNING]²¼¾ÖÖÐÊ¹ÓÃÁËÎ´ÖªµÄ_alignÊôÐÔÖµ(" + align + ")");
+						runtime.log("[WARNING]å¸ƒå±€ä¸­ä½¿ç”¨äº†æœªçŸ¥çš„_alignå±žæ€§å€¼(" + align + ")");
 					}
 				}else if(this._direction == "vertical" && (align == "left" || align == "right")){
-					runtime.log("[WARNING]²¼¾ÖÒÑ¾­Îª(vertical)£¬²»ÄÜÊ¹ÓÃleft»òright×÷Îª_alignÊôÐÔÖµ");
+					runtime.log("[WARNING]å¸ƒå±€å·²ç»ä¸º(vertical)ï¼Œä¸èƒ½ä½¿ç”¨leftæˆ–rightä½œä¸º_alignå±žæ€§å€¼");
 				}else if(this._direction == "horizontal" && (align == "top" || align == "bottom")){
-					runtime.log("[WARNING]²¼¾ÖÒÑ¾­Îª(horizontal)£¬²»ÄÜÊ¹ÓÃtop»òbottom×÷Îª_alignÊôÐÔÖµ");
+					runtime.log("[WARNING]å¸ƒå±€å·²ç»ä¸º(horizontal)ï¼Œä¸èƒ½ä½¿ç”¨topæˆ–bottomä½œä¸º_alignå±žæ€§å€¼");
 				}
 			}
-			this._nodes.push(nodes[i]);
+			this._nodes.push(node);
 		}
 		if(this._direction == ""){
 			//if(this._self.tagName != "BODY"){
-			//	runtime.log("[WARNING]Î´ÄÜÕýÈ·Ê¶±ð²¼¾Ö·½Ïò£¬Çë¼ì²éÊ¹ÓÃ²¼¾ÖµÄÔªËØµÄ×ÓÔªËØ¸öÊýÊÇ²»ÊÇÖ»ÓÐÒ»¸öÇÒ_align=client");
+			//	runtime.log("[WARNING]æœªèƒ½æ­£ç¡®è¯†åˆ«å¸ƒå±€æ–¹å‘ï¼Œè¯·æ£€æŸ¥ä½¿ç”¨å¸ƒå±€çš„å…ƒç´ çš„å­å…ƒç´ ä¸ªæ•°æ˜¯ä¸æ˜¯åªæœ‰ä¸€ä¸ªä¸”_align=client");
 			//}
 			this._direction = "vertical";
 		}
 		if(this._direction == "horizontal"){
 			//this._self.style.overflow = "hidden";
 			for(var i = 0, len = this._nodes.length; i < len; i++){
-				//Ë®Æ½µÄBorderLayout²¼¾ÖÐèÒªÌæ»»µôÔ­À´µÄfloat²¼¾Ö£¬¸ÄÓÉ¾ø¶Ô¶¨Î»»úÖÆÊµÏÖ
-				this._nodes[i].style.position = "absolute";
-				this._nodes[i].style.styleFloat = "";
-				//this._nodes[i].style.overflow = "auto";
+				//æ°´å¹³çš„BorderLayoutå¸ƒå±€éœ€è¦æ›¿æ¢æŽ‰åŽŸæ¥çš„floatå¸ƒå±€ï¼Œæ”¹ç”±ç»å¯¹å®šä½æœºåˆ¶å®žçŽ°
+				var node = this._nodes[i];
+				node.style.position = "absolute";
+				node.style.styleFloat = "";
+				//node.style.overflow = "auto";
 			}
 		}
 		nodes = null;
@@ -81,11 +83,12 @@ _class("BorderLayout", AbstractLayout, function(){
 	this.dispose = function(){
 		if(this._disposed) return;
 		this._clientNode = null;
-		for(var i = 0, len = this._nodes.length; i < len; i++){
-			//if(this._nodes[i]._self){
-			//	this._nodes[i].dispose();  //[TODO]Ó¦¸ÃÔÚDOMUtil::disposeÖÐ´¦Àí
+		var nodes = this._nodes;
+		for(var i = 0, len = nodes.length; i < len; i++){
+			//if(nodes[i]._self){
+			//	nodes[i].dispose();  //[TODO]åº”è¯¥åœ¨DomUtil::disposeä¸­å¤„ç†
 			//}
-			this._nodes[i] = null;
+			nodes[i] = null;
 		}
 		this._nodes = [];
 		this._self = null;
@@ -99,8 +102,8 @@ _class("BorderLayout", AbstractLayout, function(){
 		if(this._width == w && this._height == h) return;
 		this._width = w;
 		this._height = h;
-		//if(this._self.className == "ff_cntas_list"){
-		//	alert(w + "," + h);
+		//if(this._self.className == "wui-PaneContactTable"){
+		//	window.alert(w + "," + h);
 		//}
 		if(this._self.tagName == "TABLE"){
 			var tbl = this._self;
@@ -150,8 +153,8 @@ _class("BorderLayout", AbstractLayout, function(){
 				node = null;
 			}
 		}else{  //this._direction == "horizontal"
-			//ºáÏò²¼¾ÖÊ¹ÓÃ¾ø¶Ô¶¨Î»£¬marginRightÔÚÆäÖÐ²¢²»ÆðÊ²Ã´Êµ¼ÊµÄ×÷ÓÃ£¬Ö»ÊÇÔÚ¼ÆËãÁ½¸ö½áµãÖ®¼ämarginÊ±ÓÐÓÃ
-			//¶¨Î»ÔªËØleftÊôÐÔÊ±£¬ÐèÒª¼õÈ¥×ÔÉímarginLeftÊôÐÔµÄÖµ
+			//æ¨ªå‘å¸ƒå±€ä½¿ç”¨ç»å¯¹å®šä½ï¼ŒmarginRightåœ¨å…¶ä¸­å¹¶ä¸èµ·ä»€ä¹ˆå®žé™…çš„ä½œç”¨ï¼Œåªæ˜¯åœ¨è®¡ç®—ä¸¤ä¸ªç»“ç‚¹ä¹‹é—´marginæ—¶æœ‰ç”¨
+			//å®šä½å…ƒç´ leftå±žæ€§æ—¶ï¼Œéœ€è¦å‡åŽ»è‡ªèº«marginLeftå±žæ€§çš„å€¼
 			var ww = 0, w_client = 0;
 			for(var i = 0, len = this._nodes.length; i < len; i++){
 				var node = this._nodes[i];
@@ -175,7 +178,7 @@ _class("BorderLayout", AbstractLayout, function(){
 				}
 				var h_fix = 0;
 				if(this._self.className == "ff_contact_client"){
-					h_fix = -2;  //(ÁÙÊ±½â¾ö°ì·¨)RQFM-4934 Í¨Ñ¶Â¼Ò³ÃæÓÐÒ»¸öÏàËØµÄÈ±
+					h_fix = -2;  //(ä¸´æ—¶è§£å†³åŠžæ³•)RQFM-4934 é€šè®¯å½•é¡µé¢æœ‰ä¸€ä¸ªç›¸ç´ çš„ç¼º
 				}
 				if(h) runtime.dom.setHeight(node, h - h_fix);
 				var layout = node.getAttribute("_layout");
@@ -218,31 +221,47 @@ _class("BorderLayout", AbstractLayout, function(){
 	};
 	*/
 	/**
-	 * »ñÈ¡²ÎÓë²¼¾ÖµÄ½áµã
+	 * èŽ·å–å‚ä¸Žå¸ƒå±€çš„ç»“ç‚¹
 	 */
+	/*
 	this._getAlignNodes = function(){
+		//this._getNodes();
 		var nodes = [];
 		for(var i = 0, len = this._nodes.length; i < len; i++){
-			if(this._nodes[i].style.display == "none") continue;
-			if(this._nodes[i].__ptr__){
-				nodes.push(this._nodes[i].__ptr__);
+			var node = this._nodes[i];
+			if(node.style.display == "none") continue;
+			if(!node.__ptr__){
+				node.__ptr__ = new BoxElement(node, runtime.dom);
 			}
-			//nodes.push(new BoxElement(this._nodes[i]));
+			nodes.push(node.__ptr__);
+			node = null;
+		}
+		return nodes;
+	};
+	*/
+	this._getAlignNodes = function(){
+		var dom = runtime.dom;
+		var nodes = [];
+		for(var i = 0, len = this._nodes.length; i < len; i++){
+			var node = this._nodes[i];
+			if(node.style.display == "none") continue;
+			nodes.push(new BoxElement(node, dom));
 		}
 		return nodes;
 	};
 	this.getClientNodeWidth = function(w, nodes){
-		var nn = this._component.getProperty("paddingLeft");  //¿¼ÂÇpaddingLeft
+		//var nn = runtime.dom.getStyleProperty(this._self, "paddingLeft");  //è€ƒè™‘paddingLeft
+		var nn = this._component.getProperty("paddingLeft");  //è€ƒè™‘paddingLeft
 		for(var i = 0, len = nodes.length; i < len; i++){
 			var node = nodes[i];
-			if(i == 0){  //¿¼ÂÇµÚÒ»¸öÔªËØµÄmarginLeft
+			if(i == 0){  //è€ƒè™‘ç¬¬ä¸€ä¸ªå…ƒç´ çš„marginLeft
 				nn += node._marginLeft;
 			}
 			//node.setLeft(nn);
 			nn += (node._self == this._clientNode ? 0 : node.getWidth());  //node._self.offsetWidth
 			if(i < len - 1){
-				nn += Math.max(node._marginRight, nodes[i + 1]._marginLeft);  //È¡Á½¸öÔªËØµÄmargin×î´óÖµ
-			}else{  //i == len - 1 ¿¼ÂÇ×îºóÒ»¸öÔªËØµÄmarginRight
+				nn += Math.max(node._marginRight, nodes[i + 1]._marginLeft);  //å–ä¸¤ä¸ªå…ƒç´ çš„marginæœ€å¤§å€¼
+			}else{  //i == len - 1 è€ƒè™‘æœ€åŽä¸€ä¸ªå…ƒç´ çš„marginRight
 				nn += node._marginRight;
 			}
 			node = null;
@@ -250,19 +269,27 @@ _class("BorderLayout", AbstractLayout, function(){
 		return w - nn;
 	};
 	this.getClientNodeHeight = function(h, nodes){
-		var nn = this._component.getProperty("paddingTop");  //¿¼ÂÇpaddingTop
+		//var nn = runtime.dom.getStyleProperty(this._self, "paddingTop");  //è€ƒè™‘paddingTop
+		var nn = this._component.getProperty("paddingTop");  //è€ƒè™‘paddingTop
 		for(var i = 0, len = nodes.length; i < len; i++){
 			var node = nodes[i];
-			if(i == 0){  //¿¼ÂÇµÚÒ»¸öÔªËØµÄmarginTop
+			if(i == 0){  //è€ƒè™‘ç¬¬ä¸€ä¸ªå…ƒç´ çš„marginTop
 				nn += node._marginTop;
 			}
 			//node.setTop(nn);
 			nn += (node._self == this._clientNode ? 0 : node.getHeight());  //node._self.offsetHeight
 			if(i < len - 1){
-				nn += Math.max(node._marginBottom, nodes[i + 1]._marginTop);  //È¡Á½¸öÔªËØµÄmargin×î´óÖµ
-			}else{  //i == len - 1 ¿¼ÂÇ×îºóÒ»¸öÔªËØµÄmarginBottom
+				nn += Math.max(node._marginBottom, nodes[i + 1]._marginTop);  //å–ä¸¤ä¸ªå…ƒç´ çš„marginæœ€å¤§å€¼
+			}else{  //i == len - 1 è€ƒè™‘æœ€åŽä¸€ä¸ªå…ƒç´ çš„marginBottom
 				nn += node._marginBottom;
 			}
+//			var top = runtime.dom.getStyleProperty(node._self, "top");
+//			console.log(top);
+//			if(top == -23){
+//				nn += top;
+//				console.log(nn)
+//			}
+//			nn += top;
 			node = null;
 		}
 		return h - nn;
@@ -270,9 +297,14 @@ _class("BorderLayout", AbstractLayout, function(){
 	this.updateDock =
 	this.layoutElement = function(w, h){
 		//if(this._width == w && this._height == h) return;
+		//this._width = w;
+		//this._height = h;
 		this._component.resizeTo(w, h);
+		if(this._self && this._self.__ptr__){
+			this._self.__ptr__._height = h;
+		}
 		//if(this._self.className == "ff_cntas_list"){
-		//	alert(w + "," + h);
+		//	window.alert(w + "," + h);
 		//}
 		if(this._self.tagName == "TABLE"){
 			var tbl = this._self;
@@ -291,11 +323,12 @@ _class("BorderLayout", AbstractLayout, function(){
 			tbl = null;
 			return;
 		}else if(this._self.tagName != "BODY" && this._self.tagName != "TD"){
-			//alert(this._self.tagName + "," + w + "," + h);
-			//¸ß¶ÈºÍ¿í¶ÈÒÑ¾­±»¸¸ÔªËØµ÷Õû¹ýÁË
+			//window.alert(this._self.tagName + "," + w + "," + h);
+			//é«˜åº¦å’Œå®½åº¦å·²ç»è¢«çˆ¶å…ƒç´ è°ƒæ•´è¿‡äº†
 			//if(w) runtime.dom.setWidth(this._self, w);
 			//if(h) runtime.dom.setHeight(this._self, h);
 			//if(w) w = runtime.dom.getInnerWidth(this._self);  //this._self.clientWidth - this._paddingLeft - this._paddingRight;
+			//h = runtime.dom.getInnerHeight(this._self);  //this._self.clientHeight - this._paddingTop - this._paddingBottom;
 			h = this._component.getInnerHeight();  //this._self.clientHeight - this._paddingTop - this._paddingBottom;
 		}
 		var nodes = this._getAlignNodes();
@@ -304,7 +337,7 @@ _class("BorderLayout", AbstractLayout, function(){
 			var nn = 0;
 			for(var i = 0, len = nodes.length; i < len; i++){
 				var node = nodes[i];
-				if(i == 0){  //¿¼ÂÇµÚÒ»¸öÔªËØµÄmarginTop
+				if(i == 0){  //è€ƒè™‘ç¬¬ä¸€ä¸ªå…ƒç´ çš„marginTop
 					nn += node._marginTop;
 				}
 				//node.setTop(nn);
@@ -320,21 +353,21 @@ _class("BorderLayout", AbstractLayout, function(){
 					node.layout();
 				}
 				if(i < len - 1){
-					nn += Math.max(node._marginBottom, nodes[i + 1]._marginTop);  //È¡Á½¸öÔªËØµÄmargin×î´óÖµ
-				}else{  //i == len - 1 ¿¼ÂÇ×îºóÒ»¸öÔªËØµÄmarginBottom
+					nn += Math.max(node._marginBottom, nodes[i + 1]._marginTop);  //å–ä¸¤ä¸ªå…ƒç´ çš„marginæœ€å¤§å€¼
+				}else{  //i == len - 1 è€ƒè™‘æœ€åŽä¸€ä¸ªå…ƒç´ çš„marginBottom
 					nn += node._marginBottom;
 				}
 				node = null;
 			}
 		}else{  //this._direction == "horizontal"
-			//ºáÏò²¼¾ÖÊ¹ÓÃ¾ø¶Ô¶¨Î»£¬marginRightÔÚÆäÖÐ²¢²»ÆðÊ²Ã´Êµ¼ÊµÄ×÷ÓÃ£¬Ö»ÊÇÔÚ¼ÆËãÁ½¸ö½áµãÖ®¼ämarginÊ±ÓÐÓÃ
-			//¶¨Î»ÔªËØleftÊôÐÔÊ±£¬ÐèÒª¼õÈ¥×ÔÉímarginLeftÊôÐÔµÄÖµ
-			var n_client = this.getClientNodeWidth(w, nodes);  //w - nn + runtime.dom.getStyleProperty(this._self, "paddingLeft");  //²¹ÉÏ¿¼ÂÇpaddingRightÖµ
+			//æ¨ªå‘å¸ƒå±€ä½¿ç”¨ç»å¯¹å®šä½ï¼ŒmarginRightåœ¨å…¶ä¸­å¹¶ä¸èµ·ä»€ä¹ˆå®žé™…çš„ä½œç”¨ï¼Œåªæ˜¯åœ¨è®¡ç®—ä¸¤ä¸ªç»“ç‚¹ä¹‹é—´marginæ—¶æœ‰ç”¨
+			//å®šä½å…ƒç´ leftå±žæ€§æ—¶ï¼Œéœ€è¦å‡åŽ»è‡ªèº«marginLeftå±žæ€§çš„å€¼
+			var n_client = this.getClientNodeWidth(w, nodes);  //w - nn + runtime.dom.getStyleProperty(this._self, "paddingLeft");  //è¡¥ä¸Šè€ƒè™‘paddingRightå€¼
 			var nn = 0;
 			for(var i = 0, len = nodes.length; i < len; i++){
 				var node = nodes[i];
 				node.setLeft(nn);
-				if(i == 0){  //¿¼ÂÇµÚÒ»¸öÔªËØµÄmarginLeft
+				if(i == 0){  //è€ƒè™‘ç¬¬ä¸€ä¸ªå…ƒç´ çš„marginLeft
 					nn += node._marginLeft;
 				}
 				if(node._self == this._clientNode){
@@ -348,19 +381,17 @@ _class("BorderLayout", AbstractLayout, function(){
 					node.layout();
 				}
 				if(i < len - 1){
-					nn += Math.max(node._marginRight, nodes[i + 1]._marginLeft);  //È¡Á½¸öÔªËØµÄmargin×î´óÖµ
-				}else{  //i == len - 1 ¿¼ÂÇ×îºóÒ»¸öÔªËØµÄmarginRight
+					nn += Math.max(node._marginRight, nodes[i + 1]._marginLeft);  //å–ä¸¤ä¸ªå…ƒç´ çš„marginæœ€å¤§å€¼
+				}else{  //i == len - 1 è€ƒè™‘æœ€åŽä¸€ä¸ªå…ƒç´ çš„marginRight
 					nn += node._marginRight;
 				}
 				node = null;
 			}
 		}
-		/*
 		for(var i = 0, len = nodes.length; i < len; i++){
 			nodes[i].dispose();
 			nodes[i] = null;
 		}
-		*/
 		nodes = null;
 	};
 });

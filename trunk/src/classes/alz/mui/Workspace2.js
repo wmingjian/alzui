@@ -2,6 +2,9 @@ _package("alz.mui");
 
 _import("alz.mui.Component");
 
+/**
+ * 工作区组件
+ */
 _class("Workspace", Component, function(){
 	this._init = function(){
 		_super._init.call(this);
@@ -16,6 +19,7 @@ _class("Workspace", Component, function(){
 		};
 	};
 	this.dispose = function(){
+		if(this._disposed) return;
 		this._captureComponent = null;
 		this._self.onmouseup = null;
 		this._self.onmousemove = null;

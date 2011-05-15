@@ -3,14 +3,28 @@ _package("alz.action");
 _import("alz.mui.Component");
 
 /**
- * ¾ßÓĞactionÌØĞÔµÄ×é¼şµÄ»ùÀà
+ * å…·æœ‰actionç‰¹æ€§çš„ç»„ä»¶çš„åŸºç±»
  */
 _class("ActionElement", Component, function(){
+	ActionElement.hash = {       //free        cn
+		"ActionElement"   : null,
+		"FormElement"     : null,
+		"LinkLabel"       : null,
+		"ComboBox"        : null,  //["ComboBox", "FolderSelect", "GroupSelect"]
+		"TextField"       : null,
+		"UploadFileButton": null,
+		"Button"          : null,  //["Button","SilverButton"]
+		"CheckBox"        : null,
+		"Radio"           : null
+	};
+	ActionElement.create = function(name){
+		return new this.hash[name]();
+	};
 	this._init = function(){
 		_super._init.call(this);
 		this._actionManager = null;
 		this._action = "";
-		this._timer = 0;  //¼ÆÊ±Æ÷£¬·ÀÖ¹ÓÃ»§¶à´ÎÖØ¸´µã»÷
+		this._timer = 0;  //è®¡æ—¶å™¨ï¼Œé˜²æ­¢ç”¨æˆ·å¤šæ¬¡é‡å¤ç‚¹å‡»
 	};
 	this.create = function(parent, obj, actionManager){
 		this.setParent2(parent);
@@ -19,10 +33,14 @@ _class("ActionElement", Component, function(){
 		this.init(obj);
 		return obj;
 	};
+	this.bind = function(obj, actionManager){
+		this._actionManager = actionManager;
+		this.init(obj);
+	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
 		this._disabled = this._self.getAttribute("_disabled") == "true";
-		this._action = this._self.getAttribute("_action");
+		this.setAction(this._self.getAttribute("_action"));
 		if(this._className == "ActionElement"){
 			var _this = this;
 			this._self.onclick = function(ev){
@@ -48,7 +66,7 @@ _class("ActionElement", Component, function(){
 	};
 	this.setDisabled = function(v){
 		_super.setDisabled.apply(this, arguments);
-		if(!this._disabled && this._self){
+		if(this._self){
 			this._self.disabled = v;
 		}
 	};
@@ -57,7 +75,7 @@ _class("ActionElement", Component, function(){
 			if(this._disabled) return false;
 			var d = new Date().getTime();
 			if(this._timer != 0){
-				if(d - this._timer <= 500){  //Á½´Îµã»÷¼ä¸ô±ØĞë´óÓÚ500ºÁÃë
+				if(d - this._timer <= 500){  //ä¸¤æ¬¡ç‚¹å‡»é—´éš”å¿…é¡»å¤§äº500æ¯«ç§’
 					runtime.log("cancel");
 					this._timer = d;
 					return false;
@@ -65,7 +83,7 @@ _class("ActionElement", Component, function(){
 			}
 			this._timer = d;
 			//if(this._self.tagName == "INPUT" && this._self.type == "checkbox"){
-			//onDispatchAction¿ÉÒÔÓÃÀ´¼ÇÂ¼ÓÃ»§µÄÍêÕûµÄĞĞÎª£¬²¢¶Ô´Ë½øĞĞ¡°ÓÃ»§ĞĞÎª·ÖÎö¡±
+			//onDispatchActionå¯ä»¥ç”¨æ¥è®°å½•ç”¨æˆ·çš„å®Œæ•´çš„è¡Œä¸ºï¼Œå¹¶å¯¹æ­¤è¿›è¡Œâ€œç”¨æˆ·è¡Œä¸ºåˆ†æâ€
 			if(typeof this.onDispatchAction == "function"){
 				this.onDispatchAction(this._action, sender, ev);
 			}
@@ -74,7 +92,7 @@ _class("ActionElement", Component, function(){
 			}else{
 				return this._actionManager.dispatchAction(this._action, sender, ev);
 			}
-		/*}catch(ex){  //¶ÔËùÓĞaction´¥·¢µÄÂß¼­²úÉúµÄ´íÎó½øĞĞÈİ´í´¦Àí
+		/*}catch(ex){  //å¯¹æ‰€æœ‰actionè§¦å‘çš„é€»è¾‘äº§ç”Ÿçš„é”™è¯¯è¿›è¡Œå®¹é”™å¤„ç†
 			var sb = [];
 			for(var k in ex){
 				sb.push(k + "=" + ex[k]);
@@ -83,7 +101,7 @@ _class("ActionElement", Component, function(){
 		}*/
 	};
 	this.onDispatchAction = function(action, sender, ev){
-		//[TODO]iframe Ä£Ê½ÏÂ_actionCollection Î´¶¨Òå
+		//[TODO]iframe æ¨¡å¼ä¸‹_actionCollection æœªå®šä¹‰
 		//runtime._actionCollection.onDispatchAction(action, sender);
 	};
 });

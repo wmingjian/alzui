@@ -1,11 +1,12 @@
 _package("alz.core");
 
+_import("alz.core.ManagerBase");
 _import("alz.core.Plugin");
 
 /**
- * ²å¼ş¹ÜÀíÕß
+ * Applicationæ’ä»¶ç®¡ç†è€…ç±»
  */
-_class("PluginManager", "", function(){
+_class("PluginManager", ManagerBase, function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._plugins = {};
@@ -21,13 +22,13 @@ _class("PluginManager", "", function(){
 			var id = conf.id;
 			var plugin = new conf.clazz();
 			plugin.create(id, this);
-			this.register(plugin);  //×¢²á²å¼ş
-			rt[id] = plugin;  //Ä¬ÈÏ°²×°µ½runtime¶ÔÏóÉÏÃæ
+			this.register(plugin);  //æ³¨å†Œæ’ä»¶
+			rt[id] = plugin;  //é»˜è®¤å®‰è£…åˆ°runtimeå¯¹è±¡ä¸Šé¢
 		}
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
-		//[TODO]¶à¸öÓ¦ÓÃµÄ²å¼ş×¢²áµ½Í¬Ò»¸öµØ·½£¬Ôò¿ç´°¿ÚÓ¦ÓÃµÄ²å¼şĞ¶ÔØÊ±»á±¨´í
+		//[TODO]å¤šä¸ªåº”ç”¨çš„æ’ä»¶æ³¨å†Œåˆ°åŒä¸€ä¸ªåœ°æ–¹ï¼Œåˆ™è·¨çª—å£åº”ç”¨çš„æ’ä»¶å¸è½½æ—¶ä¼šæŠ¥é”™
 		for(var k in this._plugins){
 			this._plugins[k].dispose();
 			delete this._plugins[k];
@@ -37,27 +38,27 @@ _class("PluginManager", "", function(){
 	this.destroy = function(){
 	};
 	/**
-	 * ÅĞ¶ÏÒ»¸ö²å¼şÊÇ·ñÒÑ¾­´æÔÚ
+	 * åˆ¤æ–­ä¸€ä¸ªæ’ä»¶æ˜¯å¦å·²ç»å­˜åœ¨
 	 */
 	this.exists = function(name){
 		return name in this._plugins;
 	};
 	/**
-	 * ×¢²áÒ»¸ö²å¼ş£¬Ã¿¸öAPPÏÂËùÓĞ²å¼ş²»ÄÜÖØÃû
-	 * @param {PlugIn} plugin ²å¼şµÄÊµÀı
+	 * æ³¨å†Œä¸€ä¸ªæ’ä»¶ï¼Œæ¯ä¸ªAPPä¸‹æ‰€æœ‰æ’ä»¶ä¸èƒ½é‡å
+	 * @param {PlugIn} plugin æ’ä»¶çš„å®ä¾‹
 	 */
 	this.register = function(plugin){
 		this._plugins[plugin.getName()] = plugin;
 	};
 	/**
-	 * Í¨¹ıÃû×Ö»ñÈ¡Ò»¸öÒÑ¾­×¢²áµÄ²å¼şÊµÀı
+	 * é€šè¿‡åå­—è·å–ä¸€ä¸ªå·²ç»æ³¨å†Œçš„æ’ä»¶å®ä¾‹
 	 */
 	this.getPlugIn = function(name){
 		return this._plugins[name];
 	};
 	/**
-	 * µ÷ÓÃ²å¼şµÄonResizeÊÂ¼ş
-	 * ¸øËùÓĞ²å¼şÒ»¸öµ÷Õû×ÔÉí²¼¾ÖµÄ»ú»á
+	 * è°ƒç”¨æ’ä»¶çš„onResizeäº‹ä»¶
+	 * ç»™æ‰€æœ‰æ’ä»¶ä¸€ä¸ªè°ƒæ•´è‡ªèº«å¸ƒå±€çš„æœºä¼š
 	 */
 	this.onResize = function(ev){
 		for(var k in this._plugins){

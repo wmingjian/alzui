@@ -4,17 +4,17 @@ _package("alz.core");
 _import("alz.core.ScriptLoader");
 //_import("alz.core.IframeLoader");
 
-//ÒÀÀµÓÚ runtime, runtime.getBrowser()
+//ä¾èµ–äº runtime, runtime.getBrowser()
 //[TODO]
-//  1)Ìí¼Ó·À´íÎó´¦Àí»úÖÆ£¬±£Ö¤ÇëÇó¶ÓÁĞµÄ³ÖĞø¹¤×÷
-//  2)¶ÌÂ·ËùÓĞµÄÒì²½ÇëÇó£¬±£Ö¤µ¥»ú»·¾³ÏÂÄÜ¹»Õı³£¹¤×÷
+//  1)æ·»åŠ é˜²é”™è¯¯å¤„ç†æœºåˆ¶ï¼Œä¿è¯è¯·æ±‚é˜Ÿåˆ—çš„æŒç»­å·¥ä½œ
+//  2)çŸ­è·¯æ‰€æœ‰çš„å¼‚æ­¥è¯·æ±‚ï¼Œä¿è¯å•æœºç¯å¢ƒä¸‹èƒ½å¤Ÿæ­£å¸¸å·¥ä½œ
 
 /**
- * Òì²½Êı¾İµ÷ÓÃÒıÇæ
- * [TODO]¿çÒ³Ãæ¹¤×÷
+ * å¼‚æ­¥æ•°æ®è°ƒç”¨å¼•æ“
+ * [TODO]è·¨é¡µé¢å·¥ä½œ
  */
 _class("AjaxEngine", "", function(){
-	AjaxEngine._version = "1.01.0001";  //AjaxÒıÇæµÄµ±Ç°°æ±¾
+	AjaxEngine._version = "1.01.0001";  //Ajaxå¼•æ“çš„å½“å‰ç‰ˆæœ¬
 	AjaxEngine._PROGIDS = [
 		"Microsoft.XMLHTTP",
 		"Msxml2.XMLHTTP",
@@ -23,7 +23,7 @@ _class("AjaxEngine", "", function(){
 		"MSXML.XMLHTTP",
 		"MSXML2.ServerXMLHTTP"
 	];
-	//VBS°æ±¾µÄ UTF-8 ½âÂëº¯Êı£¬´óÊı¾İÁ¿Çé¿öÏÂĞ§ÂÊµÍÏÂ£¬ÉõÓÃ£¡
+	//VBSç‰ˆæœ¬çš„ UTF-8 è§£ç å‡½æ•°ï¼Œå¤§æ•°æ®é‡æƒ…å†µä¸‹æ•ˆç‡ä½ä¸‹ï¼Œç”šç”¨ï¼
 	AjaxEngine._vbsCode = "Function VBS_bytes2BStr(vIn)"
 		+ "\n  Dim sReturn, i, nThisChar, nNextChar"
 		+ "\n  sReturn = \"\""
@@ -72,25 +72,25 @@ _class("AjaxEngine", "", function(){
 		_super._init.call(this);
 		this._timer = 0;
 		this._msec = 10;
-		this._retryMsec = 2000;  //ÇëÇóÊ§°ÜÖØÊÔµÄÊ±¼ä¼ä¸ô
-		this._http = null;  //[TODO]Õâ¸ö¶ÔÏóÓ¦¸Ã½ö¹©Òì²½ÇëÇó¶ÓÁĞÊ¹ÓÃ
-		this._queue = [];  //Òì²½ÇëÇó¶ÓÁĞ
-		this._uniqueId = 0;  //Ã¿¸öÇëÇóµÄÈ«¾ÖÎ¨Ò»±àºÅµÄÖÖ×Ó
+		this._retryMsec = 2000;  //è¯·æ±‚å¤±è´¥é‡è¯•çš„æ—¶é—´é—´éš”
+		this._http = null;  //[TODO]è¿™ä¸ªå¯¹è±¡åº”è¯¥ä»…ä¾›å¼‚æ­¥è¯·æ±‚é˜Ÿåˆ—ä½¿ç”¨
+		this._queue = [];  //å¼‚æ­¥è¯·æ±‚é˜Ÿåˆ—
+		this._uniqueId = 0;  //æ¯ä¸ªè¯·æ±‚çš„å…¨å±€å”¯ä¸€ç¼–å·çš„ç§å­
 		this._userinfo = false;
-		this._testCase = null;  //²âÊÔÓÃÀı
+		this._testCase = null;  //æµ‹è¯•ç”¨ä¾‹
 		this._retryCount = 0;
 		this._scriptLoader = null;
-		this._data = null;  //script-src·½·¨»ñÈ¡µÄÊı¾İÁÙÊ±´æ´¢µØ
+		this._data = null;  //script-srcæ–¹æ³•è·å–çš„æ•°æ®ä¸´æ—¶å­˜å‚¨åœ°
 		this._ignoreMessages = [
-			"²»ÄÜÖ´ĞĞÒÑÊÍ·Å Script µÄ´úÂë"
-			//"Íê³É¸Ã²Ù×÷ËùĞèµÄÊı¾İ»¹²»¿ÉÊ¹ÓÃ¡£"
+			"ä¸èƒ½æ‰§è¡Œå·²é‡Šæ”¾ Script çš„ä»£ç "
+			//"å®Œæˆè¯¥æ“ä½œæ‰€éœ€çš„æ•°æ®è¿˜ä¸å¯ä½¿ç”¨ã€‚"
 		];
 	};
 	this.init = function(){
 		this._http = AjaxEngine.getXmlHttpObject();
 	};
 	this.dispose = function(){
-		//if(this._disposed) return;
+		if(this._disposed) return;
 		this._data = null;
 		if(this._scriptLoader){
 			this._scriptLoader.dispose();
@@ -128,16 +128,17 @@ _class("AjaxEngine", "", function(){
 		http.open(method, url, async);
 		if(method == "POST"){
 			http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+			http.setRequestHeader("HTTP-X-Requested-With", "XMLHttpRequest");
 			if(this._userinfo){
 				http.setRequestHeader("SESSIONID", "10000");
 				http.setRequestHeader("USERNAME", runtime.getUser().getName());
 			}
 		}
-		//if(runtime.getWindow().Event){  //FF ºÍ NS Ö§³Ö Event ¶ÔÏó
+		//if(runtime.getWindow().Event){  //FF å’Œ NS æ”¯æŒ Event å¯¹è±¡
 		if(runtime.moz){  //FF
 			var ext = url.substr(url.lastIndexOf("."));
 			if(ext == ".xml" || ext == ".aul"){
-				http.overrideMimeType("text/xml; charset=gb2312");  //ÓÃÓÚ½« UTF-8 ×ª»»Îª gb2312
+				http.overrideMimeType("text/xml; charset=gb2312");  //ç”¨äºå°† UTF-8 è½¬æ¢ä¸º gb2312
 			}else{
 				http.overrideMimeType("text/xml");
 				//http.setRequestHeader("Content-Type", "text/xml");
@@ -147,19 +148,19 @@ _class("AjaxEngine", "", function(){
 		return http;
 	};
 	/**
-	 * @param {String} method Ìá½»·½·¨(GET|POST)
-	 * @param {String} url ÍøÂçµ÷ÓÃµÄurl
-	 * @param {String|Object} postData ÇëÇóÊı¾İ
-	 * @param {String} type ·µ»ØÖ»ÀàĞÍ(text|xml)
-	 * @param {Function} callback »Øµ÷º¯Êı
-	 * @param {Array} cbAgrs ´«¸ø»Øµ÷·½·¨µÄ²ÎÊı
+	 * @param {String} method æäº¤æ–¹æ³•(GET|POST)
+	 * @param {String} url ç½‘ç»œè°ƒç”¨çš„url
+	 * @param {String|Object} postData è¯·æ±‚æ•°æ®
+	 * @param {String} type è¿”å›åªç±»å‹(text|xml)
+	 * @param {Function} func å›è°ƒå‡½æ•°
+	 * @param {Array} cbAgrs ä¼ ç»™å›è°ƒæ–¹æ³•çš„å‚æ•°
 	 * @return {String|XmlDocument}
 	 */
-	this.netInvoke1 = function(method, url, postData, type, callback){
+	this.netInvoke1 = function(method, url, postData, type, func){
 		try{
-			var async = (typeof(callback) != "undefined" && callback != null) ? true : false;
-			if(async){  //Èç¹ûÊÇÒì²½ÇëÇó£¬Ê¹ÓÃÇëÇó¶ÓÁĞ¹¤×÷Ä£Ê½
-				return this.netInvoke(method, url, postData, type, callback);
+			var async = (typeof func != "undefined" && func != null) ? true : false;
+			if(async){  //å¦‚æœæ˜¯å¼‚æ­¥è¯·æ±‚ï¼Œä½¿ç”¨è¯·æ±‚é˜Ÿåˆ—å·¥ä½œæ¨¡å¼
+				return this.netInvoke(method, url, postData, type, func);
 			}else{
 				var http = this._openHttp(method, url, async);
 				/*
@@ -168,7 +169,7 @@ _class("AjaxEngine", "", function(){
 				div.innerHTML = url + "&" + postData;
 				im_history.appendChild(div);
 				*/
-				http.send(postData);  //FFÏÂÃæ²ÎÊınull²»ÄÜÊ¡ÂÔ
+				http.send(postData);  //FFä¸‹é¢å‚æ•°nullä¸èƒ½çœç•¥
 				http = null;
 				return this._onSyncCallback(type);
 			}
@@ -177,41 +178,41 @@ _class("AjaxEngine", "", function(){
 			return;
 		}
 	};
-	//ÄÚÇ¶º¯Êı
+	//å†…åµŒå‡½æ•°
 	this._encodeData = function(http, charset){
 		if(runtime.getWindow() && charset == "utf-8"){
 			return "" + http.responseText;
-		}else if(runtime.getWindow() && runtime.getWindow().execScript){  //FF ²»Ö§³Ö execScript
-			if(typeof(VBS_bytes2BStr) == "undefined"){
+		}else if(runtime.getWindow() && runtime.getWindow().execScript){  //FF ä¸æ”¯æŒ execScript
+			if(typeof VBS_bytes2BStr == "undefined"){
 				runtime.getWindow().execScript(AjaxEngine._vbsCode, "VBScript");
 			}
 			return VBS_bytes2BStr(http.responseBody);
 		}else{
-			//[TODO]Ö±½Ó·µ»Ø responseText »áÓĞÒò UTF-8 ±àÂë¶øÒıÆğµÄÂÒÂëÎÊÌâ
+			//[TODO]ç›´æ¥è¿”å› responseText ä¼šæœ‰å›  UTF-8 ç¼–ç è€Œå¼•èµ·çš„ä¹±ç é—®é¢˜
 			return http.responseText;
 		}
 	};
-	//¹©¼ÓÔØÀà¿â´úÂëÊ¹ÓÃµÄ·½·¨
-	this.netInvoke2 = function(method, url, postData, charset, agent, funName, args){
-		var async = (typeof(agent) != "undefined" && agent != null) ? true : false;
-		if(async){  //Èç¹ûÊÇÒì²½ÇëÇó£¬Ê¹ÓÃÇëÇó¶ÓÁĞ¹¤×÷Ä£Ê½
-			return this.netInvoke(method, url, postData, type, agent, funName, args);
+	//ä¾›åŠ è½½ç±»åº“ä»£ç ä½¿ç”¨çš„æ–¹æ³•
+	this.netInvoke2 = function(method, url, postData, charset, agent, func, args){
+		var async = (typeof agent != "undefined" && agent != null) ? true : false;
+		if(async){  //å¦‚æœæ˜¯å¼‚æ­¥è¯·æ±‚ï¼Œä½¿ç”¨è¯·æ±‚é˜Ÿåˆ—å·¥ä½œæ¨¡å¼
+			return this.netInvoke(method, url, postData, type, agent, func, args);
 		}else{
 			var http = this._openHttp(method, url, async);
-			if(runtime.getHostenv() == "safari" || runtime.getHostenv() == "chrome"){  //SafariÏÂÃæĞèÒªÕâÒ»¾ä
+			if(runtime.getHostenv() == "safari" || runtime.getHostenv() == "chrome"){  //Safariä¸‹é¢éœ€è¦è¿™ä¸€å¥
 				http.onreadystatechange = null;
 			}
 			/*if(async){
 				http.onreadystatechange = function(){
 					if(http.readyState != 4) return;
-					if(typeof(agent[funName]) == "function"){
-						agent[funName](http.responseText);
+					if(typeof agent[func] == "function"){
+						agent[func](http.responseText);
 					}else{
 						agent(http.responseText);
 					}
 				};
 			}*/
-			http.send("");  //Ã»ÓĞ "" µÄ»° FF ÏÂÃæ»á±¨´í
+			http.send("");  //æ²¡æœ‰ "" çš„è¯ FF ä¸‹é¢ä¼šæŠ¥é”™
 			//if(!async){
 			var data;
 			if(http.status && (200 > http.status || 300 <= http.status)){
@@ -227,26 +228,26 @@ _class("AjaxEngine", "", function(){
 		}
 	};
 	/**
-	 * ¿ÉÒÔ¸´ÓÃHTTP×é¼şµÄÍøÂçµ÷ÓÃ
-	 * @param {String} method Ìá½»·½·¨(GET|POST)
-	 * @param {String} url ÍøÂçµ÷ÓÃµÄurl
-	 * @param {String|Object} postData ÇëÇóÊı¾İ
-	 * @param {String} type ·µ»ØÖ»ÀàĞÍ(text|xml)
-	 * @param {Object|Function} agent »Øµ÷´úÀí¶ÔÏó»òÕßº¯Êı¶ÔÏó
-	 * @param {String} funName »Øµ÷´úÀí¶ÔÏóµÄ»Øµ÷·½·¨Ãû³Æ
-	 * @param {Array} cbAgrs ´«¸ø»Øµ÷·½·¨µÄ²ÎÊı
+	 * å¯ä»¥å¤ç”¨HTTPç»„ä»¶çš„ç½‘ç»œè°ƒç”¨
+	 * @param {String} method æäº¤æ–¹æ³•(GET|POST)
+	 * @param {String} url ç½‘ç»œè°ƒç”¨çš„url
+	 * @param {String|Object} postData è¯·æ±‚æ•°æ®
+	 * @param {String} type è¿”å›åªç±»å‹(text|json|xml)
+	 * @param {Object|Function} agent å›è°ƒä»£ç†å¯¹è±¡æˆ–è€…å‡½æ•°å¯¹è±¡
+	 * @param {Function|String} func å›è°ƒä»£ç†å¯¹è±¡çš„å›è°ƒæ–¹æ³•åç§°
+	 * @param {Array} cbAgrs ä¼ ç»™å›è°ƒæ–¹æ³•çš„å‚æ•°
 	 * @return {String|XmlDocument}
 	 * [TODO]
-	 *   1)¼ì²é agent ºÍ agent[funName] ±ØĞëÓĞÒ»¸öÊÇ Function ¶ÔÏó
+	 *   1)æ£€æŸ¥ agent å’Œ agent[func] å¿…é¡»æœ‰ä¸€ä¸ªæ˜¯ Function å¯¹è±¡
 	 */
-	this.netInvoke = function(method, url, postData, type, agent, funName, cbArgs){
+	this.netInvoke = function(method, url, postData, type, agent, func, cbArgs){
 		//inner function
 		function json2str(json){
 			var sb = [];
 			for(var k in json){
-				//ÏÂÃæµÄ¸Ä½ø£¬Ö§³Ö¿çwindowµÄjson¶ÔÏó´«µİ£¬¸Ä½øÂß¼­²Î¿¼clone·½·¨ÊµÏÖ
+				//ä¸‹é¢çš„æ”¹è¿›ï¼Œæ”¯æŒè·¨windowçš„jsonå¯¹è±¡ä¼ é€’ï¼Œæ”¹è¿›é€»è¾‘å‚è€ƒcloneæ–¹æ³•å®ç°
 				switch(typeof json[k]){
-				//case "undefined": break;  //Ä¿Ç°²»Ö§³ÖundefinedÖµ
+				//case "undefined": break;  //ç›®å‰ä¸æ”¯æŒundefinedå€¼
 				case "boolean":
 				case "number":
 				case "string":
@@ -254,17 +255,17 @@ _class("AjaxEngine", "", function(){
 					break;
 				case "object":
 					if(json[k] === null){  //null
-						//Ä¿Ç°²»Ö§³ÖnullÖµ
+						//ç›®å‰ä¸æ”¯æŒnullå€¼
 					}else{
-						//ÒòÎª¿ç window ²Ù×÷£¬ËùÒÔ²»ÄÜÊ¹ÓÃ instanceof ÔËËã·û
+						//å› ä¸ºè·¨ window æ“ä½œï¼Œæ‰€ä»¥ä¸èƒ½ä½¿ç”¨ instanceof è¿ç®—ç¬¦
 						//if(json[k] instanceof Array){
 						if("length" in json[k]){  //array
-							//°ÑjsÊı×é×ª»»³ÉPHPÄÜ¹»½ÓÊÕµÄPHPÊı×é
+							//æŠŠjsæ•°ç»„è½¬æ¢æˆPHPèƒ½å¤Ÿæ¥æ”¶çš„PHPæ•°ç»„
 							for(var i = 0, len = json[k].length; i < len; i++){
 								sb.push(k + "=" + encodeURIComponent(json[k][i]));
 							}
 						}else{  //object
-							//Ä¿Ç°²»Ö§³ÖobjectÀàĞÍµÄ²ÎÊı
+							//ç›®å‰ä¸æ”¯æŒobjectç±»å‹çš„å‚æ•°
 						}
 					}
 					break;
@@ -273,45 +274,46 @@ _class("AjaxEngine", "", function(){
 			return sb.join("&");
 		}
 		//if(runtime._debug){
-		//	check typeof agent || agent[funName] == "function"
+		//	check typeof agent || agent[func] == "function"
 		//}
 		var req = {
-			uniqueid: ++this._uniqueId,  //ÏÈ¼ÓºóÓÃ
-			method  : method,
-			url     : url,
-			data    : (typeof postData == "string" ? postData : json2str(postData)),
-			type    : type,
-			agent   : agent,
-			fun     : funName,
-			args    : cbArgs
+			"uniqueid": ++this._uniqueId,  //å…ˆåŠ åç”¨
+			"action"  : runtime._actionCollection.getActiveAction(),  //å…³è”å½“å‰çš„actionå¯¹è±¡
+			"method"  : method,
+			"url"     : url,
+			"data"    : (typeof postData == "string" ? postData : json2str(postData)),
+			"type"    : type,
+			"agent"   : agent,
+			"func"    : func,
+			"args"    : cbArgs
 		};
 		this._queue.push(req);
 		req = null;
-		if(this._timer == 0) this._startAjaxThread();
+		if(this._timer == 0){
+			this._startAjaxThread();
+		}
 		return this._uniqueId;
 	};
 	/**
-	 * ÔİÍ£Òì²½ÇëÇóµÄ¹¤×÷Ïß³Ì
-	 * @param {Boolean} abort ÊÇ·ñÖĞ¶Ïµ±Ç°µÄÇëÇó
+	 * æš‚åœå¼‚æ­¥è¯·æ±‚çš„å·¥ä½œçº¿ç¨‹
+	 * @param {Boolean} abort æ˜¯å¦ä¸­æ–­å½“å‰çš„è¯·æ±‚
 	 */
 	this.pauseAjaxThread = function(abort){
 		if(abort){
-			this._http.abort();  //ÖĞÖ¹µ±Ç°ÇëÇó
+			this._http.abort();  //ä¸­æ­¢å½“å‰è¯·æ±‚
 		}
-		runtime.getWindow().clearTimeout(this._timer);  //½áÊø¶¨Ê±Æ÷
+		runtime.getWindow().clearTimeout(this._timer);  //ç»“æŸå®šæ—¶å™¨
 		this._timer = 0;
 	};
 	/**
-	 * ¿ªÊ¼Òì²½ÇëÇóµÄ¹¤×÷Ïß³Ì
+	 * å¼€å§‹å¼‚æ­¥è¯·æ±‚çš„å·¥ä½œçº¿ç¨‹
 	 */
 	this._startAjaxThread = function(msec){
-		this._timer = runtime.startTimer(msec || this._msec, this, function(){
-			this._ajaxThread();
-		});
+		this._timer = runtime.startTimer(msec || this._msec, this, "_ajaxThread");
 	};
 	this._checkAjaxThread = function(retry){
 		if(this._queue.length != 0){
-			this._startAjaxThread(retry ? this._retryMsec : null);
+			this._startAjaxThread(retry ? this._retryMsec : this._msec);
 		}else{
 			this.pauseAjaxThread();
 		}
@@ -321,13 +323,15 @@ _class("AjaxEngine", "", function(){
 		if(runtime._testCaseWin){
 			runtime._testCaseWin.log(req.url + "?" + req.data);
 		}
-		var _this = this;
 		if(this._testCase && this._testCase.doFilter(req.url)){
 			var o = this._testCase.doService(req.url, this._testCase.getRequest(req.data));
 			if(o){
-				window.setTimeout(function(){_this._onTestCaseCallback(o)}, 0);
+				runtime.startTimer(0, this, function(){
+					this._onTestCaseCallback(o);
+				});
 			}
 		}else{
+			var _this = this;
 			if(req.type == "script_json"){
 				var loader = this._getScriptLoader();
 				loader.setCallback(function(){
@@ -337,8 +341,13 @@ _class("AjaxEngine", "", function(){
 				loader = null;
 			}else{
 				var http = this._openHttp(req.method, req.url, true);
-				var _this = this;
-				http.onreadystatechange = function(){_this._onAsyncCallback();};
+				http.onreadystatechange = function(){
+					//try{
+						_this._onAsyncCallback();
+					//}catch(ex){  //å±è”½å¼‚æ­¥è¯·æ±‚é”™è¯¯
+					//	alert(ex.message);
+					//}
+				};
 				http.send(req.data);
 				http = null;
 			}
@@ -348,28 +357,26 @@ _class("AjaxEngine", "", function(){
 	};
 	this._onTestCaseCallback = function(o){
 		var req = this._queue[0];
-		//µ÷ÓÃÕæÊµµÄ»Øµ÷º¯Êı
-		if(typeof(req.agent) == "function"){
+		//è°ƒç”¨çœŸå®çš„å›è°ƒå‡½æ•°
+		if(typeof req.agent == "function"){
 			req.agent(o, req.args);
-		}else if(typeof(req.fun) == "function"){
-			var fun = req.fun;
-			fun.call(req.agent, o, req.args);
-			fun = null;
+		}else if(typeof req.func == "function"){
+			req.func.call(req.agent, o, req.args);
 		}else{
-			req.agent[req.fun](o, req.args);
+			req.agent[req.func](o, req.args);
 		}
 		this._queue[0] = null;
-		this._queue.shift();  //Çå³ı¶ÓÁĞµÚÒ»¸öÔªËØ
+		this._queue.shift();  //æ¸…é™¤é˜Ÿåˆ—ç¬¬ä¸€ä¸ªå…ƒç´ 
 		this._checkAjaxThread();
 	};
 	/**
-	 * Í¬²½»Øµ÷º¯Êı
+	 * åŒæ­¥å›è°ƒå‡½æ•°
 	 */
 	this._onSyncCallback = function(type){
 		if(this._http.readyState != 4){
-			throw "×ÊÔ´ÎÄ¼ş¼ÓÔØÊ§°Ü";
+			throw "èµ„æºæ–‡ä»¶åŠ è½½å¤±è´¥";
 		}
-		//¼ì²é×´Ì¬ this._http.readyState ºÍ this._http.status
+		//æ£€æŸ¥çŠ¶æ€ this._http.readyState å’Œ this._http.status
 		var status = this._http.status;
 		if(status == 0 || (status >= 200 && status < 300)){
 			return this._getResponseData(type, this._http);
@@ -384,7 +391,7 @@ _class("AjaxEngine", "", function(){
 				case 12152: // Connection closed by server.
 				case 13030: // See above comments for variable status.
 				default:
-					runtime.showException("Í¬²½ÇëÇó´íÎó"
+					runtime.showException("åŒæ­¥è¯·æ±‚é”™è¯¯"
 						+ "\nstatus=" + status
 						+ "\nstatusText=" + this._http.statusText
 					);
@@ -395,22 +402,22 @@ _class("AjaxEngine", "", function(){
 		}
 	};
 	/**
-	 * Òì²½»Øµ÷º¯Êı
+	 * å¼‚æ­¥å›è°ƒå‡½æ•°
 	 * [TODO]
-	 *   1)°Ñµ±Ç°³ö´íµÄÇëÇóÒÆ¶¯µ½¶ÓÁĞµÄÄ©Î²È¥£¬Ó¦¸Ã¸üºÃ£¬µ«ÊÇÈç¹ûÏàÁÚµÄÇëÇóÓĞÏÈºó
-	 * ÒÀÀµ¹ØÏµÔò²»½¨ÒéÕâÃ´×ö¡£
-	 *   2)Ôö¼Ó¼òµ¥µÄÊÇ·ñÖØÊÔµÄÈ·ÈÏ»úÖÆ¡£
+	 *   1)æŠŠå½“å‰å‡ºé”™çš„è¯·æ±‚ç§»åŠ¨åˆ°é˜Ÿåˆ—çš„æœ«å°¾å»ï¼Œåº”è¯¥æ›´å¥½ï¼Œä½†æ˜¯å¦‚æœç›¸é‚»çš„è¯·æ±‚æœ‰å…ˆå
+	 * ä¾èµ–å…³ç³»åˆ™ä¸å»ºè®®è¿™ä¹ˆåšã€‚
+	 *   2)å¢åŠ ç®€å•çš„æ˜¯å¦é‡è¯•çš„ç¡®è®¤æœºåˆ¶ã€‚
 	 */
 	this._onAsyncCallback = function(){
 		if(this._http.readyState != 4) return;
 		var retry = false;
 		var status = this._http.status;
 		if(status == 0 || (status >= 200 && status < 300)){
-			this._retryCount = 0;  //Ö»Òª³É¹¦Ò»´Î£¬¾ÍÖÃÁã
+			this._retryCount = 0;  //åªè¦æˆåŠŸä¸€æ¬¡ï¼Œå°±ç½®é›¶
 			var req  = this._queue[0];
 			var o = this._getResponseData(req.type, this._http);
-			//µ÷ÓÃÕæÊµµÄ»Øµ÷º¯Êı
-			if(typeof(req.agent) == "function"){
+			//è°ƒç”¨çœŸå®çš„å›è°ƒå‡½æ•°
+			if(typeof req.agent == "function"){
 				//try{
 					req.agent(o, req.args);
 				//}catch(ex){
@@ -418,11 +425,9 @@ _class("AjaxEngine", "", function(){
 				//		throw ex;
 				//	}
 				//}
-			}else if(typeof(req.fun) == "function"){
+			}else if(typeof req.func == "function"){
 				//try{
-					var fun = req.fun;
-					fun.call(req.agent, o, req.args);
-					fun = null;
+					req.func.call(req.agent, o, req.args);
 				//}catch(ex){
 				//	if(ex.message != this._ignoreMessages[0]){
 				//		throw ex;
@@ -430,7 +435,7 @@ _class("AjaxEngine", "", function(){
 				//}
 			}else{
 				//try{
-					req.agent[req.fun](o, req.args);
+					req.agent[req.func](o, req.args);
 				//}catch(ex){
 				//	if(ex.message != this._ignoreMessages[0]){
 				//		throw ex;
@@ -439,7 +444,7 @@ _class("AjaxEngine", "", function(){
 			}
 			req = null;
 			this._queue[0] = null;
-			this._queue.shift();  //Çå³ı¶ÓÁĞµÚÒ»¸öÔªËØ
+			this._queue.shift();  //æ¸…é™¤é˜Ÿåˆ—ç¬¬ä¸€ä¸ªå…ƒç´ 
 		}else{
 			/*
 			try{
@@ -451,7 +456,7 @@ _class("AjaxEngine", "", function(){
 				case 12031:
 				case 12152: // Connection closed by server.
 				case 13030: // See above comments for variable status.
-					runtime.showException("Òì²½ÇëÇó´íÎó"
+					runtime.showException("å¼‚æ­¥è¯·æ±‚é”™è¯¯"
 						+ "\nstatus=" + status
 						+ "\nstatusText=" + this._http.statusText
 					);
@@ -463,33 +468,33 @@ _class("AjaxEngine", "", function(){
 			}
 			*/
 			this._retryCount++;
-			if(this._retryCount <= 3){  //ÖØÊÔÈı´Î
+			if(this._retryCount <= 3){  //é‡è¯•ä¸‰æ¬¡
 				retry = true;
 			}else{
-				retry = runtime.getWindow().confirm("Òì²½ÇëÇó´íÎó£º"  //runtime.showException
+				retry = runtime.getWindow().confirm("å¼‚æ­¥è¯·æ±‚é”™è¯¯ï¼š"  //runtime.showException
 					+ "\nstatus=" + status
 					+ "\nstatusText=" + this._http.statusText
-					+ "\nÊÇ·ñÖØÊÔ±¾´ÎÇëÇó£¿"
+					+ "\næ˜¯å¦é‡è¯•æœ¬æ¬¡è¯·æ±‚ï¼Ÿ"
 				);
 			}
-			this._http.abort();  //ÖĞÖ¹µ±Ç°³ö´íµÄÇëÇó
-			if(!retry){  //Èç¹û²»ĞèÒªÖØÊÔµÄ»°
+			this._http.abort();  //ä¸­æ­¢å½“å‰å‡ºé”™çš„è¯·æ±‚
+			if(!retry){  //å¦‚æœä¸éœ€è¦é‡è¯•çš„è¯
 				this._queue[0] = null;
-				this._queue.shift();  //Çå³ı¶ÓÁĞµÚÒ»¸öÔªËØ
+				this._queue.shift();  //æ¸…é™¤é˜Ÿåˆ—ç¬¬ä¸€ä¸ªå…ƒç´ 
 			}
 		}
 		this._checkAjaxThread(retry);
 	};
 	/**
-	 * SCRIPT-src Òì²½»Øµ÷º¯Êı
+	 * SCRIPT-src å¼‚æ­¥å›è°ƒå‡½æ•°
 	 */
 	this._onScriptCallback = function(){
-		this._retryCount = 0;  //Ö»Òª³É¹¦Ò»´Î£¬¾ÍÖÃÁã
+		this._retryCount = 0;  //åªè¦æˆåŠŸä¸€æ¬¡ï¼Œå°±ç½®é›¶
 		var req  = this._queue[0];
 		var o = this._data;
-		this._data = null;  //±£Ö¤²»¶ÔÆäËûµÄÇëÇó²úÉúÓ°Ïì
-		//µ÷ÓÃÕæÊµµÄ»Øµ÷º¯Êı
-		if(typeof(req.agent) == "function"){
+		this._data = null;  //ä¿è¯ä¸å¯¹å…¶ä»–çš„è¯·æ±‚äº§ç”Ÿå½±å“
+		//è°ƒç”¨çœŸå®çš„å›è°ƒå‡½æ•°
+		if(typeof req.agent == "function"){
 			//try{
 				req.agent(o, req.args);
 			//}catch(ex){
@@ -497,11 +502,9 @@ _class("AjaxEngine", "", function(){
 			//		throw ex;
 			//	}
 			//}
-		}else if(typeof(req.fun) == "function"){
+		}else if(typeof req.func == "function"){
 			//try{
-				var fun = req.fun;
-				fun.call(req.agent, o, req.args);
-				fun = null;
+				req.func.call(req.agent, o, req.args);
 			//}catch(ex){
 			//	if(ex.message != this._ignoreMessages[0]){
 			//		throw ex;
@@ -509,7 +512,7 @@ _class("AjaxEngine", "", function(){
 			//}
 		}else{
 			//try{
-				req.agent[req.fun](o, req.args);
+				req.agent[req.func](o, req.args);
 			//}catch(ex){
 			//	if(ex.message != this._ignoreMessages[0]){
 			//		throw ex;
@@ -518,7 +521,7 @@ _class("AjaxEngine", "", function(){
 		}
 		req = null;
 		this._queue[0] = null;
-		this._queue.shift();  //Çå³ı¶ÓÁĞµÚÒ»¸öÔªËØ
+		this._queue.shift();  //æ¸…é™¤é˜Ÿåˆ—ç¬¬ä¸€ä¸ªå…ƒç´ 
 		this._checkAjaxThread();
 	};
 	this._getResponseData = function(type, http){
@@ -541,15 +544,15 @@ _class("AjaxEngine", "", function(){
 		return o;
 	};
 	/*
-	this.netInvoke = function(method, url, postData, type, callback){
+	this.netInvoke = function(method, url, postData, type, func){
 		try{
-			var async = callback ? true : false;
+			var async = func ? true : false;
 			this._http.open(method, url, async);
 			if(async){
 				var _this = this;
 				this._http.onreadystatechange = function(){
 					if(_this._http.readyState == 4){
-						_this.onreadystatechange(type, callback);
+						_this.onreadystatechange(type, func);
 					}
 				};
 			}
@@ -561,14 +564,15 @@ _class("AjaxEngine", "", function(){
 			* /
 			if(method == "POST"){
 				this._http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+				this._http.setRequestHeader("HTTP-X-Requested-With", "XMLHttpRequest");
 			}
-			this._http.send(postData);  //FFÏÂÃæ²ÎÊınull²»ÄÜÊ¡ÂÔ
+			this._http.send(postData);  //FFä¸‹é¢å‚æ•°nullä¸èƒ½çœç•¥
 			if(async){
 				return;
 			}else{
-				//¼ì²é×´Ì¬ this._http.readyState ºÍ this._http.status
+				//æ£€æŸ¥çŠ¶æ€ this._http.readyState å’Œ this._http.status
 				if(this._http.readyState != 4){
-					runtime.getWindow().alert("×ÊÔ´ÎÄ¼ş¼ÓÔØÊ§°Ü");
+					runtime.getWindow().alert("èµ„æºæ–‡ä»¶åŠ è½½å¤±è´¥");
 					return;
 				}else{
 					return this.onreadystatechange(type);
@@ -583,7 +587,7 @@ _class("AjaxEngine", "", function(){
 			return;
 		}
 	};
-	this.onreadystatechange = function(type, callback){
+	this.onreadystatechange = function(type, func){
 		//code = Bytes2BStr(this._http.responseBody);
 		var o;
 		switch(type){
@@ -595,45 +599,44 @@ _class("AjaxEngine", "", function(){
 			o = this._http.responseXML;
 			break;
 		}
-		if(callback){
-			callback(o);
+		if(func){
+			func(o);
 		}else{
 			return o;
 		}
 	};
 	*/
 	/**
-	 * µ÷ÓÃÒ»¸öÇëÇó¶ÓÁĞ
-	 * @param {Array} queue ÇëÇó¶ÓÁĞÊı×é
-	 * @param {Object} agent »Øµ÷´úÀí¶ÔÏó
-	 * @param {Function} callback »Øµ÷º¯Êı
+	 * è°ƒç”¨ä¸€ä¸ªè¯·æ±‚é˜Ÿåˆ—
+	 * @param {Array} queue è¯·æ±‚é˜Ÿåˆ—æ•°ç»„
+	 * @param {Object} agent å›è°ƒä»£ç†å¯¹è±¡
+	 * @param {Function} func å›è°ƒå‡½æ•°
 	 */
-	this.netInvokeQueue = function(queue, agent, callback){
+	this.netInvokeQueue = function(queue, agent, func){
 		var i = 0;
-		var _this = this;
 		function cb(){
 			if(i < queue.length){
 				var req = queue[i];
-				//netInvoke(method, url, postData, type, agent, funName)
-				_this.netInvoke.call(_this, req[0], req[1], req[2], req[3], function(data){
+				//netInvoke(method, url, postData, type, agent, func)
+				this.netInvoke(req[0], req[1], req[2], req[3], this, function(data){
 					var agent = req[4];
-					var fun   = req[5];
-					//µ÷ÓÃÕæÊµµÄ»Øµ÷º¯Êı
-					if(typeof(agent) == "function"){
+					var func  = req[5];
+					//è°ƒç”¨çœŸå®çš„å›è°ƒå‡½æ•°
+					if(typeof agent == "function"){
 						agent(data, req[6]);
-					}else if(typeof(fun) == "function"){
-						fun.call(agent, data, req[6]);
+					}else if(typeof func == "function"){
+						func.call(agent, data, req[6]);
 					}else{
-						agent[fun](data, req[6]);
+						agent[func](data, req[6]);
 					}
-					fun = null;
+					func = null;
 					agent = null;
 					req = null;
 					i++;
-					runtime.startTimer(0, this, cb);  //µ÷ÓÃÏÂÒ»¸ö
+					runtime.startTimer(0, this, cb);  //è°ƒç”¨ä¸‹ä¸€ä¸ª
 				});
-			}else{  //¶ÓÁĞÍê³É
-				callback.apply(agent);
+			}else{  //é˜Ÿåˆ—å®Œæˆ
+				func.apply(agent);
 			}
 		}
 		cb.call(this);
@@ -647,16 +650,16 @@ _class("AjaxEngine", "", function(){
 		return -1;
 	};
 	/**
-	 * ÖÕÖ¹Ö¸¶¨µÄ uniqueid µÄÄ³¸öÇëÇó£¬¶ÓÁĞÕı³£ÔË×ª
-	 * @param {Number} uniqueid Ã¿¸öÇëÇóµÄÈ«¾ÖÎ¨Ò»±àºÅ
+	 * ç»ˆæ­¢æŒ‡å®šçš„ uniqueid çš„æŸä¸ªè¯·æ±‚ï¼Œé˜Ÿåˆ—æ­£å¸¸è¿è½¬
+	 * @param {Number} uniqueid æ¯ä¸ªè¯·æ±‚çš„å…¨å±€å”¯ä¸€ç¼–å·
 	 */
 	this.abort = function(uniqueid){
 		var n = this.getReqIndex(uniqueid);
 		if(n == -1) return;
-		if(n == 0){  //Èç¹ûÊÇµ±Ç°ÇëÇó
-			this._http.abort();  //ÖĞÖ¹µ±Ç°ÇëÇó
+		if(n == 0){  //å¦‚æœæ˜¯å½“å‰è¯·æ±‚
+			this._http.abort();  //ä¸­æ­¢å½“å‰è¯·æ±‚
 			this._queue[n] = null;
-			this._queue.shift();  //Çå³ı¶ÓÁĞµÚÒ»¸öÔªËØ
+			this._queue.shift();  //æ¸…é™¤é˜Ÿåˆ—ç¬¬ä¸€ä¸ªå…ƒç´ 
 			this._checkAjaxThread();
 		}else{
 			this._queue[n] = null;

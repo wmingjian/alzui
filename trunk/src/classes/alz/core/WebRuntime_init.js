@@ -1,6 +1,6 @@
 _package("alz.core");
 
-_extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
+_extension("WebRuntime", function(){  //æ³¨å†Œ WebRuntime æ‰©å±•
 	/*
 	this._init = function(){
 	};
@@ -13,7 +13,8 @@ _extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
 		}
 		return dest;
 	};
-	this.toArray = function(iterable){  //prototype $A µÄÊµÏÖ´úÂë
+	/*
+	this.toArray = function(iterable){  //prototype $A çš„å®ç°ä»£ç 
 		if(!iterable) return [];
 		if(iterable.toArray){
 			return iterable.toArray();
@@ -25,11 +26,23 @@ _extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
 			return results;
 		}
 	};
+	*/
+	this.toArray = function(arrayLike){
+		var rs = [];
+		try{
+			rs = [].slice.call(arrayLike, 0);
+		}catch(e){  //for IE6/7/8
+			for(var i = 0; j = arrayLike[i++];){
+				rs.push(j);
+			}
+		}
+		return rs;
+	};
 	/**
-	 * ±éÀúÒ»¸ö¶ÔÏó£¬²¢·µ»Ø¸ñÊ½»¯µÄ×Ö·û´®
+	 * éå†ä¸€ä¸ªå¯¹è±¡ï¼Œå¹¶è¿”å›æ ¼å¼åŒ–çš„å­—ç¬¦ä¸²
 	 */
 	this.forIn = function(obj){
-		if(typeof obj == "string") return [obj];  //FF ¼æÈİÎÊÌâ
+		if(typeof obj == "string") return [obj];  //FF å…¼å®¹é—®é¢˜
 		var a = [];
 		for(var k in obj){
 			a.push(k + "=" + (typeof obj[k] == "function" ? "[function]" : obj[k]));
@@ -44,8 +57,8 @@ _extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
 		this._win.alert(a.join("\n"));
 	};
 	/**
-	 * ÏÔÊ¾ĞÅÏ¢
-	 * Ê¹ÓÃÁË±ØĞë document.body ¶ÔÏó£¬±ØĞëÔÚ onContentLoaded Ö®ºóÊ¹ÓÃ
+	 * æ˜¾ç¤ºä¿¡æ¯
+	 * ä½¿ç”¨äº†å¿…é¡» document.body å¯¹è±¡ï¼Œå¿…é¡»åœ¨ onContentLoaded ä¹‹åä½¿ç”¨
 	 */
 	this.showInfo = function(info){
 		//this._win.alert(info);
@@ -61,7 +74,7 @@ _extension("WebRuntime", function(){  //×¢²á WebRuntime À©Õ¹
 		this._info.innerHTML = info;
 		if(this._info.style.display == "none"){
 			this._info.style.display = "block";
-			//ÏÔÊ¾µÄÊ±ºòÖØĞÂ¶¨Òå¿í¶È
+			//æ˜¾ç¤ºçš„æ—¶å€™é‡æ–°å®šä¹‰å®½åº¦
 			this._info.style.width = (this.getBody().offsetWidth - 20) + "px";
 		}
 	};

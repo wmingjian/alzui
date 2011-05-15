@@ -3,7 +3,7 @@ _package("alz.core");
 _import("alz.core.EventTarget");
 
 /**
- * JSÎÄ¼ş¼ÓÔØÆ÷
+ * JSæ–‡ä»¶åŠ è½½å™¨
  */
 _class("ScriptLoader", EventTarget, function(){
 	this._init = function(){
@@ -11,16 +11,17 @@ _class("ScriptLoader", EventTarget, function(){
 		this._event = runtime.ie ? "onreadystatechange" : "onload";
 		this._scripts = [];
 		this._agent = null;
-		this._fun = null;
+		this._func = null;
 		this._urls = null;
 		this._index = 0;
 	};
-	this.create = function(agent, fun){
+	this.create = function(agent, func){
 		this._agent = agent;
-		this._fun = fun;
+		this._func = func;
 	};
 	this.dispose = function(){
-		this._fun = null;
+		if(this._disposed) return;
+		this._func = null;
 		this._agent = null;
 		for(var i = 0, len = this._scripts.length; i < len; i++){
 			this._scripts[i][this._event] = null;
@@ -37,7 +38,7 @@ _class("ScriptLoader", EventTarget, function(){
 		obj.type = "text/javascript";
 		obj.charset = "utf-8";
 		obj[this._event] = function(){
-			//½Å±¾Èç¹û»º´æ×´Ì¬Îª complete£¬·ñÔòÎª loaded
+			//è„šæœ¬å¦‚æœç¼“å­˜çŠ¶æ€ä¸º completeï¼Œå¦åˆ™ä¸º loaded
 			if(runtime.ie && !(this.readyState == "loaded" || this.readyState == "complete")){
 				return;
 			}
@@ -49,13 +50,13 @@ _class("ScriptLoader", EventTarget, function(){
 		return obj;
 	};
 	/**
-	 * Ò»´Î¼ÓÔØÒ»¸ö»ò¶à¸ö½Å±¾
+	 * ä¸€æ¬¡åŠ è½½ä¸€ä¸ªæˆ–å¤šä¸ªè„šæœ¬
 	 */
 	this.load = function(urls, data, skipcb){
 		if(!skipcb){
 			for(var i = 0, len = urls.length; i < len; i++){
 				urls[i] += "?"
-					+ "_cb_=0,runtime._ajax._data"  //0=(±äÁ¿¸³Öµ£¬n=v),1=(º¯Êı»Øµ÷£¬f(v))
+					+ "_cb_=0,runtime._ajax._data"  //0=(å˜é‡èµ‹å€¼ï¼Œn=v),1=(å‡½æ•°å›è°ƒï¼Œf(v))
 					+ "&ts=" + new Date().getTime()
 					+ (data ? "&" + data : "");
 			}
@@ -64,8 +65,8 @@ _class("ScriptLoader", EventTarget, function(){
 		this.onLoad();
 	};
 	this.onLoad = function(ev){
-		if(this._index >= this._urls.length){  //Íê³É
-			this._fun.apply(this._agent);
+		if(this._index >= this._urls.length){  //å®Œæˆ
+			this._func.apply(this._agent);
 			this.dispose();
 		}else{
 			this.createScript(runtime._domScript.parentNode, this._urls[this._index++]);

@@ -1,12 +1,11 @@
 @charset "utf-8";
 
 @import "aui-LineEdit.css";
-@import "mui-ListBox.css";
-@import "mui-Window.css";
-@import "mui-Table.css";
+@import "aui-ListBox.css";
+@import "aui-Window.css";
+@import "aui-Table.css";
+@import "aui-WindowSkin.css";
 
 /* 公共样式 */
-html,
-body{position:relative;overflow:hidden;width:100%;height:100%;margin:0px;border:0px;padding:0px}
+html,body{position:relative;overflow:hidden;width:100%;height:100%;margin:0px;border:none;padding:0px;/*background-color:background;*/}
 p{margin:0px;font:12px "宋体"}
-/*background-color:background;*/

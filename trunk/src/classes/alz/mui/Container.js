@@ -3,7 +3,7 @@ _package("alz.mui");
 _import("alz.mui.Component");
 
 /**
- * ·²ÊÇ¾ßÓĞ_layout,_alignÊôĞÔµÄÔªËØÈ«²¿ÊÇ¸ÃÀà»ò×ÓÀàµÄÊµÀı
+ * å‡¡æ˜¯å…·æœ‰_layout,_alignå±æ€§çš„å…ƒç´ å…¨éƒ¨æ˜¯è¯¥ç±»æˆ–å­ç±»çš„å®ä¾‹
  */
 _class("Container", Component, function(){
 	this._init = function(){
@@ -32,7 +32,7 @@ _class("Container", Component, function(){
 		this._nodes.push(component);
 	};
 	/**
-	 * »á±» DockPanel ×é¼şÖØÔØ£¬ÒÔÊµÏÖÌØÊâµÄ²¼¾Ö¶¨Òå
+	 * ä¼šè¢« DockPanel ç»„ä»¶é‡è½½ï¼Œä»¥å®ç°ç‰¹æ®Šçš„å¸ƒå±€å®šä¹‰
 	 */
 	this.getDockRect = function(){
 		return {
@@ -43,12 +43,12 @@ _class("Container", Component, function(){
 		};
 	};
 	/**
-	 * °´ÕÕÍ£¿¿µÄÓÅÏÈË³Ğò£º1)ÉÏÏÂ£»2)×óÓÒ£»3)¾ÓÖĞ£¬¸üĞÂÍ£¿¿×é¼şµÄÎ»ÖÃĞÅÏ¢
+	 * æŒ‰ç…§åœé çš„ä¼˜å…ˆé¡ºåºï¼š1)ä¸Šä¸‹ï¼›2)å·¦å³ï¼›3)å±…ä¸­ï¼Œæ›´æ–°åœé ç»„ä»¶çš„ä½ç½®ä¿¡æ¯
 	 */
 	this.updateDock = function(){
 		var rect = this.getDockRect();
 		var nodes = this._nodes;
-		//µ÷ÕûÉÏÍ£¿¿µÄ×é¼ş
+		//è°ƒæ•´ä¸Šåœé çš„ç»„ä»¶
 		for(var i = 0, len = nodes.length; i < len; i++){
 			var obj = nodes[i];
 			switch(obj.getAlign()){
@@ -60,7 +60,7 @@ _class("Container", Component, function(){
 				break;
 			}
 		}
-		//µ÷ÕûÏÂÍ£¿¿µÄ×é¼ş
+		//è°ƒæ•´ä¸‹åœé çš„ç»„ä»¶
 		for(var i = nodes.length - 1; i >= 0; i--){
 			var obj = nodes[i];
 			switch(obj.getAlign()){
@@ -71,7 +71,7 @@ _class("Container", Component, function(){
 				break;
 			}
 		}
-		//µ÷Õû×óÍ£¿¿µÄ×é¼ş
+		//è°ƒæ•´å·¦åœé çš„ç»„ä»¶
 		for(var i = 0, len = nodes.length; i < len; i++){
 			var obj = nodes[i];
 			switch(obj.getAlign()){
@@ -83,7 +83,7 @@ _class("Container", Component, function(){
 				break;
 			}
 		}
-		//µ÷ÕûÓÒÍ£¿¿µÄ×é¼ş
+		//è°ƒæ•´å³åœé çš„ç»„ä»¶
 		for(var i = nodes.length - 1; i >= 0; i--){
 			var obj = nodes[i];
 			switch(obj.getAlign()){
@@ -94,12 +94,12 @@ _class("Container", Component, function(){
 				break;
 			}
 		}
-		//µ÷Õû¾ÓÖĞÍ£¿¿µÄ×é¼ş
+		//è°ƒæ•´å±…ä¸­åœé çš„ç»„ä»¶
 		for(var i = 0, len = nodes.length; i < len; i++){
 			var obj = nodes[i];
 			switch(obj.getAlign()){
 			case "client":
-				//×îºóµ÷Õûalign == "client"µÄ×é¼şµÄ´óĞ¡
+				//æœ€åè°ƒæ•´align == "client"çš„ç»„ä»¶çš„å¤§å°
 				obj.moveTo(rect.x, rect.y);
 				obj.resize(rect.w, rect.h);
 				break;

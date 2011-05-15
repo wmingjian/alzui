@@ -3,7 +3,7 @@ _package("alz.mui");
 _import("alz.mui.ToggleGroup");
 
 /**
- * Ë«Ì¬°´Å¥¹ÜÀíÕß
+ * åŒæ€æŒ‰é’®ç®¡ç†è€…
  */
 _class("ToggleManager", "", function(){
 	this._init = function(){

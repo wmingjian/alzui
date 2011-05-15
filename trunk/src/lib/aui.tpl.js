@@ -1,6 +1,8 @@
 /*
- * alzui-mini ¿ò¼ÜÄ£°å¿â
+ * alzui-mini æ¡†æ¶æ¨¡æ¿åº“
  */
 runtime.regTpl("aui", {
-dialog.xml
+dialog.xml,
+debug.xml,
+dlg_debug.xml
 });

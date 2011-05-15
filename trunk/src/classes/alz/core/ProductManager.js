@@ -1,21 +1,21 @@
 _package("alz.core");
 
 /**
- * ²úÆ·ÅäÖÃĞÅÏ¢¹ÜÀíÕßÀà
+ * äº§å“é…ç½®ä¿¡æ¯ç®¡ç†è€…ç±»
  */
 _class("ProductManager", "", function(){
 	this._init = function(){
 		_super._init.call(this);
 		/**
-		 * ²úÆ·ÅäÖÃÊı¾İ
+		 * äº§å“é…ç½®æ•°æ®
 		 * {
-		 *   name: "sinamail-5.0",  //²úÆ·Ãû³Æ
-		 *   tpl: [],   //Ä£°å
-		 *   skin: [],  //Æ¤·ô
-		 *   paper: []  //ĞÅÖ½
+		 *   name: "sinamail-5.0",  //äº§å“åç§°
+		 *   tpl: [],   //æ¨¡æ¿
+		 *   skin: [],  //çš®è‚¤
+		 *   paper: []  //ä¿¡çº¸
 		 * }
 		 */
-		this._products = {};  //²úÆ·ÅäÖÃÊı¾İ£¬¸ñÊ½[{name:"",tpl:[],skin:[],paper:[]},...]
+		this._products = {};  //äº§å“é…ç½®æ•°æ®ï¼Œæ ¼å¼[{name:"",tpl:[],skin:[],paper:[]},...]
 		this._activeProduct = null;
 	};
 	this.dispose = function(){
@@ -29,12 +29,12 @@ _class("ProductManager", "", function(){
 	this.destroy = function(){
 	};
 	/**
-	 * ×¢²áÒ»¸ö²úÆ·ÅäÖÃÊı¾İ
-	 * @param {JsonObject} data ²úÆ·ÅäÖÃ¶ÔÏó
+	 * æ³¨å†Œä¸€ä¸ªäº§å“é…ç½®æ•°æ®
+	 * @param {JsonObject} data äº§å“é…ç½®å¯¹è±¡
 	 */
 	this.regProduct = function(data){
 		if(data.name in this._products){
-			window.alert("[ERROR]²úÆ·" + data.name + "ÒÑ¾­×¢²á¹ıÁË");
+			window.alert("[ERROR]äº§å“" + data.name + "å·²ç»æ³¨å†Œè¿‡äº†");
 		}else{
 			this._products[data.name] = data;
 			this._activeProduct = data;
@@ -47,13 +47,13 @@ _class("ProductManager", "", function(){
 		for(var k in this._products){
 			return this._products[k];
 		}
-		runtime.log("[WebRuntime::getProduct]data_xxx.jsÎ´ÄÜÕıÈ·¼ÓÔØ£¬ÏµÍ³ÎŞ·¨Õı³£ÔËĞĞ£¬Çë¼ì²é£¡");
+		runtime.log("[WebRuntime::getProduct]data_xxx.jsæœªèƒ½æ­£ç¡®åŠ è½½ï¼Œç³»ç»Ÿæ— æ³•æ­£å¸¸è¿è¡Œï¼Œè¯·æ£€æŸ¥ï¼");
 		return {
-			"name" : "",  //²úÆ·Ãû³Æ
-			"tpl"  : [],  //Ä£°å
-			"skin" : [],  //Æ¤·ô
-			"paper": [],  //ĞÅÖ½
-			"app"  : []   //APPÅäÖÃ
+			"name" : "",  //äº§å“åç§°
+			"tpl"  : [],  //æ¨¡æ¿
+			"skin" : [],  //çš®è‚¤
+			"paper": [],  //ä¿¡çº¸
+			"app"  : []   //APPé…ç½®
 		};
 		//return null;
 	};

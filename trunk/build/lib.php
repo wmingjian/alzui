@@ -1,37 +1,29 @@
 <?php
 require_once('_inc.php');
 
-$path_classes = $path_root . '/' . $install_dir . '/lib/classes/';
+/*
+	URL格式：
+	/caf/lib/aui.lib.js
+	/caf/apps/__app__.lib.js
+	/apps/citylife/lib/citylife.lib.js
+*/
+/*
 $map = array(
-	'aui.lib.js'          => array(),  //单文件框架
-	'__init__mini.lib.js' => array(),
-	'core.lib.js'         => array(),
-	'ui.lib.js'           => array(),
-	'ui_action.lib.js'    => array(),   //lib目录 app目录
-	'docs.lib.js'     => array('/docs/src/' , '/docs/src/classes/'),
-	'demos.lib.js'    => array('/demos/src/', '/demos/src/classes/')
+	//lib文件名                  lib目录                         类搜索目录(分号分隔多个目录)
+	'aui.lib.js'        => array('/framework/src/'               , ''),
+	'docs.lib.js'       => array('/framework/src/'               , ''),
+	'demos.lib.js'      => array('/framework/src/'               , ''),
+	'scrollview.lib.js' => array('/framework/src/'               , ''),
+	'caf.lib.js'        => array('/framework/src/'               , ''),
+	'__app__.lib.js'    => array('/framework/apps/__app__/src/'  , '/framework/apps/__app__/src/classes/'  ),
+	'homeshell.lib.js'  => array('/framework/apps/homeshell/src/', '/framework/apps/homeshell/src/classes/'),
+	'citylife.lib.js'   => array('/apps/citylife/src/' , '/apps/citylife/src/classes/' ),
+	'qutao.lib.js'      => array('/apps/qutao/src/'    , '/apps/qutao/src/classes/'    ),
+	'search.lib.js'     => array('/apps/search/src/'   , '/apps/search/src/classes/'   ),
+	'yunweibo.lib.js'   => array('/apps/yunweibo/src/' , '/apps/yunweibo/src/classes/' ),
+	'doubanmov.lib.js'  => array('/apps/doubanmov/src/', '/apps/doubanmov/src/classes/'),
+	'sample.lib.js'     => array('/apps/sample/src/'   , '/apps/sample/src/classes/'   )
 );
-
+*/
 header("Content-Type: text/javascript; charset=utf-8");
-echo '/* autogen by file.php */';
-echo "\n";
-$f = strtolower($_GET['f']);
-$code = file_get_contents($path_root . preg_replace('/\/lib\//', "/lib/lib/", $f));
-$code = preg_replace_callback('/\nimport ([\w\.]+);/', "do_import", $code);  //'/\nimport (\w+(?:\.\w+)+);/'
-$code = mb_convert_encoding($code, 'utf-8', 'gb2312');
-if($autoGenFile){
-	$name = preg_replace('/\.lib\.js/', ".lib0.js", $f);
-	//$name = $f;
-	file_put_contents($path_root . $name, $code);
-}
-echo $code;
-
-function do_import($matches){
-	global $path_classes;
-	$name = preg_replace('/\./', "/", $matches[1]) . '.js';
-	$fdata = file_get_contents($path_classes . $name);
-	$fdata = preg_replace('/_class\(\"(\w+)\", (\w+|\"\"), function\(\)\{/', '_class("\1", \2, function(_super){', $fdata);
-	return "\n/*<file name=\"" . $name . "\">*/"
-		. "\n" . $fdata
-		. "\n/*</file>*/";
-}
+echo $libtool->create_lib($_GET['f']);
