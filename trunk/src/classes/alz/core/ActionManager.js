@@ -1,7 +1,7 @@
 _package("alz.core");
 
 /**
- * Action管理者类
+ * Action管理者类(Pane专用元素管理类)
  */
 _class("ActionManager", "", function(){
 	this._init = function(){
@@ -31,6 +31,12 @@ _class("ActionManager", "", function(){
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){
+	};
+	/**
+	 * 获取action响应类
+	 */
+	this.getActionEngine = function(){
+		return this._actionEngine;
 	};
 	this.setFocusButton = function(btn){
 		this._focusbutton = btn;
@@ -97,6 +103,9 @@ _class("ActionManager", "", function(){
 	};
 	/**
 	 * 分派一个action
+	 * @param {String} name action的名字
+	 * @param {Element} sender action发送者
+	 * @param {Event} ev 原始的事件
 	 */
 	this.dispatchAction = function(name, sender, ev){
 		if(this._actionEngine.doAction){

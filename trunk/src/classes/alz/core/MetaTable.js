@@ -1,14 +1,43 @@
 _package("alz.core");
 
-_class("MetaTable", "", function(){
+_import("alz.core.EventTarget");
+_import("alz.core.TableIndex");
+_import("alz.core.TableFilter");
+_import("alz.core.DataChangeEvent");
+
+/**
+ * 元数据表
+ */
+_class("MetaTable", EventTarget, function(){
 	this._init = function(key){
 		_super._init.call(this);
+	//this._parent = null;
+	//this._listeners = [];     //数据监听组件列表
+		this._conf = null;        //配置信息
+		this._id = "";            //数据表ID标识
 		this._primaryKey = key || "id";
-		this._hash = {};
-		this._list = [];
+		this._hash = {};          //(哈希表)数据列表
+		this._list = [];        //数据数组(当含有排序信息后，可以当作主索引使用)
+		this._hashIndex = {};     //索引哈希(每个元素是一个TableIndex对象)
+		this._filters = {};       //过滤器及过滤器对应的结果
+	};
+	this.create = function(parent, id, path){
+		var index = this.createIndex("+" + this._primaryKey);
+		this._list = index.getList();  //主索引
+		this._parent = parent;
+		this._id = id;
+		this._path = path;
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
+		for(var k in this._filters){
+			this._filters[k] = null;
+			delete this._filters[k];
+		}
+		for(var k in this._hashIndex){
+			this._hashIndex[k].dispose();
+			delete this._hashIndex[k];
+		}
 		for(var i = 0, len = this._list.length; i < len; i++){
 			this._list[i] = null;
 		}
@@ -17,7 +46,73 @@ _class("MetaTable", "", function(){
 		for(var k in this._hash){
 			delete this._hash[k];
 		}
+		//this._parent = null;
 		_super.dispose.apply(this);
+	};
+	this.exists = function(id){
+		return id in this._hash;
+	};
+	this.setConf = function(v){
+		this._conf = v;
+	};
+	this.getId = function(){
+		return this._id;
+	};
+	this.getPrimaryKey = function(){
+		return this._primaryKey;
+	};
+	this.getMaxId = function(){
+		return this._maxId;
+	};
+	this.getLength = function(){
+		return this._list.length;
+	};
+	this.getItem = function(id){
+		return this._hash[id];
+	};
+	this.getList = function(){
+		return this._list;
+	};
+	this.getListByFilter = function(filter){
+		var arr = [];
+		for(var i = 0, len = this._list.length; i < len; i++){
+			var item = this._list[i];
+			if(filter(item)){
+				arr.push(item);
+			}
+			item = null;
+		}
+		return arr;
+	};
+	this.getIndex2 = function(key){
+		if(key in this._hashIndex){
+			return this._hashIndex[key];
+		}else{
+			return this.createIndex(key);
+		}
+	};
+	/**
+	 * 创建一个索引
+	 * @param {String} 要索引的key
+	 * @return {TableIndex}
+	 */
+	this.createIndex = function(key){
+		var ti = new TableIndex();
+		ti.create(this, key);
+		this._hashIndex[key] = ti;
+		return ti;
+	};
+	/**
+	 * 创建一个过滤器
+	 * @param {String} key 排序的字段
+	 * @param {Function} filter 过滤器函数
+	 * @return {TableFilter}
+	 */
+	this.createFilter = function(key, filter){
+		var tf = new TableFilter();
+		tf.create(this, key, filter);
+		this._filters[key] = tf;
+		return tf;
 	};
 	this._insertIndex = function(item){
 		var key = this._primaryKey;
@@ -85,6 +180,9 @@ _class("MetaTable", "", function(){
 		}
 		return item;
 	};
+	/**
+	 * 添加一条记录
+	 */
 	this.append = function(item){
 		var ret = this._append(item);
 		if(ret){
@@ -97,6 +195,9 @@ _class("MetaTable", "", function(){
 		}
 		return ret;
 	};
+	/**
+	 * 添加N条记录
+	 */
 	this.appends = function(items){
 		var arr = [];
 		for(var i = 0, len = items.length; i < len; i++){
@@ -114,19 +215,22 @@ _class("MetaTable", "", function(){
 			*/
 		}
 	};
-	this.getLength = function(){
-		return this._list.length;
+	/**
+	 * 更新一条记录
+	 */
+	/**
+	 * 删除N条记录
+	 * @param ids {Array}
+	 */
+	this.deleteRecords = function(ids){
+		for(var i = 0, len = ids.length; i < len; i++){
+			this.deleteRecord(ids[i]);
+		}
 	};
 	this.pop = function(){
 		var item = this._list.pop();
 		delete this._hash[item[this._primaryKey]];
 		return item;
-	};
-	this.exists = function(id){
-		return id in this._hash;
-	};
-	this.getItem = function(id){
-		return this._hash[id];
 	};
 	this.dump = function(){
 		var sb = [];
@@ -134,5 +238,13 @@ _class("MetaTable", "", function(){
 			sb.push(this._list[i][this._primaryKey]);
 		}
 		return sb;
+	};
+	/**
+	 * 执行回调函数
+	 * @param {Number} cbid 回调函数编号
+	 * @param {JsonObject} data 传递给回调函数的参数
+	 */
+	this.callback = function(cbid, data){
+		runtime._task.execute(cbid, [data]);
 	};
 });

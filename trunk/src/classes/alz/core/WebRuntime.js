@@ -1,6 +1,10 @@
 _package("alz.core");
 
+_import("alz.core.IConfigurable");
 _import("alz.lang.Exception");
+_import("alz.core.PluginManager");
+_import("alz.core.ThreadPool");
+_import("alz.core.TaskSchedule");
 _import("alz.core.AppManager");
 //_import("alz.core.DOMUtil");
 //_import("alz.core.AjaxEngine");
@@ -8,6 +12,14 @@ _import("alz.core.AppManager");
 //_import("alz.mui.Workspace");
 
 _class("WebRuntime", "", function(){
+	_implements(this, IConfigurable);
+	this.__conf__(__context__, {
+		"plugin": [  //插件配置列表
+			{"id": "thread"    , "clazz": "ThreadPool"  },  //伪线程池
+			{"id": "task"      , "clazz": "TaskSchedule"}   //任务调度器
+		//{"id": "appManager", "clazz": "AppManager"  }   //应用管理者
+		]
+	});
 	this._init = function(){
 		_super._init.call(this);
 		//调试及其它各种开关选项
@@ -51,6 +63,7 @@ _class("WebRuntime", "", function(){
 		this.dom = null;
 		this._libManager = null;  //库文件管理者
 		this._libLoader = null;   //库文件加载器
+		this._pluginManager = null;  //插件管理者
 		this._appManager = null;  //应用管理者
 		this._contextList = {};   //上下文环境对象列表
 		this._libContext = null;  //当前lib的上下文环境对象
@@ -136,6 +149,7 @@ _class("WebRuntime", "", function(){
 		this._pathSkin = this._config["pathskin"];
 		this._pathPlugin = this._config["pathplugin"];
 		this._libManager = new LibManager();
+		this._pluginManager = new PluginManager();
 		this._appManager = new AppManager();
 		if(this._config["skin"]){
 			var url = this._pathLib + "skin/" + this._config["skin"] + "/skin.css";
@@ -209,6 +223,7 @@ _class("WebRuntime", "", function(){
 		//for(var i = 1, len = this._clazz._exts.length; i < len; i++){
 		//	this._clazz._exts[i].init.call(this);
 		//}
+		this._pluginManager.create(this, this.findConf("plugin"));
 		this._libManager.initLoadLib();
 		this._newWorkspace = newWorkspace;
 		//this._workspace = new Screen();
@@ -262,6 +277,8 @@ _class("WebRuntime", "", function(){
 		this._info = null;
 		this._appManager.dispose();
 		this._appManager = null;
+		this._pluginManager.dispose();
+		this._pluginManager = null;
 		this._libLoader.dispose();
 		this._libLoader = null;
 		this._libManager.dispose();
@@ -720,6 +737,49 @@ _class("WebRuntime", "", function(){
 			"func" : func
 		});
 	};
+	this.createDelegate = function(obj, fn, args, appendArgs){
+		if(!this.getConfData("core_shield")){
+			return function(){
+				var ap = Array.prototype;
+				var callArgs = args || arguments;
+				if(appendArgs === true){
+					callArgs = ap.slice.call(arguments, 0);
+					callArgs = callArgs.concat(args);
+				}else if(typeof appendArgs == "number"){
+					callArgs = ap.slice.call(arguments, 0);
+					// copy arguments first
+					var applyArgs = [appendArgs, 0].concat(args);
+					// create method call params
+					ap.splice.apply(callArgs, applyArgs);
+					// splice them in
+				}
+				return obj[fn].apply(obj || window, callArgs);
+			};
+		}else{
+			var _this = this;
+			return function(){
+				var ap = Array.prototype;
+				try{
+					var callArgs = args || arguments;
+					if(appendArgs === true){
+						callArgs = ap.slice.call(arguments, 0);
+						callArgs = callArgs.concat(args);
+					}else if(typeof appendArgs == "number"){
+						callArgs = ap.slice.call(arguments, 0);
+						// copy arguments first
+						var applyArgs = [appendArgs, 0].concat(args);
+						// create method call params
+						ap.splice.apply(callArgs, applyArgs);
+						// splice them in
+					}
+					return obj[fn].apply(obj || window, callArgs);
+				}catch(ex){
+					_this.error("[WebRuntime::createDelegate*]" + ex.message);
+					_this.getActiveApp().showOperationFailed();  //[TODO]不一定是APP的错误
+				}
+			};
+		}
+	};
 	this.addEventListener = function(obj, type, eventHandle){
 		if(obj.attachEvent){
 			obj.attachEvent("on" + type, eventHandle);
@@ -799,7 +859,7 @@ _class("WebRuntime", "", function(){
 		*/
 		default:
 			if(this._workspace && this._workspace.eventHandle){
-				this._workspace.eventHandle(ev);
+				return this._workspace.eventHandle(ev);
 			}
 			break;
 		}
@@ -1210,7 +1270,8 @@ _class("WebRuntime", "", function(){
 	 * @param {Object} json 局部变量区
 	 * @param {Object} hash 全局变量区
 	 */
-	this.tpl_replace = function(tpl, json, hash){
+	this.tpl_replace =
+	this.formatTpl = function(tpl, json, hash){
 		hash = hash || {};
 		return tpl.replace(/\{\$(\w+)\}/ig, function(_0, _1){
 			//return _1 in json ? json[_1] : (hash ? hash[_1] : _0);

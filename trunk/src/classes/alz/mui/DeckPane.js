@@ -49,12 +49,7 @@ _class("DeckPane", Component, function(){
 		parent = parent || this;  //runtime.getWorkspace()
 		var k = key.split("#")[0];
 		var conf = this._app.findConf("pane", k);
-		var clazz = this._app.findClass(conf.clazz);
-		if(clazz === null){
-			runtime.error("[DeckPane::createPane]" + conf.clazz);
-			return null;
-		}
-		var pane = new clazz();
+		var pane = new conf.clazz();
 		pane.setData(conf);
 		pane.setParams(params);
 		if(parent instanceof Pane){

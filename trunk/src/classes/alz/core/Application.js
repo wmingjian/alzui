@@ -1,49 +1,30 @@
 _package("alz.core");
 
+_import("alz.core.IConfigurable");
 _import("alz.core.EventTarget");
+_import("alz.core.PluginManager");
+//_import("alz.core.LocalStorage");
+_import("alz.core.DataModel");
+_import("alz.core.TagLib");
 _import("alz.template.TemplateManager");
+//_import("alz.core.TemplateManager");
+_import("alz.core.HistoryManager");
 
 /**
  * [TODO]
  * 1)application 变量在 runtime.createApp 方法返回之后被覆盖了
  */
 _class("Application", EventTarget, function(){
-	/*
-	var __exts = [];
-	Application.regExt = function(func){  //注册应用的扩展
-		var o = new func();
-		__exts.push(o);
-		for(var k in o){
-			if(k == "_init") continue;  //[TODO]
-			if(k == "init" || k == "dispose") continue;  //忽略构造或析构函数
-			Application.prototype[k] = o[k];  //绑定到原型上
-		}
-		o = null;
-	};
-	*/
-	/*
-	 * popup   弹出式组件配置信息
-	 * dialog  对话框组件配置信息
-	 * pane    面板组件配置信息
-	 */
-	this.__conf = {};
-	/**
-	 * 注册配置数据
-	 */
-	this.__conf__ = function(data){
-		for(var k in data){
-			var hash;
-			if(!(k in this.__conf)){
-				hash = this.__conf[k] = {};
-			}else{
-				hash = this.__conf[k];
-			}
-			for(var i = 0, len = data[k].length; i < len; i++){
-				var item = data[k][i];
-				hash[item.id] = item;
-			}
-		}
-	};
+	_implements(this, IConfigurable);
+	this.__conf__(__context__, {
+		"plugin": [  //插件配置列表
+		//{"id": "storage" , "clazz": "LocalStorage"   },
+			{"id": "model"   , "clazz": "DataModel"      },
+			{"id": "taglib"  , "clazz": "TagLib"         },
+			{"id": "template", "clazz": "TemplateManager"},
+			{"id": "history" , "clazz": "HistoryManager" }
+		]
+	});
 	this._init = function(){
 		__context__.application = this;  //绑定到lib上下文环境上
 		_super._init.call(this);
@@ -55,9 +36,10 @@ _class("Application", EventTarget, function(){
 		this._workspace = null;  //工作区组件
 		this._hotkey = {};  //热键
 		this._domTemp = null;
-		//this._template = null;  //模版引擎
-		this._template = runtime.getTemplate();  //模版引擎
+		this._pluginManager = null;  //插件管理者
 		this._contentPane = null;
+		//this._template = null;  //模版引擎
+		//this._template = runtime.getTemplate();  //模版引擎
 		this.__keydown = null;
 		/*
 		this._cache = {  //参考了 prototype 的实现
@@ -68,13 +50,11 @@ _class("Application", EventTarget, function(){
 			}
 		};
 		*/
-		//执行构造扩展
-		//for(var i = 0, len = __exts.length; i < len; i++){
-		//	__exts[i]._init.call(this);
-		//}
 	};
 	this.init = function(){
 		//_super.init.apply(this, arguments);
+		this._pluginManager = new PluginManager();
+		this._pluginManager.create(this, this.findConf("plugin"));
 		this._workspace = runtime._workspace;
 		if(!Application._hotkey){
 			//注册系统热键
@@ -96,23 +76,16 @@ _class("Application", EventTarget, function(){
 			Application._hotkey = true;
 		}
 		//this._template = runtime.getTemplate();  //模版引擎
-		//执行初始化扩展
-		//for(var i = 0, len = __exts.length; i < len; i++){
-		//	__exts[i].init.apply(this, arguments);
-		//}
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
-		//执行析构扩展
-		//for(var i = 0, len = __exts.length; i < len; i++){
-		//	__exts[i].dispose.apply(this, arguments);
-		//}
 		if(this.__keydown){
 			this.__keydown = null;
 			runtime.getDom().removeEventListener(runtime.getDocument(), "keydown", this.__keydown);
 		}
+		this._pluginManager.dispose();
+		this._pluginManager = null;
 		this._contentPane = null;
-		this._template = null;
 		this._domTemp = null;
 		//runtime.getDocument().onkeydown = null;
 		for(var k in this._hotkey){
@@ -128,6 +101,14 @@ _class("Application", EventTarget, function(){
 	this.destroy = function(){
 	};
 	this.onContentLoad = function(){
+	};
+	this.initConf = function(tpl){
+		//注册数据模型
+		this._model.regModels(this.findConf("model"));
+		//注册组件的自定义标签
+		this._taglib.regTags(this.findConf("tags"));
+		//注册模板库
+		this._template.reg(runtime.getTplData(tpl));
 	};
 	/**
 	 * 注册系统热键
@@ -189,8 +170,7 @@ _class("Application", EventTarget, function(){
 			return null;
 		}
 	};
-	this.findConf = function(type, k){
-		var hash = this.__conf[type];
-		return hash[k in hash ? k : type];  //默认值和type参数一直
+	this.getTpl = function(name){
+		return this._template.getTpl(name);
 	};
 });

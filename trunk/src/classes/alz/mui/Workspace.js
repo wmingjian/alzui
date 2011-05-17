@@ -150,12 +150,16 @@ _class("Workspace", Container, function(){
 	this.onMouseDown = function(ev){
 		if(this._activePopup){
 			switch(this._activePopup._className){
-			case "Popup":
-				if(this._activePopup.getVisible()){
+			case "alz.mui.PopupMenu":
+				var target = ev.target || ev.srcElement;
+				if(this._activePopup._self == target || this._activePopup._self.contains(target)){
+					//交给组件自己处理
+				}else if(this._activePopup.getVisible()){
 					this.setActivePopup(null);
 				}
-				break;
-			case "Dialog":
+				ev.stopPropagation();
+				return false;
+			case "alz.mui.Dialog":
 				break;
 			}
 		}

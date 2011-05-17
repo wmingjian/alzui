@@ -58,6 +58,15 @@ _class("Pane", Container, function(){
 		return this._currentSender;
 	};
 	/**
+	 * 通过模板名创建一组DOM元素
+	 * @param {Element} parent 父元素
+	 * @param {String} tpl 模板名
+	 * @return {Element}
+	 */
+	this.createTplElement = function(parent, tpl, app){
+		return this.createDomElement(parent, (app || this._app).getTpl(tpl)/*, ".module"*/);
+	};
+	/**
 	 * 初始化组件中的动作元素，使这些元素可以响应默认事件触发其action
 	 * [TODO]如何避免已经初始化过的元素重复初始化？
 	 * @param {HTMLElement} element

@@ -4,7 +4,7 @@ _import("alz.core.ManagerBase");
 _import("alz.core.Plugin");
 
 /**
- * Application插件管理者类
+ * 插件管理者(面向WebRuntime,Application)
  */
 _class("PluginManager", ManagerBase, function(){
 	this._init = function(){
@@ -16,14 +16,16 @@ _class("PluginManager", ManagerBase, function(){
 		_super.create.apply(this, arguments);
 	};
 	*/
-	this.create = function(rt, data){
-		for(var i = 0, len = data.length; i < len; i++){
-			var conf = data[i];
-			var id = conf.id;
-			var plugin = new conf.clazz();
-			plugin.create(id, this);
+	this.create = function(target, data){
+		for(var k in data){
+			var plugin = new data[k].clazz();
+			plugin.create(k, this);
 			this.register(plugin);  //注册插件
-			rt[id] = plugin;  //默认安装到runtime对象上面
+			var name = "_" + k;
+			if(name in target){
+				console.log("[PluginManager::create]对象(class=" + target._className + "已经有属性:" + name);
+			}
+			target[name] = plugin;  //默认安装到runtime对象上面
 		}
 	};
 	this.dispose = function(){
@@ -48,13 +50,13 @@ _class("PluginManager", ManagerBase, function(){
 	 * @param {PlugIn} plugin 插件的实例
 	 */
 	this.register = function(plugin){
-		this._plugins[plugin.getName()] = plugin;
+		this._plugins[plugin.getId()] = plugin;
 	};
 	/**
 	 * 通过名字获取一个已经注册的插件实例
 	 */
-	this.getPlugIn = function(name){
-		return this._plugins[name];
+	this.getPlugIn = function(id){
+		return this._plugins[id];
 	};
 	/**
 	 * 调用插件的onResize事件

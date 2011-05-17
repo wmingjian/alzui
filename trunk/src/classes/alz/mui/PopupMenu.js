@@ -18,14 +18,14 @@ _class("PopupMenu", Popup, function(){
 		this.setApp(app);
 		this._owner = owner;
 		this._params = params;
-		var html = this._app._template.getTpl(tpl);
-		var obj = this.createDomElement(parent, html);
+		var obj = this.createTplElement(parent, tpl);
 		this.init(obj);
 		return obj;
 	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
 		this.setVisible(false);
+		this.initActionElements();
 	};
 	this.reset = function(params){
 		this._params = params;
@@ -67,5 +67,20 @@ _class("PopupMenu", Popup, function(){
 	};
 	this.hide = function(){
 		runtime._workspace.setActivePopup(null);
+	};
+	this.callback = function(){
+		var args = [this];  //回调函数的第一个参数一定是对话框组件本身
+		for(var i = 0, len = arguments.length; i < len; i++){
+			args.push(arguments[i]);
+		}
+		if(this._req){
+			this._req.func.apply(this._req.agent, args);
+			this._req = null;  //只允许被调用一次
+		}
+	};
+	this.doAction = function(act, sender){
+		this.hide();
+		this.callback(act, sender);
+		return false;
 	};
 });

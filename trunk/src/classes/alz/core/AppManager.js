@@ -1,12 +1,13 @@
 _package("alz.core");
 
+_import("alz.core.Plugin");
 _import("alz.core.LibLoader");
 _import("alz.core.Application");
 
 /**
- * 应用管理者类
+ * 应用管理者
  */
-_class("AppManager", "", function(){
+_class("AppManager", Plugin, function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._confList = {};  //APP配置数据

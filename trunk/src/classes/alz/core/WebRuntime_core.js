@@ -1,16 +1,33 @@
 _package("alz.core");
 
-//_import("alz.core.XPathQuery");
 _import("alz.core.DOMUtil");
 //_import("alz.core.DOMUtil2");
 _import("alz.core.AjaxEngine");
-_import("alz.core.ProductManager");
+_import("alz.core.XPathQuery");
+_import("alz.template.TemplateManager");
 _import("alz.core.ActionCollection");
+_import("alz.core.ProductManager");
 
 _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	var properties = ["_ajax", "_template", "_actionCollection", "_productManager"];
+	this.__conf__({
+		"plugin": [  //插件配置列表
+			{"id": "ajax"            , "clazz": "AjaxEngine"      },  //异步请求引擎
+			{"id": "dom"             , "clazz": "DOMUtil"         },  //DOM操作工具
+		//{"id": "element"         , "clazz": "Element"         },  //DOM元素操作
+		//{"id": "animation"       , "clazz": "AnimationEngine" },  //动画引擎
+		//{"id": "eventManager"    , "clazz": "EventManager"    },  //事件管理
+		//{"id": "gestureManager"  , "clazz": "GestureManager"  },  //手势管理
+			{"id": "xpq"             , "clazz": "XPathQuery"      },  //xpath选择器
+			{"id": "template"        , "clazz": "TemplateManager" },  //模版引擎
+			{"id": "actionCollection", "clazz": "ActionCollection"},  //用户行为动作收集器
+			{"id": "productManager"  , "clazz": "ProductManager"  }   //产品管理者
+		]
+	});
 	this._init = function(){  //加载之后的初始化工作
-		//this.selector = new XPathQuery();
+		//创建插件
+		//this._pluginManager.create(this, this.findConf("plugin"));
+		//this._xpq = new XPathQuery();
 		//this.regPlugin("dom", DOMUtil);
 		this.dom = new DOMUtil();
 		//this.domutil = new DomUtil2();
@@ -84,8 +101,8 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 			this.dom = null;
 		}
 		*/
-		//this.selector.dispose();
-		//this.selector = null;
+		//this._xpq.dispose();
+		//this._xpq = null;
 	};
 	/**
 	 * 返回用于操作DOM元素的工具类对象

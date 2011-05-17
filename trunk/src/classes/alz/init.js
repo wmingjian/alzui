@@ -528,21 +528,28 @@ function LibContext(name, rt){
 		proto[name] = methodImp || function(){};
 	};
 	this._implements = function(proto/*, interfaces*/){
-		if(arguments.length < 2){
+		var len = arguments.length;
+		if(len < 2){
 			window.alert("[_implements]arguments.length error");
 		}else{
 			var imps = proto._clazz._imps;
-			for(var i = 1, len = arguments.length; i < len; i++){
-				var obj = new arguments[i]();
+			for(var i = 1; i < len; i++){
+				var func = arguments[i];
+				var obj = new func();
+				if(!("_init" in obj)){
+					obj["_init"] = function(){};
+				}
+				//var obj = {"_init": function(){}};
+				//func.call(obj);
 				imps.push(obj);
 				//将构造函数_init之外的方法拷贝到原型上面
 				for(var k in obj){
-					if(k != "_init"){
-						proto[k] = obj[k];
+					var m = obj[k];
+					if(k != "_init"/* && typeof m === "function"*/){
+						proto[k] = m;
 					}
 				}
 			}
-			imps = null;
 		}
 	};
 	/**
@@ -563,9 +570,10 @@ function LibContext(name, rt){
 		//	_exts[name] = [];
 		//}
 		var methods = {
-			"_init"  : 1,  //构造函数
-			"init"   : 1,  //初始化函数
-			"dispose": 1   //析构函数
+			"_init"   : 1,  //构造函数
+			"init"    : 1,  //初始化函数
+			"dispose" : 1,  //析构函数
+			"__conf__": 1   //配置数据注册方法
 		};
 		var p = clazz[__proto];
 		var exts = p._clazz._exts;  //_exts[name]
@@ -581,7 +589,11 @@ function LibContext(name, rt){
 			exts.push(ext);
 			ext = null;
 		}
-		var o = new extImp();  //创建扩展的一个实例（只需创建一个）
+		//var o = new extImp();  //创建扩展的一个实例（只需创建一个）
+		var o = {
+			"__conf__": function(){}
+		};
+		extImp.call(o);  //调用扩展实现
 		exts.push(o);  //注册扩展
 		for(var k in o){
 			if(k in methods) continue;  //忽略关键方法

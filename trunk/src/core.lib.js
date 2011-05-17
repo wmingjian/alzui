@@ -3162,7 +3162,7 @@ _import("alz.core.AppManager");
 _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	var properties = ["_ajax"];
 	this._init = function(){  //加载之后的初始化工作
-		//this.selector = new XPathQuery();
+		//this._xpq = new XPathQuery();
 		this.dom = new DOMUtil();
 		//this.domutil = new DomUtil2();
 		if(!this.getParentRuntime()){
@@ -3230,8 +3230,8 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 			this.dom.dispose();
 			this.dom = null;
 		}
-		//this.selector.dispose();
-		//this.selector = null;
+		//this._xpq.dispose();
+		//this._xpq = null;
 	};
 	/**
 	 * 返回用于操作DOM元素的工具类对象

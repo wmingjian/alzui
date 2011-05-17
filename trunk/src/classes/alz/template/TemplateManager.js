@@ -1,5 +1,6 @@
 _package("alz.template");
 
+_import("alz.core.Plugin");
 _import("alz.template.TrimPath");
 //_import("alz.core.Ajax");
 
@@ -14,7 +15,7 @@ _import("alz.template.TrimPath");
  * tpl  = 符合 /\{[\$=]\w+\}/ 规则的简易模板
  * asp  = 仿 ASP 语法的模板
  */
-_class("TemplateManager", "", function(){
+_class("TemplateManager", Plugin, function(){
 	//var RE_TPL = /<!-- template name=\"(\w+\.tpl)\" type=\"(html|tpl|asp)\"( title=\"[^\"]+\")* -->/;
 	var RE_TPL = /<template name=\"(\w+\.tpl)\" type=\"(html|tpl|asp|tmpl|xml)\"(?: params=\"([^\"]+)\")*( title=\"[^\"]+\")*>/;
 	this._init = function(){
