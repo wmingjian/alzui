@@ -1,11 +1,11 @@
 _package("alz.mui");
 
-_import("alz.mui.Component");
+_import("alz.mui.Pane");
 
 /**
  * 弹出式组件
  */
-_class("Popup", Component, function(){
+_class("Popup", Pane, function(){
 	this._init = function(){
 		_super._init.call(this);
 	};
@@ -28,7 +28,7 @@ _class("Popup", Component, function(){
 	};
 	this.setVisible = function(v){
 		_super.setVisible.apply(this, arguments);
-		this._regOnFrame(window.top, "mousedown", !v);  //[TODO]对跨域iframe的处理还不到位
+		//this._regOnFrame(window.top, "mousedown", !v);  //[TODO]对跨域iframe的处理还不到位
 	};
 	this._isOutterElement = function(el){
 		var doc = el.ownerDocument;

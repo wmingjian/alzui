@@ -1,5 +1,7 @@
 _package("alz.core");
 
+_import("alz.core.Plugin");
+
 /**
  * @class DOMUtil
  * @extends alz.lang.AObject
@@ -7,7 +9,7 @@ _package("alz.core");
  * @example
 var _dom = new DOMUtil();
  */
-_class("DOMUtil", "", function(){
+_class("DOMUtil", Plugin, function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._components = [];

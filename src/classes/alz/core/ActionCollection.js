@@ -1,9 +1,11 @@
 _package("alz.core");
 
+_import("alz.core.Plugin");
+
 /**
  * action收集器
  */
-_class("ActionCollection", "", function(){
+_class("ActionCollection", Plugin, function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._list = [];

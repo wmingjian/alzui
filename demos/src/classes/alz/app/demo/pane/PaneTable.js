@@ -9,7 +9,6 @@ _import("alz.mui.TableView");
 _class("PaneTable", Pane, function(){
 	this._init = function(){
 		_super._init.call(this);
-		this._app = null;
 		this._tpl = "pane_table.xml";
 		this._table = null;
 	};
@@ -30,10 +29,9 @@ _class("PaneTable", Pane, function(){
 			});
 		}
 		this.setParent2(parent);
-		this._app = app;
 		this._data = data;
-		var obj = runtime.dom.createDomElement(this._app._template.getTpl(this._tpl));
-		parent.appendChild(obj);
+		this.setApp(app);
+		var obj = this.createTplElement(parent, this._tpl);
 		this.init(obj);
 		return obj;
 	};
@@ -45,7 +43,6 @@ _class("PaneTable", Pane, function(){
 	this.dispose = function(){
 		this._table.dispose();
 		this._table = null;
-		this._app = null;
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){

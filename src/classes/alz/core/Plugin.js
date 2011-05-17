@@ -9,11 +9,11 @@ _class("Plugin", EventTarget, function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._app = null;  //插件所属的应用(Application)或管理者{PluginManager}
-		this._name = "";   //插件的名字
+		this._id = "";     //插件的名字(ID标识)
 	};
-	this.create = function(name, app){
+	this.create = function(id, app){
 		this._app = app;
-		this._name = name;
+		this._id = id;
 	};
 	this.reset = function(){
 	};
@@ -24,7 +24,8 @@ _class("Plugin", EventTarget, function(){
 	};
 	this.destroy = function(){
 	};
-	this.getName = function(){
-		return this._name;
+	this.getName =
+	this.getId = function(){
+		return this._id;
 	};
 });

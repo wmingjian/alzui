@@ -1,9 +1,11 @@
 _package("alz.core");
 
+_import("alz.core.Plugin");
+
 /**
  * 产品配置信息管理者类
  */
-_class("ProductManager", "", function(){
+_class("ProductManager", Plugin, function(){
 	this._init = function(){
 		_super._init.call(this);
 		/**

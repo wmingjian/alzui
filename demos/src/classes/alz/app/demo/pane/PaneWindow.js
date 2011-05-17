@@ -9,16 +9,14 @@ _import("alz.mui.Window");
 _class("PaneWindow", Pane, function(){
 	this._init = function(){
 		_super._init.call(this);
-		this._app = null;
 		this._tpl = "pane_window.xml";
 		this._win1 = null;
 		this._win2 = null;
 	};
 	this.create = function(parent, app){
 		this.setParent2(parent);
-		this._app = app;
-		var obj = runtime.dom.createDomElement(this._app._template.getTpl(this._tpl));
-		parent.appendChild(obj);
+		this.setApp(app);
+		var obj = this.createTplElement(parent, this._tpl);
 		this.init(obj);
 		return obj;
 	};
@@ -46,7 +44,6 @@ _class("PaneWindow", Pane, function(){
 		this._win2 = null;
 		this._win1.dispose();
 		this._win1 = null;
-		this._app = null;
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){

@@ -126,7 +126,7 @@ _class("Window", Component, function(){
 	this.destroy = function(){
 	};
 	/*this.xquery = function(xpath){
-		return runtime.selector.query(xpath, this._self);
+		return runtime._xpq.query(xpath, this._self);
 	};*/
 	this.getResizable = function(){
 		return this._resizable;
