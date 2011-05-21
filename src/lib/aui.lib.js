@@ -31,6 +31,8 @@ import alz.core.TableFilter;
 import alz.core.MetaTable;
 import alz.core.DataModel;
 import alz.core.TagLib;
+import alz.template.TemplateElement;
+import alz.template.TemplateObject;
 import alz.template.TrimPath;
 import alz.template.Template;
 import alz.template.ParseError;
