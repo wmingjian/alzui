@@ -1,0 +1,530 @@
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>新的模板引擎测试页</title>
+<script type="text/javascript">
+/**
+ * 目的： 一个新的模板引擎的测试页面
+ * 日期： 2011-5-21
+ */
+(function(__global){
+
+if(!window.console){
+	window.console = {
+		log: function(){}
+	};
+}
+function _class(className, superClass, classImp){
+	if(superClass === "") superClass = Object;
+	var clazz = function(){
+		if(typeof this._init == "function"){
+			this._init.apply(this, arguments);
+		}
+	};
+	var _p = clazz.prototype = new superClass();
+	var _super = superClass.prototype;
+	__global[className] = clazz;
+	classImp.apply(_p, [_super]);
+}
+
+/*
+class TplVar{
+	this.id      = "";  //变量名
+	//this.value = "";  //变量值
+	//this.refs  = [];  //{TplRef}引用该变量的节点列表
+}
+//模板变量引用
+class TplVarRef(){
+	this.id    = "";  //变量名
+	this.value = "";    //变量值(默认字符串类型)
+	this.refs  = [];    //{TplRef}引用该变量的节点列表
+}
+//模板引用
+class TplRef(){
+	this.type = "";  //位置类型(attr=属性值,text=文本节点,style=CSS属性)
+	this.el   = el;  //所属元素(保存引用以备更新之用)
+	this.name = "";  //属性名(text类型为"")
+	this.val  = "";  //{TplValue}属性值
+}
+//模板值
+class TplValue(){
+	this.id    = 0;   //编号，方便索引
+	this.value = "";  //value原值
+	this.vars  = {};  //{TplVar}value依赖的模板变量(方便更新)
+}
+*/
+/**
+ * 通过模板创建的DOM元素(可以包含子节点)
+ */
+_class("TemplateElement", "", function(_super){
+	var RE_TVAR = /\{\$(\w+)\}/g;  //模板变量语法
+	this._init = function(){
+		//_super._init.call(this);
+		this._doc  = document;  //所属文档对象
+		this._self = null;  //关联的DOM元素
+		//this._tpl  = null;  //元素创建时参照的模板对象
+		this._vars = {};    //所有的模板变量(key关联DOM更新信息)
+		this._hash = null;  //批量更新临时存储
+	};
+	this.create = function(parent, tpl, argv){
+		//this._tpl = tpl;
+		var obj = tpl.createElement(parent, this);
+		this.init(obj);
+		this.update(argv);  //应用argv参数
+		return obj;
+	};
+	this.init = function(obj){
+		obj._ptr = this;
+		this._self = obj;
+	};
+	this.dispose = function(){
+		this._hash = null;
+		for(var k in this._vars){
+			var v = this._vars[k];
+			var refs = v.refs;
+			for(var i = 0, len = refs.length; i < len; i++){
+				var ref = refs[i];
+				ref.el = null;  //断开DOM元素的引用关系
+				ref.val = null;
+				refs[i] = null;
+			}
+			v.refs = null;
+			v.value = "";
+			delete this._vars[k];
+		}
+		//this._tpl = null;
+		this._self._ptr = null;
+		this._self = null;
+		this._doc = null;
+		//_super.dispose.apply(this);
+	};
+	this.getDoc = function(){
+		return this._doc;
+	};
+	/**
+	 * 添加一个模板变量引用
+	 * [TO-DO]如何区分不用实例的模板变量引用
+	 */
+	this.addRef = function(name, ref){
+		if(!(name in this._vars)){
+			this._vars[name] = {  //{TplVarRef}
+				"id"   : name,  //变量名
+				"value": "",    //变量值(默认字符串类型)
+				"refs" : []     //引用该变量的节点列表
+			};
+		}
+		this._vars[name].refs.push(ref);
+		//this._tpl.addRef(name, ref);
+	};
+	this.updateBegin = function(){
+		this._hash = {};
+	};
+	this.add = function(key, value){
+		this._hash[key] = value;
+	};
+	this.updateEnd = function(){
+		this.update(this._hash);
+		this._hash = null;
+	};
+	/**
+	 * 更新一组模版变量的值
+	 */
+	this.update = function(data){
+		for(var k in data){
+			var v = data[k];
+			if(k in this._vars){
+				this._setVar(k, v, data);
+			}else{
+				console.log("[TemplateElement::update]有多余字段" + k);
+			}
+		}
+	};
+	/**
+	 * 更新一个模版变量的值
+	 */
+	this._setVar = function(key, value, hash){
+		var v = this._vars[key];
+		v.value = value;  //[TODO]需要检查和原值是否相等，避免重复更新
+		var refs = v.refs;
+		for(var i = 0, len = refs.length; i < len; i++){
+			var ref = refs[i];
+			switch(ref.type){
+			case "attr":  //属性值
+				ref.el.setAttribute(ref.name, this._calcValue(ref.val, hash));
+				break;
+			case "text":  //文本节点
+				ref.el.nodeValue = this._calcValue(ref.val, hash);
+				break;
+			case "style":  //css属性值
+				ref.el.style[ref.name] = this._calcCssValue(ref, hash);
+				break;
+			}
+		}
+	};
+	this._calcValue = function(val, hash){
+		return val.value.replace(RE_TVAR, function(_0, key){
+			return hash[key];
+		});
+	};
+	this._calcCssValue = function(ref, hash){
+		return ref.val.value.replace(RE_TVAR, function(_0, key){
+			var value = hash[key];
+			switch(typeof value){
+			case "boolean":
+				switch(ref.name){
+				case "display": value = value ? "" : "none";
+				}
+				break;
+			}
+			return value;
+		});
+	};
+});
+
+/**
+ * 一个模板对象
+ * 1)支持xml语法
+ * 2)支持模板变量
+ * 3)支持数据绑定
+ * 4)支持数据动态更新
+ */
+_class("TemplateObject", "", function(_super){
+	var RE_TVAR = /\{\$(\w+)\}/g;  //模板变量语法
+	this._hashTag = {"meta": 1, "link": 1, "img": 1, "input": 1, "br": 1};
+	this._init = function(){
+		//_super._init.call(this);
+		this._xmldoc   = null;  //{XMLDocument}
+		this._elements = [];  //{TemplateElement} 所有模板元素实例(内部包装了对应的DOM元素)
+		this._vars     = {};  //所有的模板变量
+		this._uid      = 0;   //value对象编号
+		this._hash     = {};  //用于value排重
+		this._values   = {};  //所有的value依赖的相关key
+	};
+	this.create = function(xml){
+		this._xmldoc = this.createXMLDocument(xml);
+	};
+	this.dispose = function(){
+		for(var k in this._values){
+			//this._values[k].vars
+			delete this._values[k];
+		}
+		for(var k in this._hash){
+			delete this._hash[k];
+		}
+		for(var k in this._vars){
+			//this._vars[k].refs;
+			delete this._vars[k];
+		}
+		for(var i = 0, len = this._elements.length; i < len; i++){
+			this._elements[i].dispose();
+			this._elements[i] = null;
+		}
+		this._elements = [];
+		this._xmldoc = null;
+		//_super.dispose.apply(this);
+	};
+	this.createXMLDocument = function(xml){
+		if(window.ActiveXObject/*runtime.ie*/){
+			var xmldoc = new ActiveXObject("Msxml.DOMDocument");
+			xmldoc.async = false;
+			xmldoc.loadXML(xml);
+			return xmldoc;  //.documentElement
+		}else if(window.DOMParser){
+			var p = new DOMParser();
+			return p.parseFromString(xml, "text/xml");
+		}else{
+			console.log("浏览器不支持XMLDocument对象");
+			return null;
+		}
+	};
+	this.createElement = function(parent, element){
+		var obj = this.node2element(this.getRoot(), element.getDoc(), this, function(type, el, name, value){
+			if(!this.hasVar(value)) return;  //快速判断是否包含模板变量
+			if(type == "attr" && name == "style"){
+				var hash = this.parseStyle(value, true);
+				for(var k in hash){
+					this.createTplRef(element, "style", el, k, hash[k]);
+				}
+			}else{
+				this.createTplRef(element, type, el, name, value);
+			}
+		});
+		if(parent){
+			parent.appendChild(obj);
+		}
+		return obj;
+	};
+	this.createTplRef = function(element, type, el, name, value){
+		var val = this.parseValue(value);
+		var ref = {  //{TplRef}
+			"type": type,  //位置类型(attr=属性值,text=文本节点,style=CSS属性)
+			"el"  : el,    //所属元素(保存引用以备更新之用)
+			"name": name,  //属性名
+			"val" : val    //属性值
+		};
+		for(var key in val.vars){
+			element.addRef(key, ref);
+		}
+	};
+	this.getRoot = function(){
+		return this._xmldoc.documentElement;
+	};
+	this.parse = function(){
+	};
+	this.render = function(parent, data){
+		var el = new TemplateElement();
+		this._elements.push(el);  //注册模板元素
+		el.create(parent, this, data);
+		return el;
+	};
+	this.node2html = function(node){
+		var sb = [];
+		switch(node.nodeType){
+		case 1:  //NODE_ELEMENT
+			var tagName = node.tagName;
+			sb.push("<" + tagName);
+			for(var i = 0, len = node.attributes.length; i < len; i++){
+				var attr = node.attributes[i];
+				var name = attr.nodeName;
+				var value = attr.nodeValue;
+				/*
+				if(name in this._hashAAA){
+					if(!(tagName in this._hashAAA[name])){
+						print("[error]" + tagName + "不允许存在" + name+ "属性(value=" + value + ")\n");
+					}
+				}else if(name.charAt(0) == "_"){
+					runtime.warning(tagName + "含有自定义属性" + name+ "=\"" + value + "\"\n");
+				}else if(name == "style"){
+					runtime.warning(tagName + "含有属性" + name+ "=\"" + value + "\"\n");
+				}else if(name.substr(0, 2) == "on"){
+					runtime.warning(tagName + "含有事件代码" + name+ "=\"" + value + "\"\n");
+				}else if(!(name in this._att)){
+					runtime.error(tagName + "含有未知属性" + name+ "=\"" + value + "\"\n");
+				}
+				*/
+				sb.push(" " + name + "=\"" + value + "\"");
+			}
+			if(node.hasChildNodes()){
+				sb.push(">");
+				var nodes = node.childNodes;
+				for(var i = 0, len = nodes.length; i < len; i++){
+					sb.push(this.node2html(nodes[i]));
+				}
+				nodes = null;
+				sb.push("</" + tagName + ">");
+			}else{
+				if(tagName in this._hashTag){
+					sb.push(" />");
+				}else{
+					//runtime.warning(tagName + "是空标签\n");
+					sb.push("></" + tagName + ">");
+				}
+			}
+			break;
+		case 3:  //NODE_TEXT
+			sb.push(node.nodeValue);
+			break;
+		case 4:  //NODE_CDATA_SECTION
+			sb.push("<![CDATA[" + node.data + "]]>");
+			break;
+		case 8:  //NODE_COMMENT
+			//sb.push("<!--" + node.data + "-->");
+			break;
+		default:
+			//runtime.warning("无法处理的nodeType" + node.nodeType + "\n");
+			break;
+		}
+		return sb.join("");
+	};
+	this.node2element = function(node, doc, agent, func){
+		var el;
+		switch(node.nodeType){
+		case 1:  //NODE_ELEMENT
+			var tagName = node.tagName;
+			el = doc.createElement(tagName);
+			var attributes = node.attributes;
+			for(var i = 0, len = attributes.length; i < len; i++){
+				var attr = attributes[i];
+				var name = attr.nodeName;
+				var value = attr.nodeValue;
+				switch(name){
+				case "_datasrc":
+					break;
+				case "_action":
+				case "_tag":
+				default:
+					func.call(agent, "attr", el, name, value);
+					if(name == "style"){
+						var hash = this.parseStyle(value);
+						for(var k in hash){
+							el.style[k] = hash[k];
+						}
+					}else{
+						el.setAttribute(name, value);
+					}
+					break;
+				}
+			}
+			if(node.hasChildNodes()){
+				var nodes = node.childNodes;
+				for(var i = 0, len = nodes.length; i < len; i++){
+					el.appendChild(this.node2element(nodes[i], doc, agent, func));
+				}
+			}
+			break;
+		case 3:  //NODE_TEXT
+			var value = node.nodeValue;
+			el = doc.createTextNode(value);
+			func.call(agent, "text", el, "", value);
+			break;
+		case 4:  //NODE_CDATA_SECTION
+			//var value = node.data;
+			//el = doc.createCDATASection(value);
+			//func.call(agent, "cdata", el, "", value);
+			//sb.push("<![CDATA[" + value + "]]>");
+			break;
+		case 8:  //NODE_COMMENT
+			//var value = node.data;
+			//el = doc.createComment(value);
+			//func.call(agent, "comment", el, "", value);
+			//sb.push("<!--" + value + "-->");
+			break;
+		default:
+			//runtime.warning("无法处理的nodeType" + node.nodeType + "\n");
+			break;
+		}
+		return el;
+	};
+	this.hasVar = function(str){
+		return str.indexOf("{$") != -1;
+	};
+	/**
+	 * style内容简单解析过程
+	 */
+	this.parseStyle = function(str, has){
+		var hash = {};
+		var arr = str.split(";");
+		for(var i = 0, len = arr.length; i < len; i++){
+			if(arr[i] === "") continue;  //最后一个分号问题
+			var prop = arr[i].split(":");
+			var p = this.hasVar(prop[1]);  //快速判断是否包含模板变量
+			if(has && p || !has && !p){
+				hash[prop[0]] = prop[1];
+			}
+		}
+		return hash;
+	};
+	/**
+	 * 解析一个值对象
+	 * [TODO]如何表示一个val只与一个模板变量关联，并且仅仅是模板变量的值
+	 * [TO-DO]对同一个value不应该重复进行模板变量检查
+	 */
+	this.parseValue = function(value){
+		var val;
+		if(value in this._hash){
+			val = this._hash[value];
+		}else{
+			val = {  //{TplValue}
+				"id"   : this._uid,  //编号，方便索引
+				"value": value,      //value原值
+				"vars" : {}          //value依赖的模板变量(方便更新)
+			};
+			this._values[this._uid] = val;
+			this._uid++;
+			this._hash[value] = val;
+			var _this = this;
+			value.replace(RE_TVAR, function(_0, key){
+				if(!(key in _this._vars)){
+					_this.addVar(key, {  //模板变量
+						"id"   : key   //变量名
+					//"value": "",   //变量值
+					//"refs" : []    //引用该变量的节点列表
+					});
+				}
+				val.vars[key] = _this._vars[key];
+			});
+		}
+		return val;
+	};
+	//添加一个模板变量
+	this.addVar = function(name, v){
+		this._vars[name] = v;
+	};
+	//添加一个变量引用
+	/*
+	this.addRef = function(name, ref){
+		this._vars[name].refs.push(ref);
+	};
+	*/
+});
+
+})(this);
+
+var tpl;
+var html = '<div class="{$cls}" style="opacity:{$opacity};border:1px solid red;" _action="abc{$visible}">'
+	+ '<div>{$a}*{$b}<a href="{$url}">#{$a}#</a>--{$a}--</div>'
+	+ '<ul _datasrc="{$list}">'
+	+ '<li>{$name}</li>'
+	+ '</ul>'
+	+ '</div>';
+var data = [
+	{
+		"cls" : "aaa",
+		"opacity": "0.1",
+		"url" : "http://www.google.com",
+		"a"   : "google",
+		"b"   : "xxxx",
+		"list": [
+			{"id": 1, "name": "aaaa"},
+			{"id": 2, "name": "bbbb"},
+			{"id": 3, "name": "cccc"},
+			{"id": 4, "name": "dddd"}
+		]
+	},
+	{
+		"cls": "bbb",
+		"opacity": "1",
+		"url": "http://www.baidu.com",
+		"a"  : "baidu",
+		"b"  : "yyyy",
+		"list": [
+			{"id": 1, "name": "aa--"},  //mod
+			{"id": 2, "name": "bbbb"},
+		//{"id": 3, "name": "cccc"},  //del
+			{"id": 4, "name": "dddd"},
+			{"id": 5, "name": "eeee"}   //add
+		]
+	}
+];
+window.onload = function(){
+	tpl = new TemplateObject();
+	tpl.create(html);
+	var n = 0;
+	var el = tpl.render(document.body, data[n]);
+	var timer = 0;
+	(function(){
+		el.update(data[n++ % 2]);
+		if(timer != 0){
+			window.clearTimeout(timer);
+		}
+		timer = window.setTimeout(arguments.callee, 500);
+	})();
+	//批量更新接口
+	/*
+	el.updateBegin();
+	el.add("url", "http://www.google.com");
+	el.add("a", "xxxxxxxxx");
+	el.add("b", "yyyyyyyyy");
+	el.updateEnd();
+	*/
+};
+window.onunload = function(){
+	tpl.dispose();
+	tpl = null;
+};
+</script>
+</head>
+<body>
+</body>
+</html>
