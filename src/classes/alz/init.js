@@ -11,6 +11,13 @@ if(typeof __global.runtime != "undefined"){  //内嵌模式，重新初始化
 	}
 }
 */
+if(!window.console){
+	window.console = {
+		log: function(){},
+		warn: function(){},
+		error: function(){}
+	};
+}
 
 //var __version = "__VERSION__";  //当前版本信息，格式:"主版本号.副版本号.修订版本号"
 //var __buildtime = __BUILD_TIME__;
