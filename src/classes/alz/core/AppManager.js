@@ -11,6 +11,7 @@ _class("AppManager", Plugin, function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._confList = {};  //APP配置数据
+		this._activeAppName = "";
 		this._activeAppConf = null;  //当前的应用配置
 		this._hash = {};
 		this._list = [];
@@ -88,6 +89,7 @@ _class("AppManager", Plugin, function(){
 		}
 		this._confList[name] = conf;
 		if(conf.active){
+			this._activeAppName = name;
 			this._activeAppConf = conf;
 		}
 	};
