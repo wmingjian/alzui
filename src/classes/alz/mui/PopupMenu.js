@@ -14,7 +14,7 @@ _class("PopupMenu", Popup, function(){
 		this._req = null;
 	};
 	this.create = function(parent, app, owner, params, tpl){
-		this.setParent(parent);
+		this.setParent2(parent);
 		this.setApp(app);
 		this._owner = owner;
 		this._params = params;

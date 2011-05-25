@@ -223,7 +223,7 @@ _class("Workspace", Container, function(){
 			dlg.onMouseMove(ev);
 		}else if(this._fixed == "fixing"){
 			if(ev.srcElement != this._fixedOff.o || ev.offsetX != this._fixedOff.ev_offsetX || ev.offsetY != this._fixedOff.ev_offsetY){
-				window.alert("[Workspace::_mousemoveForFixed]fixing unexpect");
+				console.warn("[Workspace::_mousemoveForFixed]fixing unexpect");
 			}
 			this._fixedX = pos.x - this._fixedOff.pos_x;  //pos.x + ev.offsetX - (this._fixedOff.pos_x + this._fixedOff.ev_offsetX)
 			this._fixedY = pos.y - this._fixedOff.pos_y;  //pos.y + ev.offsetY - (this._fixedOff.pos_y + this._fixedOff.ev_offsetY)

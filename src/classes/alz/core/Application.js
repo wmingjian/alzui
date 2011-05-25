@@ -205,7 +205,7 @@ _class("Application", EventTarget, function(){
 			var conf = this.findConf("dialog", key);
 			dlg = new conf.clazz();
 			dlg.setOwnerApp(this);
-			dlg.create(this._contentPane, app || this, params, conf.tpl);
+			dlg.create(runtime.getWorkspace(), app || this, params, conf.tpl);
 			this._dialogs[name] = dlg;
 		}
 		if(agent){
@@ -232,7 +232,7 @@ _class("Application", EventTarget, function(){
 		if(!popup){
 			var conf = this.findConf("popup", name);
 			popup = new conf.clazz();
-			popup.create(this._contentPane, this, owner, params, conf.tpl);
+			popup.create(runtime.getWorkspace(), this, owner, params, conf.tpl);
 			this._popups[name] = popup;
 		}
 		if(agent){

@@ -656,6 +656,7 @@ _class("WebRuntime", "", function(){
 	this._extendSystemObject = function(){
 		//if(typeof HTMLElement != "undefined" && !window.opera){
 		if(this.moz){  //window.HTMLElement
+			var __proto = "prototype";
 			_p = HTMLElement[__proto];
 			_p.__defineGetter__("outerHTML", function(){
 				var str = "<" + this.tagName;
