@@ -35,6 +35,7 @@ _class("Application", EventTarget, function(){
 		this._params = null;  //传递给应用的参数
 		this._workspace = null;  //工作区组件
 		this._hotkey = {};  //热键
+		this._doc = runtime.getDocument();
 		this._domTemp = null;
 		this._pluginManager = null;  //插件管理者
 		this._contentPane = null;
@@ -97,6 +98,7 @@ _class("Application", EventTarget, function(){
 		this._pluginManager = null;
 		this._contentPane = null;
 		this._domTemp = null;
+		this._doc = null;
 		//runtime.getDocument().onkeydown = null;
 		for(var k in this._hotkey){
 			delete this._hotkey[k];

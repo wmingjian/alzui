@@ -329,13 +329,20 @@ _class("Component", EventTarget, function(){
 		if(context == null){
 			runtime.error("[Component::query]context is null!");
 		}
-		return runtime._xpq.query(xpath, context);
 		*/
-		return this._self.querySelectorAll(xpath);
+		if(runtime.ie){
+			return runtime._xpq.query(xpath, this._self);
+		}else{
+			return this._self.querySelectorAll(xpath);
+		}
 	};
 	this.find = function(xpath/*, context*/){
 		//return this.query(xpath, context)[0];
-		return this._self.querySelector(xpath);
+		if(runtime.ie){
+			return runtime._xpq.query(xpath, this._self)[0];
+		}else{
+			return this._self.querySelector(xpath);
+		}
 	};
 	this.setData = function(v){
 		this._data = v;

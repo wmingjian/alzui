@@ -157,7 +157,11 @@ _class("Workspace", Container, function(){
 				}else if(this._activePopup.getVisible()){
 					this.setActivePopup(null);
 				}
-				ev.stopPropagation();
+				if(ev.stopPropagation){
+					ev.stopPropagation();
+				}else{
+					ev.cancelBubble = true;
+				}
 				return false;
 			case "alz.mui.Dialog":
 				break;

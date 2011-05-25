@@ -13,7 +13,7 @@ _interface("IConfigurable", "", function(_property){
 		"taglib": {},  //标签库     格式: {id:s,clazz:s}
 		"popup" : {},  //弹出式组件 格式: {id:s,clazz:s,tpl:s}
 		"dialog": {},  //对话框组件 格式: {id:s,clazz:s,tpl:s}
-		"pane"  : {},  //面板组件   格式: {id:s,clazz:s,tpl:s}
+		"pane"  : {}   //面板组件   格式: {id:s,clazz:s,tpl:s}
 	};
 	/**
 	 * 注册配置数据

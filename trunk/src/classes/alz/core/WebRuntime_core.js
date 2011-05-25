@@ -27,7 +27,7 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	this._init = function(){  //加载之后的初始化工作
 		//创建插件
 		//this._pluginManager.create(this, this.findConf("plugin"));
-		//this._xpq = new XPathQuery();
+		this._xpq = new XPathQuery();
 		//this.regPlugin("dom", DOMUtil);
 		this.dom = new DOMUtil();
 		//this.domutil = new DomUtil2();
@@ -101,8 +101,8 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 			this.dom = null;
 		}
 		*/
-		//this._xpq.dispose();
-		//this._xpq = null;
+		this._xpq.dispose();
+		this._xpq = null;
 	};
 	/**
 	 * 返回用于操作DOM元素的工具类对象
