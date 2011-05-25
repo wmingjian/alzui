@@ -50,6 +50,8 @@ _class("Application", EventTarget, function(){
 			}
 		};
 		*/
+		this._popups = {};   //弹出式组件
+		this._dialogs = {};  //所有对话框组件
 	};
 	this.init = function(){
 		//_super.init.apply(this, arguments);
@@ -79,6 +81,14 @@ _class("Application", EventTarget, function(){
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
+		for(var k in this._popups){
+			this._popups[k].dispose();
+			delete this._popups[k];
+		}
+		for(var k in this._dialogs){
+			this._dialogs[k].dispose();
+			delete this._dialogs[k];
+		}
 		if(this.__keydown){
 			this.__keydown = null;
 			runtime.getDom().removeEventListener(runtime.getDocument(), "keydown", this.__keydown);
@@ -172,5 +182,75 @@ _class("Application", EventTarget, function(){
 	};
 	this.getTpl = function(name){
 		return this._template.getTpl(name);
+	};
+	this.navPane = function(pid, params){
+	};
+	/**
+	 * 调用一个对话框组件（创建，重置）
+	 * @param name {String} 要创建的对话框的名字（类名 + "#" + id）
+	 * @param app {Application} 对话框所属的应用
+	 * @param params {Hash} 创建参数
+	 *   params["p2" ] 这是一个附加的参数[TODO]需要重构掉
+	 *   params["act"]
+	 *   params["url"] urlCode
+	 * @param agent {Object} 回调代理对象
+	 * @param func {String|Function} 回调函数
+	 */
+	this.dlgInvoke = function(name, app, params, agent, func){
+		var key = name.split("#")[0];
+		var dlg = this._dialogs[name];
+		if(!dlg){
+			var conf = this.findConf("dialog", key);
+			dlg = new conf.clazz();
+			dlg.setOwnerApp(this);
+			dlg.create(this._contentPane, app || this, params, conf.tpl);
+			this._dialogs[name] = dlg;
+		}
+		if(agent){
+			dlg.setReq({
+				"agent": agent,
+				"func" : typeof func == "string" ? agent[func] : func
+			});
+		}
+		dlg.showModal(true);
+		dlg.reset(params);
+		return dlg;
+	};
+	/**
+	 * 调用一个弹出式组件（创建，重置）
+	 * @param name {String} 要创建的弹出式组件的名字
+	 * @param app {Application} 弹出式组件所属的组件
+	 * @param params {Hash} 创建参数
+	 * @param agent {Object} 回调代理对象
+	 * @param func {String|Function} 回调函数
+	 */
+	this.popupInvoke = 
+	this.popInvoke = function(name, owner, params, agent, func){
+		var popup = this._popups[name];
+		if(!popup){
+			var conf = this.findConf("popup", name);
+			popup = new conf.clazz();
+			popup.create(this._contentPane, this, owner, params, conf.tpl);
+			this._popups[name] = popup;
+		}
+		if(agent){
+			popup.setReq({
+				"agent": agent,
+				"func" : typeof func == "string" ? agent[func] : func
+			});
+		}
+		popup.show();
+		popup.reset(params);
+		return popup;
+	};
+	this.doAction = function(act, sender){
+		var key = "do_" + act;
+		if(key in this && typeof this[key] == "function"){
+			var ret = this[key](act, sender);
+			return typeof ret == "boolean" ? ret : false;
+		}else{
+			runtime.error("[Application::doAction]未定义的act=" + act);
+			return false;
+		}
 	};
 });

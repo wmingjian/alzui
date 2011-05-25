@@ -1032,7 +1032,7 @@ _class("WebRuntime", "", function(){
 				libConf = null;
 			}
 		}else{  //找不到，则认为库已经加载完毕
-			this._appManager.loadAppFiles("address.app", null, this, function(){
+			this._appManager.loadAppFiles(this._appManager._activeAppName, null, this, function(){
 				if(lib.type == "lib" || lib.type == "tpl"){
 					if(typeof this.onLoad == "function"){
 						this.onLoad();
