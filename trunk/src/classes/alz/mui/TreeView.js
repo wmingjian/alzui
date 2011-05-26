@@ -260,7 +260,7 @@ _class("TreeView", Component, function(){
 		return rect;
 	};
 	this.getPos = function(obj, refObj){
-		var pos = {x:0,y:0};
+		var pos = {"x": 0, "y": 0};
 		var dom = runtime.dom;
 		for(var o = obj; o && o != refObj; o = o.offsetParent){
 			var bl, bt, x, y;

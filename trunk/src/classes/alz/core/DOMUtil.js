@@ -69,7 +69,7 @@ _class("DOMUtil", Plugin, function(){
 	/*
 	this.getPos = function(el, refElement){
 		try{
-		var pos = {x: 0, y: 0};
+		var pos = {"x": 0, "y": 0};
 		//var sb = [];
 		for(var o = el; o; o = o.offsetParent){
 			var s = "tagName=" + o.tagName + ",className=" + o.className;
@@ -119,7 +119,7 @@ _class("DOMUtil", Plugin, function(){
 	*/
 	this.getPos = function(el, refElement){
 		try{
-		var pos = {x: 0, y: 0};
+		var pos = {"x": 0, "y": 0};
 		for(var o = el; o; o = o.offsetParent){
 			var s = "tagName=" + o.tagName + ",className=" + o.className;
 			var x = 0, y = 0, a, b;
@@ -353,8 +353,8 @@ _class("DOMUtil", Plugin, function(){
 			obj = new BoxElement(el, this);
 			/*
 			obj = {
-				_self: el,
-				dispose: function(){
+				"_self": el,
+				"dispose": function(){
 					this._self.__ptr__ = null;
 					this._self = null;
 				}

@@ -51,7 +51,7 @@ _class("Component", EventTarget, function(){
 		this._width = 0;
 		this._height = 0;
 		this._align = "none";
-		this._dockRect = {x: 0, y: 0, w: 0, h: 0};  //停靠以后组件的位置信息
+		this._dockRect = {"x": 0, "y": 0, "w": 0, "h": 0};  //停靠以后组件的位置信息
 		this._borderLeftWidth = 0;
 		this._borderTopWidth = 0;
 		this._borderRightWidth = 0;
@@ -244,10 +244,10 @@ _class("Component", EventTarget, function(){
 			if(this._align != "none"){
 				this._position = "absolute";
 				this._dockRect = {
-					x: this._left,
-					y: this._top,
-					w: this._width,
-					h: this._height
+					"x": this._left,
+					"y": this._top,
+					"w": this._width,
+					"h": this._height
 				};
 			}
 		}
