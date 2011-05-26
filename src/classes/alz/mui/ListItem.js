@@ -7,9 +7,9 @@ _import("alz.mui.Component");
  */
 _class("ListItem", Component, function(){
 	this._css = {
-		normal: {},
-		active: {},
-		_hover: {}
+		"normal": {},
+		"active": {},
+		"_hover": {}
 	};
 	this._init = function(){
 		_super._init.call(this);

@@ -183,7 +183,7 @@ _class("Workspace", Container, function(){
 			//window.alert((pos.x + ev.offsetX) + "," + (pos.y + ev.offsetY) + "|" + ev.clientX + "," + ev.clientY);
 			this._offsetX = ev.offsetX;
 			this._offsetY = ev.offsetY;
-			this._fixedOff = {x: pos.x + ev.offsetX, y: pos.y + ev.offsetY};
+			this._fixedOff = {"x": pos.x + ev.offsetX, "y": pos.y + ev.offsetY};
 			this._fixed = "fixing";
 			//this.onMouseMove(ev);
 			var rect = this.getViewPort();
@@ -193,7 +193,7 @@ _class("Workspace", Container, function(){
 			obj.style.top = (-2000 + y) + "px";
 			this._mousemoveForFixed(ev);
 		}else if(this._fixed == "fixing"){
-			//this._fixedOff = {x: ev.clientX, y: ev.clientY};
+			//this._fixedOff = {"x": ev.clientX, "y": ev.clientY};
 			this._fixedX = pos.x + ev.offsetX - this._fixedOff.x;
 			this._fixedY = pos.y + ev.offsetY - this._fixedOff.y;
 			//window.alert("&&&&" + this._fixedX + "," + this._fixedY);
@@ -211,13 +211,13 @@ _class("Workspace", Container, function(){
 		if(this._fixed == null){
 			//window.alert((pos.x + ev.offsetX) + "," + (pos.y + ev.offsetY) + "|" + ev.clientX + "," + ev.clientY);
 			this._fixedOff = {
-				pos_x: pos.x,
-				pos_y: pos.y,
-				o: ev.srcElement,
-				ev_offsetX: ev.offsetX,
-				ev_offsetY: ev.offsetY,
-				x: pos.x + ev.offsetX,
-				y: pos.y + ev.offsetY
+				"pos_x"     : pos.x,
+				"pos_y"     : pos.y,
+				"o"         : ev.srcElement,
+				"ev_offsetX": ev.offsetX,
+				"ev_offsetY": ev.offsetY,
+				"x"         : pos.x + ev.offsetX,
+				"y"         : pos.y + ev.offsetY
 			};
 			this._fixed = "fixing";
 			dlg.onMouseMove(ev);
@@ -282,7 +282,7 @@ _class("Workspace", Container, function(){
 			//var a = this.forIn(ev);
 			var a = [];
 			for(var k in o) a.push(k + "=" + ev[k]);
-			var off = {x:0,y:0};
+			var off = {"x": 0, "y": 0};
 			for(var el = ev.srcElement; el; el = el.offsetParent){
 				off.x += el.offsetLeft + parseInt0(el.currentStyle.borderLeftWidth);
 				off.y += el.offsetTop + parseInt0(el.currentStyle.borderTopWidth);

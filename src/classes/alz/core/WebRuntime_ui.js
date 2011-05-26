@@ -91,11 +91,11 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	};
 	this.getViewPort = function(element){
 		var rect = {
-			x: element.scrollLeft,
-			y: element.scrollTop,
-			//w: element.clientWidth,  //Math.max(element.clientWidth || element.scrollWidth)
-			w: Math.max(element.clientWidth, element.parentNode.clientWidth),
-			h: Math.max(element.clientHeight, element.parentNode.clientHeight)  //Math.max(element.clientHeight || element.scrollHeight)
+			"x": element.scrollLeft,
+			"y": element.scrollTop,
+			//"w": element.clientWidth,  //Math.max(element.clientWidth || element.scrollWidth)
+			"w": Math.max(element.clientWidth, element.parentNode.clientWidth),
+			"h": Math.max(element.clientHeight, element.parentNode.clientHeight)  //Math.max(element.clientHeight || element.scrollHeight)
 		};
 		//if(this.ff){}
 		//rect.w = Math.max(element.clientWidth, element.parentNode.clientWidth);

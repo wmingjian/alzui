@@ -74,8 +74,8 @@ _class("Pane", Container, function(){
 	 * @param {Array} customTags 自定义支持action的标签
 	 */
 	this.initActionElements = function(element, owner, customTags){
-		owner = owner || this.getActionEngine();
-		this.initComponents();
+		//owner = owner || this.getActionEngine();
+		this.initComponents(element, customTags);
 	};
 	/**
 	 * 初始化组件中的 Action 动作组件
@@ -123,8 +123,9 @@ _class("Pane", Container, function(){
 						}
 						//application._buttons[btn._action] = btn;
 						break;
-					//default:
-					//	break;
+					default:  //li,label等标签
+						component = new LinkLabel();
+						break;
 					}
 					component.bind(node, this._actionManager);
 					this._actionManager.add(component);
