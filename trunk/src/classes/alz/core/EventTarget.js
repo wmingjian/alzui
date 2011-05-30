@@ -167,7 +167,13 @@ _class("EventTarget", "", function(){
 			}
 		}
 	};
+	this.addListener = function(type, agent, func){
+		this.addEventListener(type, function(ev){
+			return agent[func].call(agent, ev);
+		}, false);
+	};
 	this.dispatchEvent = function(ev){
+		var type = ev.type || ev.getType();
 		var ret = true;
 		for(var obj = this; obj; obj = obj.getParent()){  //默认事件传递顺序为有内向外
 			if(obj.getDisabled()){
@@ -175,13 +181,13 @@ _class("EventTarget", "", function(){
 				ret = false;
 				break;  //continue;
 			}
-			if(obj["on" + ev.type]){  //如果组件的时间响应方法存在
-				ret = obj["on" + ev.type](ev);  //应该判断事件响应函数的返回值并做些工作
+			if(obj["on" + type]){  //如果组件的时间响应方法存在
+				ret = obj["on" + type](ev);  //应该判断事件响应函数的返回值并做些工作
 				if(ev.cancelBubble){
 					return ret;  //如果禁止冒泡，则退出
 				}
 			}else{
-				var map = obj._eventMaps[ev.type];
+				var map = obj._eventMaps[type];
 				if(map){  //检查事件映射表中是否有对应的事件
 					var bCancel = false;
 					ev.cancelBubble = false;  //还原

@@ -247,4 +247,68 @@ _class("MetaTable", EventTarget, function(){
 	this.callback = function(cbid, data){
 		runtime._task.execute(cbid, [data]);
 	};
+	/**
+	 * 添加一条记录
+	 */
+	this.insertRecord = function(data, list){
+		data[this._primaryKey] = parseInt(data[this._primaryKey]);  //默认主键数字型
+		var id = data[this._primaryKey];
+		//1)保证主键(id)唯一性
+		if(id in this._hash){  //如果已经存在，忽略
+			runtime.warning("新增记录(type=" + this._id + ")已经存在id=" + id);
+		}else{  //新增
+			var item = data;  //runtime.clone(data);
+			if(id > this._maxId){
+				this._maxId = id;
+			}
+			this._hash[id] = item;  //2)存储到hash中
+			//3)更新主索引和其他索引
+			//var n = this.insertPos(this._list, item, this._primaryKey);
+			for(var k in this._hashIndex){
+				this._hashIndex[k].updateIndex("add", item);
+			}
+			//[TODO]4)更新过滤器
+			if(list){  //批量添加忽略数据监听
+				//this._list.push(item);
+				list.push(item);
+			}else{
+				this.dispatchEvent(new DataChangeEvent(this._id + "_add", item));
+			}
+		}
+		/* for test
+		function dump(list){
+			var sb = [];
+			for(var i = 0, len = list.length; i < len; i++){
+				sb.push(list[i][this._primaryKey]);
+			}
+			runtime.log(sb.join(","));
+		}
+		dump(this._list);
+		*/
+		return this._hash[id];
+	};
+	/**
+	 * 添加N条记录
+	 */
+	this.insertRecords = function(data){
+		var list = [];
+		for(var i = 0, len = data.length; i < len; i++){
+			var record = data[i];
+			this.insertRecord(record, list);
+		}
+		/* for test
+		var n = 0;
+		for(var i = 0, len = data.length; i < len;){
+			if(n % 2 == 1){
+				this.insertRecord(data[i], list);
+				i++;
+			}else{
+				this.insertRecord(data[len - 1], list);
+				len--;
+			}
+			n++;
+		}
+		*/
+		this.dispatchEvent(new DataChangeEvent(this._id + "_adds", list));
+	};
 });

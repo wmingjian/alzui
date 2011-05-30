@@ -182,6 +182,9 @@ _class("Application", EventTarget, function(){
 			return null;
 		}
 	};
+	this.getModel = function(key){
+		return this._model.getModel(key);
+	};
 	this.getTpl = function(name){
 		return this._template.getTpl(name);
 	};

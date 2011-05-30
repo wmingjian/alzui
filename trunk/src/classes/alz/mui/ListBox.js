@@ -13,22 +13,28 @@ _class("ListBox", Component, function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._data = null;
+		this._model = null;  //数据源
+		this._tableIndex = null;
 		this._useSelectionMode = false;  //{Boolean}是否使用 SelectionManager
 		this._multiple         = false;  //{Boolean}默认不支持多选
 		this._selectionMode    = 0;      //{Number}列表项目多选模式
-		this._key = "";    //数据模型中的主键
 		this._hash = {};   //哈希表
-		this._items = [];  //列表项目
+		this._list = [];  //列表项目
 		this._activeItem = null;
 		this._selectMgr = null;
+	};
+	this.bind = function(obj, model){
+		this.setParent2(obj.parentNode);
+		this.setModel(model, "+id");
+		this.init(obj);
 	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
 		this._self.onselectstart = function(){return false;};
 		this._selectMgr = new SelectionManager();
-//		this._useSelectionMode = true;  //{Boolean}是否使用 SelectionManager
-//		this._multiple         = true;  //{Boolean}默认不支持多选
-//		this._selectionMode    = 1;      //{Number}列表项目多选模式
+		//this._useSelectionMode = true;  //{Boolean}是否使用 SelectionManager
+		//this._multiple         = true;  //{Boolean}默认不支持多选
+		//this._selectionMode    = 1;     //{Number}列表项目多选模式
 		this._selectMgr.setBindList(this);
 	};
 	this.dispose = function(){
@@ -39,15 +45,20 @@ _class("ListBox", Component, function(){
 			this._activeItem.deactivate();
 			this._activeItem = null;
 		}
-		for(var i = 0, len = this._items.length; i < len; i++){
-			//this._items[i].dispose();
-			this._items[i] = null;
+		for(var i = 0, len = this._list.length; i < len; i++){
+			//this._list[i].dispose();
+			this._list[i] = null;
 		}
-		this._items = [];  //列表项目
+		this._list = [];  //列表项目
 		for(var k in this._hash){
 			this._hash[k].dispose();
 			delete this._hash[k];
 		}
+		if(this._tableIndex){
+			this._tableIndex.removeEventListener("dataChange", this);
+			this._tableIndex = null;
+		}
+		this._model = null;
 		this._data = null;
 		this._self.onselectstart = null;
 		_super.dispose.apply(this);
@@ -57,6 +68,13 @@ _class("ListBox", Component, function(){
 	};
 	this.setData = function(v){
 		this._data = v;
+	};
+	this.setModel = function(v, filter){
+		this._model = v;
+		var index = v.getIndex2(filter);
+		this._tableIndex = index;
+		index.addListener("dataChange", this, "onDataChange");
+		runtime.startTimer(0, index, "dispatchExistRecords");  //滞后加载已有的数据，因为相关组件的_self属性可能还不存在
 	};
 	this.getActiveItem = function(){
 		return this._activeItem;
@@ -82,32 +100,31 @@ _class("ListBox", Component, function(){
 		return this._selectMgr.cancelAllActiveItems();
 	};
 	this.pushItem = function(item){
-		if(this._key == "") window.alert("[ListBox::pushItem]key == ''");
-		var k = item._data[this._key];
+		var k = item._data[this._model.getPrimaryKey()];
 		if(!(k in this._hash)){
 			this._hash[k] = item;
-			this._items.push(item);
+			this._list.push(item);
 		}
 	};
 	this.unshiftItem = function(item){
-		if(this._key == "") window.alert("[ListBox::unshiftItem]key == ''");
-		var k = item._data[this._key];
+		var k = item._data[this._model.getPrimaryKey()];
 		if(!(k in this._hash)){
 			this._hash[k] = item;
-			this._items.unshift(item);
+			this._list.unshift(item);
 		}
 	};
 	/**
+	 * 移除一个列表项目
 	 * @param n {Number|ListItem}
-	 * @param bCache {boolean}
+	 * @param cache {boolean}  是否缓存列表项目
 	 * [TODO]更新 _selectMgr 中的相关信息
 	 */
-	this.removeItem = function(n, bCache){
+	this.removeItem = function(n, cache){
 		if(typeof n != "number"){
-			n = this._items.indexOf(n);
+			n = this._list.indexOf(n);
 		}
 		if(n != -1){
-			var item = this._items[n];
+			var item = this._list[n];
 			if(item == this._activeItem){
 				this._activeItem = null;
 			}
@@ -122,16 +139,16 @@ _class("ListBox", Component, function(){
 			//app.getModel("group").removeAllGroupMember(uid);  //移除每个组中的成员索引信息
 			//delete hash[item._data.uid];  //移除 ContactItem._data 信息
 			//移除 Item
-			delete this._hash[item._data[this._key]];
-			if(bCache){  //如果缓存，只需从父节点移出
+			delete this._hash[item._data[this._model.getPrimaryKey()]];
+			if(cache){  //如果缓存，只需从父节点移出
 				if(item._self && item._self.parentNode != null){
 					item._self.parentNode.removeChild(item._self);
 				}
 			}else{
 				item.dispose();
 			}
-			this._items[n] = null;
-			this._items.removeAt(n);
+			this._list[n] = null;
+			this._list.removeAt(n);
 		}
 	};
 	/**
@@ -139,8 +156,8 @@ _class("ListBox", Component, function(){
 	 * [TODO]通过建立合理的数据结构，下面的循环都是可以优化的
 	 */
 	this.removeActiveItems = function(app){
-		for(var i = 0; i < this._items.length;){
-			if(this._items[i]._active){
+		for(var i = 0; i < this._list.length;){
+			if(this._list[i]._active){
 				this.removeItem(i);
 				continue;
 			}
@@ -150,8 +167,8 @@ _class("ListBox", Component, function(){
 	};
 	this.indexOf_key = function(data, key){
 		var n = -1;
-		for(var i = 0, len = this._items.length; i < len; i++){
-			if(this._items[i][key] == data){
+		for(var i = 0, len = this._list.length; i < len; i++){
+			if(this._list[i][key] == data){
 				n = i;
 				break;
 			}
@@ -160,8 +177,8 @@ _class("ListBox", Component, function(){
 	};
 	this.getItemIndex = function(item){
 		var n = -1;
-		for(var i = 0, len = this._items.length; i < len; i++){
-			if(this._items[i] == item){
+		for(var i = 0, len = this._list.length; i < len; i++){
+			if(this._list[i] == item){
 				n = i;
 				break;
 			}
@@ -179,13 +196,13 @@ _class("ListBox", Component, function(){
 	 * 获取组建的列表项目数组
 	 */
 	this.getItems = function(){
-		return this._items;
+		return this._list;
 	};
 	/**
 	 * 获取一个列表项目
 	 */
 	this.getItem = function(n){
-		return this._items[n];
+		return this._list[n];
 	};
 	/**
 	 * 激活指定的列表项目，支持多选
@@ -215,7 +232,7 @@ _class("ListBox", Component, function(){
 	this.selectByFilter = function(func){
 		var list = [];   //活动的列表项目
 		var list0 = [];  //每个列表项目的状态(true|false)
-		var items = this._items;
+		var items = this._list;
 		for(var i = 0, len = items.length; i < len; i++){
 			var v = func(items[i]);
 			if(v){
@@ -225,5 +242,103 @@ _class("ListBox", Component, function(){
 		}
 		items = null;
 		this._selectMgr.selectItems(list, list0);
+	};
+	/**
+	 * 数据变更响应事件，主要用来分派数据变化
+	 * @param {DataChangeEvent} ev 数据变更事件
+	 */
+	this.onDataChange = function(ev){
+		var act = ev.act;
+		var data = ev.data;
+		//var olddata = ev.olddata;
+		var a = act.split("_")[1];
+		switch(a){
+		case "adds":  //批量添加
+			this.insertItems(data, ev.pos);
+			break;
+		case "add":
+			if(!this._filter || this._filter(data)){  //有过滤器的话，需要先通过过滤器，才添加
+				var id = data[this._model.getPrimaryKey()];
+				if(!(id in this._hash)){
+					this.insertItem(data, ev.pos);
+				}
+			}
+			break;
+		case "mod": 
+			//if(!this._filter || this._filter(data)){  //有过滤器的话，情况比较复杂，先交给“视图组件”来自行处理
+				//this.onDataChange.apply(this, arguments);
+				var id = data[this._model.getPrimaryKey()];
+				if(id in this._hash){
+					this.updateItem(data);
+				}
+			//}
+			break;
+		case "del":
+		case "remove":
+			if(!this._filter || this._filter(data)){  //有过滤器的话，需要先通过过滤器，才删除
+				//this.onDataChange.apply(this, arguments);
+				this.deleteItem(data);
+			}
+			break;
+		/*
+		case "update":
+		case "delete":
+		case "clear":
+		case "up":
+		case "adds":
+		case "clean":
+		*/
+		default:
+			//_super.onDataChange.apply(this, arguments);
+			break;
+		}
+	};
+	this._insertItem = function(data, pos){
+		console.log("_insertItem");
+	};
+	this.insertItem = function(data, pos){
+		this._insertItem(data, pos);
+	};
+	this.insertItems = function(data, pos){
+		for(var i = 0, len = data.length; i < len; i++){
+			this._insertItem(data[i], pos + i);
+		}
+	};
+	this.updateItem = function(data){
+	};
+	this._deleteItem = function(data){
+		var id = data[this._model.getPrimaryKey()];
+		if(id in this._hash){
+			var item = this._hash[id];
+			if(item == this._activeItem){
+				this._activeItem = null;
+			}
+			item._self.parentNode.removeChild(item._self);
+			var n = this._list.indexOf(item);
+			if(n != -1){
+				this._list[n] = null;
+				this._list.removeAt(n);
+			}
+			delete this._hash[id];
+			item.dispose();
+			item = null;
+		}
+	};
+	this.deleteItem = function(data){
+		this._deleteItem(data);
+	};
+	this.deleteAllItems = function(){
+		this._activeItem = null;
+		for(var i = 0, len = this._list.length; i < len; i++){
+			if(!this._list[i]._disposed){
+				this._list[i].dispose();
+			}
+			this._list[i] = null;
+		}
+		this._list = [];
+		for(var k in this._hash){
+			//this._hash[k].dispose();
+			delete this._hash[k];
+		}
 	};
 });
