@@ -19,6 +19,29 @@ _class("Workspace", Container, function(){
 		this._tipMouse = null;
 		this._activePopup = null;
 		this._activeDialog = null;
+		this._types = {
+			"workspace" : {},
+			"window"    : {},
+			"dialog"    : {},
+			"pane"      : {},
+			"button"    : {},
+			"checkbox"  : {},
+			"radio"     : {},
+			"combobox"  : {},
+			"richeditor": {},
+			"codeeditor": {},
+			"icon"      : {},
+			"popup"     : {},
+			"popmenu"   : {},
+			"rebar"     : {},
+			"menubar"   : {},
+			"toolbar"   : {},
+			"statusbar" : {},
+			"menu"      : {},
+			"menuitem"  : {},
+			"panel"     : {},
+			"toolbutton": {}
+		};
 	};
 	this.create = function(parent){
 		this.setParent2(parent);
@@ -108,11 +131,13 @@ _class("Workspace", Container, function(){
 		if(this._activePopup === v) return;
 		if(this._activePopup){
 			//[TODO]还原蒙板
+			runtime.dom.removeClass(this._activePopup.getOwner(), "active");
 			this._activePopup.setVisible(false);
 			//this._activePopup.setZIndex(1);
 		}
 		if(v){
 			v.setZIndex(10);
+			runtime.dom.addClass(v.getOwner(), "active");
 			v.setVisible(true);
 		}
 		this._activePopup = v;
@@ -297,5 +322,21 @@ _class("Workspace", Container, function(){
 				this._tipMouse.innerHTML = a.join("<br />");
 			}
 		}
+		if(this._activePopup){
+			var target = ev.target || ev.srcElement;
+			var bar = this._activePopup.getOwner().parentNode;
+			if(bar.className == "ui-menubar" && bar.contains(target)){
+				var item = this.getMenuItem(bar, target);
+				if(item && item._ptr){
+					bar._ptr.activeItem(item._ptr);
+				}
+			}
+		}
+	};
+	this.getMenuItem = function(bar, obj){
+		var el = obj;
+		for(; el && el.parentNode != bar; el = el.parentNode){
+		}
+		return el;
 	};
 });

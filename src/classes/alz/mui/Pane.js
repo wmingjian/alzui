@@ -144,8 +144,12 @@ _class("Pane", Container, function(){
 	 *   退机制。
 	 */
 	this.doAction = function(act, sender){
+		var skip = false;
+		if(act == "pop_show"){
+			skip = true;
+		}
 		var time = new Date().getTime();
-		if(time < this._lastTime + 500){
+		if(!skip && time < this._lastTime + 500){
 			this._lastTime = time;
 			return false;
 		}
