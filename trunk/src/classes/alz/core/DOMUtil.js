@@ -963,4 +963,31 @@ _class("DOMUtil", Plugin, function(){
 		}
 		style = null;
 	};
+	this.addClass = function(el, cls){
+		el.className = el.className ? el.className + " " + cls : cls;
+	};
+	this.removeClass = function(el, cls){
+		var arr = el.className.replace(/ +/g, " ").split(" ");
+		var sb = [];
+		for(var i = 0, len = arr.length; i < len; i++){
+			var a = arr[i];
+			if(a != ""){
+				if(a != cls){
+					sb.push(a);
+				}
+			}
+		}
+		el.className = sb.join(" ");
+	};
+	this.replaceClass = function(el, oldCls, newCls){
+		var arr = el.className.replace(/ +/g, " ").split(" ");
+		var sb = [];
+		for(var i = 0, len = arr.length; i < len; i++){
+			var a = arr[i];
+			if(a != ""){
+				sb.push(a != oldCls ? a : newCls);
+			}
+		}
+		el.className = sb.join(" ");
+	};
 });

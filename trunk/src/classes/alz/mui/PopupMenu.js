@@ -41,6 +41,9 @@ _class("PopupMenu", Popup, function(){
 	this.setApp = function(v){
 		this._app = v;
 	};
+	this.getOwner = function(){
+		return this._owner;
+	};
 	this.setReq = function(v){
 		this._req = v;
 	};
@@ -60,10 +63,30 @@ _class("PopupMenu", Popup, function(){
 		}
 		return pos;
 	};
+	this.getPos = function(obj, refObj){
+		var pos = {"x": 0, "y": 0};
+		var dom = runtime.dom;
+		for(var o = obj; o && o != refObj; o = o.offsetParent){
+			var bl, bt, x, y;
+			if(o != obj){
+				bl = dom.getStyleProperty(o, "borderLeftWidth");
+				bt = dom.getStyleProperty(o, "borderTopWidth");
+				x = isNaN(bl) ? 0 : bl;
+				y = isNaN(bt) ? 0 : bt;
+				bl = dom.getStyleProperty(o, "paddingLeftWidth");
+				bt = dom.getStyleProperty(o, "paddingTopWidth");
+				x += isNaN(bl) ? 0 : bl;
+				y += isNaN(bt) ? 0 : bt;
+			}
+			pos.x += o.offsetLeft + (o != obj ? x : 0);
+			pos.y += o.offsetTop + (o != obj ? y : 0);
+		}
+		return pos;
+	};
 	this.show = function(){
 		runtime._workspace.setActivePopup(this);
-		var pos = this.getPosition(this._owner);
-		this.moveTo(pos.x, pos.y + this._owner.offsetHeight);
+		var pos = this.getPos(this._owner);
+		this.moveTo(pos.x + 2, pos.y + this._owner.offsetHeight + 2);
 	};
 	this.hide = function(){
 		runtime._workspace.setActivePopup(null);

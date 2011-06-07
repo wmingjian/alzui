@@ -249,6 +249,12 @@ _class("Application", EventTarget, function(){
 		return popup;
 	};
 	this.doAction = function(act, sender){
+		if("execAction" in this){
+			var flag = this.execAction(act, sender);
+			if(flag){
+				return true;
+			}
+		}
 		var key = "do_" + act;
 		if(key in this && typeof this[key] == "function"){
 			var ret = this[key](act, sender);
