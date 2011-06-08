@@ -2,6 +2,7 @@ _package("alz.template");
 
 _import("alz.core.Plugin");
 _import("alz.template.TrimPath");
+_import("alz.template.TemplateObject");
 //_import("alz.core.Ajax");
 
 /**
@@ -72,6 +73,20 @@ _class("TemplateManager", Plugin, function(){
 			return false;
 		}
 	};
+	this.createXMLDocument = function(xml){
+		if(runtime.ie){
+			var xmldoc = new ActiveXObject("Msxml.DOMDocument");
+			xmldoc.async = false;
+			xmldoc.loadXML(xml);
+			return xmldoc;  //.documentElement
+		}else if(window.DOMParser){
+			var p = new DOMParser();
+			return p.parseFromString(xml, "text/xml");
+		}else{
+			console.log("浏览器不支持XMLDocument对象");
+			return null;
+		}
+	};
 	this.reg = function(tpls){
 		var arr = [];
 		for(var k in tpls){
@@ -82,7 +97,17 @@ _class("TemplateManager", Plugin, function(){
 			}else{
 				this.checkSyntax(v);
 			}
-			this._hash[k] = v;
+			var tpl = new TemplateObject();
+			tpl.create(v);
+			this._hash[k] = {
+				"type": "xml",
+				"name": k,
+				"data": v,
+				"template": tpl
+			};
+			if(k == "ui.xml"){
+				this.getApp()._taglib.regXmlTags(this.createXMLDocument(v).documentElement);
+			}
 		}
 		if(arr.length > 0){
 			runtime.error("下列这些模板不存在，请检查：" + arr.join(","));
@@ -93,7 +118,7 @@ _class("TemplateManager", Plugin, function(){
 			runtime.error("[ERROR]模版库中没有指定的模板(name=" + name + ")");
 			return "";
 		}
-		return this._hash[name];
+		return this._hash[name].data;
 	};
 	/*
 	this.load1 = function(tpls, callback){

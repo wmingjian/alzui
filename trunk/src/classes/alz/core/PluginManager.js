@@ -19,7 +19,7 @@ _class("PluginManager", ManagerBase, function(){
 	this.create = function(target, data){
 		for(var k in data){
 			var plugin = new data[k].clazz();
-			plugin.create(k, this);
+			plugin.create(k, target);
 			this.register(plugin);  //注册插件
 			var name = "_" + k;
 			if(name in target){

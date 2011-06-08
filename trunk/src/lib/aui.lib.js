@@ -91,6 +91,7 @@ import alz.mui.LineEdit;
 import alz.mui.Console;
 import alz.mui.Iframe;
 import alz.mui.CodeEditor;
+import alz.mui.ToolButton;
 import alz.mui.BitButton;
 import alz.mui.ToggleButton;
 import alz.mui.ToolBar;

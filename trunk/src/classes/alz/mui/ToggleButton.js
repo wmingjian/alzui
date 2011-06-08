@@ -8,7 +8,10 @@ _class("ToggleButton", BitButton, function(){
 		this._groupid = "";
 		this._toggled = false;
 	};
-	this.init = function(obj, app){
+	this.bind = function(obj, app){
+		this.init(obj);
+	};
+	this.init = function(obj){
 		_super.init.apply(this, arguments);
 		this._groupid = this._self.getAttribute("_groupid");
 		if(!this._groupid) throw "ToggleButton 组件缺少 _groupid 属性";

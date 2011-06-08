@@ -12,8 +12,11 @@ _class("BitButton", Component, function(){
 		this._disabled = false;
 		this._app = null;
 	};
-	this.init = function(obj, app){
+	this.bind = function(obj, app){
 		this._app = app;
+		this.init(obj);
+	};
+	this.init = function(obj){
 		_super.init.apply(this, arguments);
 		this._label = this._self.childNodes[1];
 		this.setDisabled(this._self.getAttribute("_disabled") == "true");
