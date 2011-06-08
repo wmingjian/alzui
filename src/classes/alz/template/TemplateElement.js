@@ -9,6 +9,7 @@ _class("TemplateElement", "", function(){
 		_super._init.call(this);
 		this._doc  = document;  //所属文档对象
 		this._self = null;  //关联的DOM元素
+		this._container = null;
 		//this._tpl  = null;  //元素创建时参照的模板对象
 		this._vars = {};    //所有的模板变量(key关联DOM更新信息)
 		this._hash = null;  //批量更新临时存储

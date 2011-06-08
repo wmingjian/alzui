@@ -1,6 +1,7 @@
 _package("alz.mui");
 
 _import("alz.mui.Component");
+_import("alz.mui.ToolButton");
 _import("alz.mui.BitButton");
 _import("alz.mui.ToggleButton");
 
@@ -8,28 +9,38 @@ _import("alz.mui.ToggleButton");
  * 工具栏组件
  */
 _class("ToolBar", Component, function(){
+	var HASH = {
+		"ui-toolbutton"   : ToolButton,
+		"wui-BitButton"   : BitButton,
+		"wui-ToggleButton": ToggleButton
+	};
 	this._init = function(){
 		_super._init.call(this);
 		this._app = null;
 		this._buttons = [];
 	};
-	this.init = function(obj, app){
+	this.bind = function(obj, parent, app, data, hash){
+		this.setParent2(parent);
 		this._app = app;
-		//_super.init.apply(this, arguments);
+		this.init(obj);
+		if(data){
+			this.createButtons(data, hash);
+		}
+	};
+	this.init = function(obj, app){
+		_super.init.apply(this, arguments);
 		//var nodes = this._self.childNodes;
 		var nodes = obj.childNodes;
 		for(var i = 0, len = nodes.length; i < len; i++){
-			if(nodes[i].nodeType != 1) continue;
-			var btn;
-			switch(nodes[i].className){
-			case "wui-BitButton"   : btn = new BitButton();break;
-			case "wui-ToggleButton": btn = new ToggleButton();break;
-			}
-			if(btn){
-				btn.init(nodes[i], this._app);  //[TODO]改用bind实现
+			var node = nodes[i];
+			if(node.nodeType != 1) continue;
+			if(node.className in HASH){
+				var clazz = HASH[node.className];
+				var btn = new clazz();
+				btn.bind(node, this._app);  //[TO-DO]改用bind实现
 				this._buttons.push(btn);
+				btn = null;
 			}
-			btn = null;
 		}
 		nodes = null;
 	};
@@ -44,5 +55,20 @@ _class("ToolBar", Component, function(){
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){
+	};
+	this.createButtons = function(data, hash){
+		for(var i = 0, len = data.length; i < len; i++){
+			var k = data[i];
+			switch(k){
+			case "-":
+				this._createElement2(this, "li", "sep");
+				break;
+			default:
+				var btn = new ToolButton();
+				btn.create(this, hash[k]);
+				this._buttons.push(btn);
+				break;
+			}
+		}
 	};
 });

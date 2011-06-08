@@ -23,6 +23,7 @@ _class("TemplateObject", "", function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._xmldoc   = null;  //{XMLDocument}
+		this._root     = null;
 		this._elements = [];  //{TemplateElement} 所有模板元素实例(内部包装了对应的DOM元素)
 		this._vars     = {};  //所有的模板变量
 		this._uid      = 0;   //value对象编号
@@ -30,7 +31,12 @@ _class("TemplateObject", "", function(){
 		this._values   = {};  //所有的value依赖的相关key
 	};
 	this.create = function(xml){
-		this._xmldoc = this.createXMLDocument(xml);
+		if(typeof xml == "string"){
+			this._xmldoc = this.createXMLDocument(xml);
+			this._root = this._xmldoc.documentElement;
+		}else{
+			this._root = xml;
+		}
 	};
 	this.dispose = function(){
 		for(var k in this._values){
@@ -49,6 +55,7 @@ _class("TemplateObject", "", function(){
 			this._elements[i] = null;
 		}
 		this._elements = [];
+		this._root = null;
 		this._xmldoc = null;
 		_super.dispose.apply(this);
 	};
@@ -67,7 +74,7 @@ _class("TemplateObject", "", function(){
 		}
 	};
 	this.createElement = function(parent, element){
-		var obj = this.node2element(this.getRoot(), element.getDoc(), this, function(type, el, name, value){
+		var obj = this.node2element(this.getRoot(), element.getDoc(), element, this, function(type, el, name, value){
 			if(!this.hasVar(value)) return;  //快速判断是否包含模板变量
 			if(type == "attr" && name == "style"){
 				var hash = this.parseStyle(value, true);
@@ -96,7 +103,7 @@ _class("TemplateObject", "", function(){
 		}
 	};
 	this.getRoot = function(){
-		return this._xmldoc.documentElement;
+		return this._root;
 	};
 	this.parse = function(){
 	};
@@ -165,7 +172,7 @@ _class("TemplateObject", "", function(){
 		}
 		return sb.join("");
 	};
-	this.node2element = function(node, doc, agent, func){
+	this.node2element = function(node, doc, element, agent, func){
 		var el;
 		switch(node.nodeType){
 		case 1:  //NODE_ELEMENT
@@ -176,6 +183,10 @@ _class("TemplateObject", "", function(){
 				var attr = attributes[i];
 				var name = attr.nodeName;
 				var value = attr.nodeValue;
+				if(name == "container" && value == "true"){
+					element._container = el;
+					continue;
+				}
 				switch(name){
 				case "_datasrc":
 					break;
@@ -197,7 +208,7 @@ _class("TemplateObject", "", function(){
 			if(node.hasChildNodes()){
 				var nodes = node.childNodes;
 				for(var i = 0, len = nodes.length; i < len; i++){
-					el.appendChild(this.node2element(nodes[i], doc, agent, func));
+					el.appendChild(this.node2element(nodes[i], doc, element, agent, func));
 				}
 			}
 			break;

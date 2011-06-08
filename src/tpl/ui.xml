@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui ns="a">
+	<window clazz="alz.mui.Window" title="窗体">
+		<div class="ui-window">
+			<div class="win-title"><span class="icon"></span><label>{$caption}</label></div>
+			<div class="win-body" container="true"></div>
+		</div>
+	</window>
+	<dialog clazz="alz.mui.Dialog" title="对话框">
+		<div class="ui-dialog">
+			<div class="skin"></div>
+			<h1 class="head"><label>{$caption}</label><a class="close" href="#" _action="dlg_cancel"></a></h1>
+			<div class="body" container="true"></div>
+		</div>
+	</dialog>
+	<popmenu clazz="alz.mui.PopupMenu" title="弹出式菜单">
+		<div class="ui-popmenu">
+			<ul container="true"></ul>
+		</div>
+	</popmenu>
+	<rebar>
+		<div class="ui-rebar" container="true"></div>
+	</rebar>
+	<menubar title="菜单栏">
+		<ul class="ui-menubar" container="true"></ul>
+	</menubar>
+	<menubutton>
+		<li class="menubutton" _action="pop_show" _id="{$_id}">{$text}(<u>{$key}</u>)</li>
+	</menubutton>
+	<toolbar title="工具栏">
+		<ul class="ui-toolbar" container="true"><li class="hdl"></li></ul>
+	</toolbar>
+	<statusbar title="状态栏">
+		<div class="ui-statusbar">
+			<ul class="grids">
+				<li class="grid" style="width:56px;">行 48</li>
+				<li class="grid" style="width:44px;">列 27</li>
+				<li class="grid" style="width:41px;">52</li>
+				<li class="grid" style="width:29px;">EF</li>
+				<li class="grid" style="width:46px;">UNIX,U8</li>
+				<li class="grid" style="width:25px;">REC</li>
+				<li class="grid" style="width:22px;">INS</li>
+				<li class="grid" style="width:32px;color:#808080;">READ</li>
+			</ul>
+			<div class="text">要获得帮助, 请按[F1]键</div>
+		</div>
+	</statusbar>
+	<vsplit title="垂直分隔条">
+		<div class="ui-slider-v"></div>
+	</vsplit>
+	<workspace>
+		<div class="ui-workspace" container="true"></div>
+	</workspace>
+	<panel>
+		<div container="true"></div>
+	</panel>
+	<!--
+	<table></table>
+	<textarea></textarea>
+	TextPane
+	TextField
+	ToggleButton
+	ToolTip
+	Tree
+	Viewport
+	Button
+	Checkbox
+	CheckBoxMenuItem
+	ColorChooser
+	ComboBox
+	DesktopPane
+	EditorPane
+	Label
+	List
+	Separator
+	MenuItem
+	PasswordField
+	ProgressBar
+	RadioButton
+	RadioButtonMenuItem
+	ScrollBar
+	RootPane
+	ScrollPane
+	Slider
+	Spinner
+	SplitPane
+	TabbedPane
+	-->
+</ui>

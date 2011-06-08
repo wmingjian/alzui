@@ -28,4 +28,7 @@ _class("Plugin", EventTarget, function(){
 	this.getId = function(){
 		return this._id;
 	};
+	this.getApp = function(){
+		return this._app;
+	};
 });

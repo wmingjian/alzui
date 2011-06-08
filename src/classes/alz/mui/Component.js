@@ -26,7 +26,7 @@ _class("Component", EventTarget, function(){
 	}([
 		/*0*/"href,htmlFor,id,name,innerHTML,onclick,ondragstart,onmousedown,tabIndex,title,type,maxLength,cellPadding,cellSpacing",
 		/*1*/"value,nowrap,src,unselectable,_action,_action1,_align,_fid,_layout,_name,_position,_showArrow,_needSel,scrolling,frameBorder,frameSpacing",
-		/*2*/"backgroundColor,backgroundRepeat,border,borderBottom,color,cursor,display,filter,font,fontWeight,fontFamily,fontSize,height,left,lineHeight,overflow,overflowX,padding,position,styleFloat,textAlign,top,whiteSpace,width,verticalAlign,zIndex,tableLayout,zoom"
+		/*2*/"backgroundColor,backgroundPosition,backgroundRepeat,border,borderBottom,color,cursor,display,filter,font,fontWeight,fontFamily,fontSize,height,left,lineHeight,overflow,overflowX,padding,position,styleFloat,textAlign,top,whiteSpace,width,verticalAlign,zIndex,tableLayout,zoom"
 	]);
 	this._init = function(){
 		_super._init.call(this);
@@ -135,7 +135,7 @@ _class("Component", EventTarget, function(){
 			}
 		}
 		if(parent){
-			parent.appendChild(obj);
+			(parent._self || parent).appendChild(obj);
 		}
 		return obj;
 	};

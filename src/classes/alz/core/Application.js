@@ -118,7 +118,9 @@ _class("Application", EventTarget, function(){
 		//注册数据模型
 		this._model.regModels(this.findConf("model"));
 		//注册组件的自定义标签
-		this._taglib.regTags(this.findConf("tags"));
+		this._taglib.regTags(this.findConf("taglib"));
+		var str = runtime.getTplData("aui.tpl")["ui.xml"];
+		this._taglib.regXmlTags(this._template.createXMLDocument(str).documentElement);
 		//注册模板库
 		this._template.reg(runtime.getTplData(tpl));
 	};

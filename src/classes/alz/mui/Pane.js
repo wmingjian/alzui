@@ -64,7 +64,91 @@ _class("Pane", Container, function(){
 	 * @return {Element}
 	 */
 	this.createTplElement = function(parent, tpl, app){
-		return this.createDomElement(parent, (app || this._app).getTpl(tpl)/*, ".module"*/);
+		app = app || this._app;
+		var tag;
+		var str = app.getTpl(tpl);
+		str.replace(/^<([a-z0-9]+)[ >]/, function(_0, _1){
+			tag = _1;
+		});
+		var conf = app._taglib.getTagConf(tag);
+		if(conf){
+			if(parent.getContainer){
+				parent = parent.getContainer();
+			}
+			var node = app._template.createXMLDocument(str).documentElement;
+			return this.createElementByXmlNode(parent, node, app/*, {}*/);
+		}else{
+			return this.createDomElement(parent, str/*, ".module"*/);
+		}
+	};
+	this.createElementByXmlNode = function(parent, node, app/*, scope*/){
+		var obj;
+		switch(node.nodeType){
+		case 1:  //NODE_ELEMENT
+			var container;
+			var tagName = node.tagName;
+			var conf = app._taglib.getTagConf(tagName);
+			if(conf){
+				var hash = {};
+				for(var i = 0, len = node.attributes.length; i < len; i++){
+					var name = node.attributes[i].nodeName;
+					var value = node.attributes[i].nodeValue;
+					hash[name] = value;
+				}
+				var template = conf.template;
+				var el = template.render(parent, hash);
+				obj = el._self;
+				container = el._container;
+				/*
+				var aaa = {};
+				obj = this.createElementByXmlNode(parent, conf.node.firstChild, app, aaa);
+				container = aaa.container;
+				*/
+				var id = node.getAttribute("id");
+				if(id){
+					obj.setAttribute("id", id);
+				}
+				var cls = node.getAttribute("class");
+				if(cls){
+					runtime.dom.addClass(container, cls);
+				}
+			}else{
+				obj = container = document.createElement(tagName);
+				for(var i = 0, len = node.attributes.length; i < len; i++){
+					var name = node.attributes[i].nodeName;
+					var value = node.attributes[i].nodeValue;
+					//if(name == "container" && value == "true"){
+					//	scope.container = obj;
+					//}else{
+						obj.setAttribute(name, value);
+					//}
+				}
+				parent.appendChild(obj);
+			}
+			if(node.hasChildNodes()){
+				var nodes = node.childNodes;
+				for(var i = 0, len = nodes.length; i < len; i++){
+					this.createElementByXmlNode(container, nodes[i], app/*, scope*/);
+				}
+			}
+			break;
+		case 3:  //NODE_TEXT
+			obj = document.createTextNode(node.nodeValue);
+			parent.appendChild(obj);
+			break;
+		case 4:  //NODE_CDATA_SECTION
+			obj = document.createCDATASection(node.data);
+			parent.appendChild(obj);
+			break;
+		case 8:  //NODE_COMMENT
+			//obj = document.createComment(node.data);
+			//parent.appendChild(obj);
+			break;
+		default:
+			//runtime.warning("无法处理的nodeType" + node.nodeType + "\n");
+			break;
+		}
+		return obj;
 	};
 	/**
 	 * 初始化组件中的动作元素，使这些元素可以响应默认事件触发其action
