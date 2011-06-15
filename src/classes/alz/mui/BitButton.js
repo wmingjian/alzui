@@ -1,11 +1,11 @@
 _package("alz.mui");
 
-_import("alz.mui.Component");
+_import("alz.mui.ToolButton");
 
 /**
  * 带图标的按钮组件
  */
-_class("BitButton", Component, function(){
+_class("BitButton", ToolButton, function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._icon = "";
@@ -18,7 +18,7 @@ _class("BitButton", Component, function(){
 	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
-		this._label = this._self.childNodes[1];
+		//this._label = this._self.childNodes[1];
 		this.setDisabled(this._self.getAttribute("_disabled") == "true");
 		this._icon = this._self.getAttribute("_icon") || "";
 		if(this._icon != ""){
@@ -30,30 +30,41 @@ _class("BitButton", Component, function(){
 		}
 		this.addEventGroupListener("mouseevent", {
 			mouseover: function(ev){
+				runtime.dom.addClass(this._self, "hover");
+				/*
 				this._self.style.borderLeft = "1px solid buttonhighlight";
 				this._self.style.borderTop = "1px solid buttonhighlight";
 				this._self.style.borderRight = "1px solid buttonshadow";
 				this._self.style.borderBottom = "1px solid buttonshadow";
+				*/
 			},
 			mouseout: function(ev){
 				var target = ev.target || ev.toElement;
-				if(!this._dom.contains(this._self, target)){
-					this._self.style.border = "1px solid buttonface";
+				if(!runtime.dom.contains(this._self, target)){
+					runtime.dom.removeClass(this._self, "hover");
+					runtime.dom.removeClass(this._self, "active");
+					//this._self.style.border = "1px solid buttonface";
 				}
 			},
 			mousedown: function(ev){
+				runtime.dom.addClass(this._self, "active");
+				/*
 				this._self.style.borderLeft = "1px solid buttonshadow";
 				this._self.style.borderTop = "1px solid buttonshadow";
 				this._self.style.borderRight = "1px solid buttonhighlight";
 				this._self.style.borderBottom = "1px solid buttonhighlight";
+				*/
 				var sender = ev.target || ev.srcElement;
-				this._app.doAction(sender.getAttribute("_action"), sender);
+				//this._app.doAction(sender.getAttribute("_action"), sender);
 			},
 			mouseup: function(ev){
+				runtime.dom.replaceClass(this._self, "active", "hover");
+				/*
 				this._self.style.borderLeft = "1px solid buttonhighlight";
 				this._self.style.borderTop = "1px solid buttonhighlight";
 				this._self.style.borderRight = "1px solid buttonshadow";
 				this._self.style.borderBottom = "1px solid buttonshadow";
+				*/
 			}/*,
 			click: function(ev){
 				var sender = ev.target || ev.srcElement;

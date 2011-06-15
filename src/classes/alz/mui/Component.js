@@ -1,6 +1,8 @@
 _package("alz.mui");
 
 _import("alz.core.EventTarget");
+_import("alz.mui.IBoxModel");
+_import("alz.mui.IDesignable");
 
 /**
  * UI组件应该实现BoxElement的接口
@@ -9,6 +11,7 @@ _import("alz.core.EventTarget");
  * @desc ss
  */
 _class("Component", EventTarget, function(){
+	_implements(this, IBoxModel/*, IDesignable*/);
 	/*
 	 0 : obj[k] = v;
 	 1 : obj.setAttribute(k, v);
@@ -30,10 +33,17 @@ _class("Component", EventTarget, function(){
 	]);
 	this._init = function(){
 		_super._init.call(this);
-		//runtime._components.push(this);
 		this._tag = "Component";
 		this._domCreate = false;
-		this._domBuildType = 0;  //0=create,1=bind,2=build(xml),3=build(json),4=build(format text)
+		/*
+		 * 创建方式
+		 * 0 = create
+		 * 1 = bind
+		 * 2 = build(xml)
+		 * 3 = build(json)
+		 * 4 = build(format text)
+		 */
+		this._domBuildType = 0;
 		this._win = null;  //runtime.getWindow();
 		this._doc = null;  //runtime.getDocument();  //this._win.document
 		this._dom = runtime.getDom();
@@ -41,27 +51,19 @@ _class("Component", EventTarget, function(){
 		this._owner = null;
 		//this._id = null;
 		this._tagName = "div";
+		this._tplel = null;
 		this._self = null;  //组件所关联的DOM元素
 		this._containerNode = null;
 		this._jsonData = null;
 		this._data = null;  //结点的json数据
-		this._currentPropertys = {};
-		this._left = 0;
-		this._top = 0;
-		this._width = 0;
-		this._height = 0;
+		this._attributes = {};  //纯字符串的属性值
+		this._propertys = {};   //具体类型的属性值
+
+		//盒模型相关属性
+
 		this._align = "none";
 		this._dockRect = {"x": 0, "y": 0, "w": 0, "h": 0};  //停靠以后组件的位置信息
-		this._borderLeftWidth = 0;
-		this._borderTopWidth = 0;
-		this._borderRightWidth = 0;
-		this._borderBottomWidth = 0;
-		this._paddingLeft = 0;
-		this._paddingTop = 0;
-		this._paddingRight = 0;
-		this._paddingBottom = 0;
-		//this._visible = false;
-		this._visible = null;  //boolean
+		this._visible = null;  //false(boolean)
 		this._zIndex = 0;
 		this._opacity = 0;
 		this._position = "";  //"relative"
@@ -71,8 +73,146 @@ _class("Component", EventTarget, function(){
 		this._xpath = "";
 		this._state = "normal";
 		this._cursors = ["nw", "n", "ne", "w", "e", "sw", "s", "se"];
-		this._created = false;
-		this._inited = false;
+		/*
+		UI组件插件
+		key    名字   影响属性
+		box    盒模型 left,top,width,height,margin*,border*,padding*
+		action 动作   _action
+		layout 布局   position,overflow,float,(box)
+		align  停靠   (box)
+		effect 效果   background,text,font
+		*/
+		this._plugins = {};
+		//组件状态
+		this._destroyed = false;  //是否已销毁
+		//this._disposed = false;   //是否已部署
+		this._created = false;    //是否已创建
+		this._inited = false;     //是否已初始化
+	};
+	this.build = function(el){
+		this._tplel = el;
+		this._self = el._self;
+		this._container = el._container;
+		var attributes = el._attributes;
+		if(attributes.id){
+			this._self.setAttribute("id", attributes.id);
+		}
+		if(attributes["class"]){
+			runtime.dom.addClass(this._container, attributes["class"]);
+		}
+	};
+	/**
+	 * @method bind
+	 * @param {Element} obj
+	 * @desc 调用该方法初始化的组件的所有属性从DOM元素中动态获取
+	 * 设计该方法的思想和 init 方法完全相反，init方法从脚本组件角度考虑问题，bind
+	 * 方法从 DOM 元素角度考虑问题。
+	 */
+	this.bind = function(obj){
+		this.setParent2(obj.parentNode);
+		var style = this._dom.getStyle(obj);
+		//if(this._className == "DlgPageTool") window.alert("123");
+
+		//调用一遍实现的接口
+		var imps = this.__cls__._imps;
+		for(var i = 0, len = imps.length; i < len; i++){
+			imps[i].init.call(this, obj, style);  //执行接口的init方法
+		}
+		imps = null;
+
+		this._position = this.getPropertyValue(style, "position");
+		this._visible = this.getPropertyValue(style, "display") != "none";
+		if(this._jsonData){  //_jsonData 优先级最高
+			for(var k in this._jsonData){
+				if(this._jsonData[k]){
+					this["_" + k] = this._jsonData[k];
+				}
+			}
+			if(this._align != "none"){
+				this._position = "absolute";
+				this._dockRect.x = this._left;
+				this._dockRect.y = this._top;
+				this._dockRect.w = this._width;
+				this._dockRect.h = this._height;
+			}
+		}
+		this.__init(obj, 1);
+	};
+	/**
+	 * @method create
+	 * @param {Element} parent
+	 * @return {Element}
+	 * @desc 创建一个 parent 容器的子元素
+	 */
+	this.create = function(parent){
+		this.setParent2(parent);
+		var obj = this._createElement(this._tagName || "div");
+		if(parent) this.setParent(parent, obj);
+		this.init(obj);
+		return obj;
+	};
+	this.__init = function(obj, domBuildType){
+		if(this._parent && this._parent.add){  //容器类实例有该方法
+			this._parent.add(this);
+		}
+		this._domBuildType = domBuildType;
+		obj._ptr = this;
+		this._self = obj;
+		this._containerNode = obj;  //基础组件默认_self就是具体的容器节点
+		//this._self._ptr = this;
+		//this._id = "__dlg__" + Math.round(10000 * Math.random());
+		//this._self.id = this._id;
+		if(this._position){
+			this._self.style.position = this._position;
+		}
+	};
+	/**
+	 * @method init
+	 * @param {Element} obj
+	 * @desc 以create方式初始化一个DOM元素
+	 */
+	this.init = function(obj){
+		//_super.init.apply(this, arguments);
+		this.__init(obj, 0);
+		//runtime.actionManager.add(this);
+		//this.setVisible(this._visible);
+	};
+	/**
+	 * @method dispose
+	 * @desc 析构方法
+	 */
+	this.dispose = function(){
+		if(this._disposed) return;
+		for(var k in this._plugins){
+			this._plugins[k].dispose();
+			delete this._plugins[k];
+		}
+		this._data = null;
+		this._jsonData = null;
+		this._containerNode = null;
+		if(this._self){
+			if(this._self._ptr){
+				this._self._ptr = null;
+			}
+			if(this._self.tagName != "BODY" && this._self.parentNode){  // && this._domBuildType == 0)
+				var o = this._self.parentNode.removeChild(this._self);
+				delete o;
+				if(runtime.ie){
+					this._self.outerHTML = "";
+				}
+			}
+			//runtime.checkDomClean(this);
+			this._self = null;
+		}
+		this._tplel = null;
+		this._owner = null;
+		//this._parent = null;
+		this._dom = null;
+		this._doc = null;
+		this._win = null;
+		_super.dispose.apply(this);
+	};
+	this.destroy = function(){
 	};
 	/**
 	 * @method toString
@@ -80,7 +220,7 @@ _class("Component", EventTarget, function(){
 	 * @desc 重写的toString()方法，形式为{tag:类名, align:对齐方式}
 	 */
 	this.toString = function(){
-		return "{tag:'" + this._className + "',align:'" + this._align + "'}";
+		return "{tag:'" + this._className + "'}";  //,align:'" + this._align + "'
 	};
 	/**
 	 * @method setParent2
@@ -139,6 +279,85 @@ _class("Component", EventTarget, function(){
 		}
 		return obj;
 	};
+	this.createElementByXmlNode = function(parent, node, app/*, scope*/){
+		var obj, doc = document;
+		switch(node.nodeType){
+		case 1:  //NODE_ELEMENT
+			var container;
+			var tagName = node.tagName;
+			var conf = app._taglib.getTagConf(tagName);
+			var c;
+			if(conf){
+				var attributes = {};  //id,class,dock
+				for(var i = 0, len = node.attributes.length; i < len; i++){
+					var attr = node.attributes[i];
+					var name = attr.nodeName;
+					var value = attr.nodeValue;
+					attributes[name] = value;
+				}
+				var template = conf.template;
+				var el = template.render(parent, attributes);
+				obj = el._self;
+				container = el._container;
+				/*
+				var aaa = {};
+				obj = this.createElementByXmlNode(parent, conf.node.firstChild, app, aaa);
+				container = aaa.container;
+				*/
+				var clazz = conf.getClass(node.getAttribute("clazz"));
+				if(clazz){
+					console.log("build " + tagName + "," + clazz.__cls__._fullName);
+					c = new clazz();
+					c.build(el);
+				}
+				if(attributes.id){
+					obj.setAttribute("id", attributes.id);
+				}
+				if(attributes["class"]){
+					runtime.dom.addClass(container, attributes["class"]);
+				}
+			}else{
+				obj = container = doc.createElement(tagName);
+				for(var i = 0, len = node.attributes.length; i < len; i++){
+					var attr = node.attributes[i];
+					var name = attr.nodeName;
+					var value = attr.nodeValue;
+					//if(name == "container" && value == "true"){
+					//	scope.container = obj;
+					//}else{
+						obj.setAttribute(name, value);
+					//}
+				}
+				parent.appendChild(obj);
+			}
+			if(node.hasChildNodes()){
+				var nodes = node.childNodes;
+				for(var i = 0, len = nodes.length; i < len; i++){
+					this.createElementByXmlNode(container, nodes[i], app/*, scope*/);
+				}
+			}
+			if(c && c.rendered){
+				c.rendered();
+			}
+			break;
+		case 3:  //NODE_TEXT
+			obj = doc.createTextNode(node.nodeValue);
+			parent.appendChild(obj);
+			break;
+		case 4:  //NODE_CDATA_SECTION
+			obj = doc.createCDATASection(node.data);
+			parent.appendChild(obj);
+			break;
+		case 8:  //NODE_COMMENT
+			//obj = doc.createComment(node.data);
+			//parent.appendChild(obj);
+			break;
+		default:
+			//runtime.warning("无法处理的nodeType" + node.nodeType + "\n");
+			break;
+		}
+		return obj;
+	};
 	this._renderElement = function(parent, obj){
 		if(parent.getContainer){
 			parent = parent.getContainer();
@@ -167,161 +386,6 @@ _class("Component", EventTarget, function(){
 	};
 	this.getPropertyValue = function(style, name){
 		return this._dom.getPropertyValue(style, name);
-	};
-	/**
-	 * @method bind
-	 * @param {Element} obj
-	 * @desc 调用该方法初始化的组件的所有属性从DOM元素中动态获取
-	 * 设计该方法的思想和 init 方法完全相反，init方法从脚本组件角度考虑问题，bind
-	 * 方法从 DOM 元素角度考虑问题。
-	 */
-	//this.build = function(data){};
-	this.bind = function(obj){
-		this.setParent2(obj.parentNode);
-		/*
-		var props = "color,cursor,display,visibility,opacity,zIndex,"
-			+ "overflow,position,"
-			+ "left,top,bottom,right,width,height,"
-			+ "marginBottom,marginLeft,marginRight,marginTop,"
-			+ "borderTopColor,borderTopStyle,borderTopWidth,"
-			+ "borderRightColor,borderRightStyle,borderRightWidth,"
-			+ "borderBottomColor,borderBottomStyle,borderBottomWidth,"
-			+ "borderLeftColor,borderLeftStyle,borderLeftWidth,"
-			+ "paddingBottom,paddingLeft,paddingRight,paddingTop,"
-			+ "backgroundAttachment,backgroundColor,backgroundImage,backgroundPosition,backgroundRepeat";
-		*/
-		/*
-		margin,border,padding
-		borderTop,borderRight,borderBottom,borderLeft,
-		borderColor,borderSpacing,borderStyle,borderWidth
-		fontFamily,fontSize,fontSizeAdjust,fontStretch,fontStyle,fontVariant,fontWeight
-		direction
-		overflowX,overflowY
-		textAlign,textDecoration,textIndent,textShadow,textTransform
-		lineHeight,
-		verticalAlign
-		*/
-		var style = this._dom.getStyle(obj);
-		/*
-		var arr = props.split(",");
-		for(var i = 0, len = arr.length; i < len; i++){
-			this._currentPropertys[arr[i]] = this.getPropertyValue(style, arr[i]);
-		}
-		*/
-		this._position = this.getPropertyValue(style, "position");
-		this._visible = this.getPropertyValue(style, "display") != "none";
-		this._left = this.parseNum(obj.tagName, this.getPropertyValue(style, "left")) || obj.offsetLeft;
-		this._top = this.parseNum(obj.tagName, this.getPropertyValue(style, "top")) || obj.offsetTop;
-		this._width = this.parseNum(obj.tagName, this.getPropertyValue(style, "width")) || obj.offsetWidth;
-		this._height = this.parseNum(obj.tagName, this.getPropertyValue(style, "height")) || obj.offsetHeight;
-
-		//if(this._className == "DlgPageTool") window.alert("123");
-		var props = {
-			"marginTop":0,
-			"marginRight":0,
-			"marginBottom":0,
-			"marginLeft":0,
-			"borderTopWidth":1,
-			"borderRightWidth":1,
-			"borderBottomWidth":1,
-			"borderLeftWidth":1,
-			"paddingTop":1,
-			"paddingRight":1,
-			"paddingBottom":1,
-			"paddingLeft":1
-		}
-		for(var k in props){
-			if(props[k] == 1){
-				this["_" + k] = this.parseNum(obj.tagName, this.getPropertyValue(style, k) || obj.style[k]);
-			}
-		}
-		if(this._jsonData){  //_jsonData 优先级最高
-			for(var k in this._jsonData){
-				if(this._jsonData[k]){
-					this["_" + k] = this._jsonData[k];
-				}
-			}
-			if(this._align != "none"){
-				this._position = "absolute";
-				this._dockRect = {
-					"x": this._left,
-					"y": this._top,
-					"w": this._width,
-					"h": this._height
-				};
-			}
-		}
-		this.__init(obj, 1);
-	};
-	/**
-	 * @method create
-	 * @param {Element} parent
-	 * @return {Element}
-	 * @desc 创建一个 parent 容器的子元素
-	 */
-	this.create = function(parent){
-		this.setParent2(parent);
-		var obj = this._createElement(this._tagName || "div");
-		//obj.style.border = "1px solid #000000";
-		if(parent) this.setParent(parent, obj);
-		this.init(obj);
-		return obj;
-	};
-	this.__init = function(obj, domBuildType){
-		if(this._parent && this._parent.add){  //容器类实例有该方法
-			this._parent.add(this);
-		}
-		this._domBuildType = domBuildType;
-		obj._ptr = this;
-		this._self = obj;
-		this._containerNode = obj;  //基础组件默认_self就是具体的容器节点
-		//this._self._ptr = this;
-		//this._id = "__dlg__" + Math.round(10000 * Math.random());
-		//this._self.id = this._id;
-		if(this._position) this._self.style.position = this._position;
-	};
-	/**
-	 * @method init
-	 * @param {Element} obj
-	 * @desc 以create方式初始化一个DOM元素
-	 */
-	this.init = function(obj){
-		//_super.init.apply(this, arguments);
-		this.__init(obj, 0);
-		//runtime.actionManager.add(this);
-		//this.setVisible(this._visible);
-	};
-	/**
-	 * @method dispose
-	 * @desc 析构方法
-	 */
-	this.dispose = function(){
-		if(this._disposed) return;
-		this._data = null;
-		this._jsonData = null;
-		this._containerNode = null;
-		if(this._self){
-			if(this._self._ptr){
-				this._self._ptr = null;
-			}
-			if(this._self.tagName != "BODY" && this._self.parentNode){  // && this._domBuildType == 0)
-				var o = this._self.parentNode.removeChild(this._self);
-				delete o;
-				if(runtime.ie){
-					this._self.outerHTML = "";
-				}
-			}
-			//runtime.checkDomClean(this);
-			this._self = null;
-		}
-		this._owner = null;
-		//this._parent = null;
-		this._dom = null;
-		this._doc = null;
-		this._win = null;
-		_super.dispose.apply(this);
-	};
-	this.destroy = function(){
 	};
 	this.query = function(xpath/*, context*/){
 		/*
@@ -425,18 +489,18 @@ _class("Component", EventTarget, function(){
 				this._self.style[name] = value;
 			}
 		}catch(ex){
-			window.alert(ex.description + "\n" + name + "=" + value);
+			window.alert(ex.message + "\n" + name + "=" + value);
 		}
 	};
 	/**
 	 * @method setAttribute
 	 * @param {Element} el DOM元素
-	 * @param {Object} hash 属性哈希表
+	 * @param {Object} attributes 属性哈希表
 	 * @desc  批量设置 el 的属性
 	 */
-	this.setAttribute = function(el, hash){
-		for(var attr in hash){
-			el.setAttribute(attr,hash[attr]);
+	this.setAttribute = function(el, attributes){
+		for(var attr in attributes){
+			el.setAttribute(attr, attributes[attr]);
 		}
 		return el;
 	};
@@ -447,124 +511,6 @@ _class("Component", EventTarget, function(){
 	 */
 	this.getAlign = function(){
 		return this._align;
-	};
-	/**
-	 * @method getLeft
-	 * @return {Number}
-	 * @desc  获取组件的x坐标
-	 */
-	this.getLeft = function(){
-		return this._left;
-	};
-	/**
-	 * @method setLeft
-	 * @param {Number} v
-	 * @desc  设置组件的x坐标
-	 */
-	this.setLeft = function(v){
-		this._left = v;
-		//v += this._paddingLeft;
-		this.setStyleProperty("left", v + "px");
-		if(this._myLayer){
-			this._myLayer.style.left = v + "px";
-		}
-	};
-	/**
-	 * @method getTop
-	 * @return {Number}
-	 * @desc  获取组件的y坐标
-	 */
-	this.getTop = function(){
-		return this._top;
-	};
-	/**
-	 * @method setTop
-	 * @param {Number} v
-	 * @desc  设置组件的y坐标
-	 */
-	this.setTop = function(v){
-		this._top = v;
-		//v += this._paddingTop;
-		this.setStyleProperty("top", v + "px");
-		if(this._myLayer){
-			this._myLayer.style.top = v + "px";
-		}
-	};
-	/**
-	 * @method getInnerWidth
-	 * @param {Number} v 宽度值[可选]
-	 * @return {Number}
-	 * @desc  获取组件的可见宽度
-	 */
-	this.getInnerWidth = function(v){
-		if(!v) v = this._width;
-		return Math.max(0, v - this._borderLeftWidth - this._borderRightWidth - this._paddingLeft - this._paddingRight);
-		//return Math.max(0, runtime.getBoxModel() == 0 ? v : v - this._borderLeftWidth - this._borderRightWidth - this._paddingLeft - this._paddingRight);
-	};
-	/**
-	 * @method getInnerHeight
-	 * @param {Number} v 高度值[可选]
-	 * @return {Number}
-	 * @desc  获取组件的可见高度
-	 */
-	this.getInnerHeight = function(v){
-		if(!v) v = this._height;
-		return Math.max(0, v - this._borderTopWidth - this._borderBottomWidth - this._paddingTop - this._paddingBottom);
-		//return Math.max(0, runtime.getBoxModel() == 0 ? v : v - this._borderTopWidth - this._borderBottomWidth - this._paddingTop - this._paddingBottom);
-	};
-	/**
-	 * @method getWidth
-	 * @return {Number}
-	 * @desc  获取组件的宽度
-	 */
-	this.getWidth = function(){
-		return this._width;
-	};
-	/**
-	 * @method setWidth
-	 * @param {Number} v 宽度值
-	 * @desc  设置组件的宽度
-	 */
-	this.setWidth = function(v){
-		v = Math.max(v, 0);
-		this._width = v;
-		if(this._dockRect.w == 0) this._dockRect.w = v;
-		var w = this.getInnerWidth(v);
-		this._setWidth(w);
-	};
-	/**
-	 * @method getHeight
-	 * @return {Number}
-	 * @desc  获取组件的高度
-	 */
-	this.getHeight = function(){
-		return this._height;
-	};
-	/**
-	 * @method setHeight
-	 * @param {Number} v 宽度值
-	 * @desc  设置组件的高度
-	 */
-	this.setHeight = function(v){
-		v = Math.max(v, 0);
-		this._height = v;
-		if(this._dockRect.h == 0) this._dockRect.h = v;
-		var h = this.getInnerHeight(v);
-		this._setHeight(h);
-	};
-	this._setWidth = function(v){
-		v = Math.max(v, 0);
-		this.setStyleProperty("width", v + "px");
-		if(this._myLayer){
-			this._myLayer.style.width = v + "px";
-		}
-	};
-	this._setHeight = function(v){
-		v = Math.max(v, 0);
-		this.setStyleProperty("height", v + "px");
-		if(this._myLayer){
-			this._myLayer.style.height = v + "px";
-		}
 	};
 	/**
 	 * @method setBgColor

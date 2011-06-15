@@ -46,7 +46,7 @@ _class("AObject", null, function(){
 		//return eval(this._className);
 		//return __class__;  //error!!!不是上下文环境中的这个类，是this._className对应的类
 		//return __classes__[this._className];  //避免使用eval方法
-		return this._clazz;
+		return this.__cls__.getClass();
 		//return runtime._classManager.getClassByName(this._className).getClazz();
 	};
 	/**
@@ -54,7 +54,7 @@ _class("AObject", null, function(){
 	 * @return {Class}
 	 */
 	this.getSuperClass = function(){
-		return this.getClass()._super.getClass();
+		return this.__cls__.getSuperClass();
 	};
 	/**
 	 * @method getClassName
@@ -120,11 +120,7 @@ _class("AObject", null, function(){
 			clazz = __classes__[clazz];
 			//clazz = runtime._classManager.getClassByName(this._className).getClazz();
 		}
-		//查找 _clazz._super 链
-		for(var obj = this; obj; obj = obj._clazz._super){
-			if(obj._clazz == clazz) return true;
-		}
-		return false;
+		return this.__cls__.contains(clazz);
 	};
 	/**
 	 * 获取当前对象的类型

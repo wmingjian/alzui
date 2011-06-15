@@ -54,6 +54,17 @@ _class("Window", Component, function(){
 		this._width = 0;
 		this._height = 0;
 	};
+	this.build = function(el){
+		_super.build.apply(this, arguments);
+		var attributes = el._attributes;
+		if(attributes.dock){
+			if(attributes.dock == "true"){
+				runtime.dom.removeClass(this._self, "undock");
+			}else{
+				runtime.dom.addClass(this._self, "undock");
+			}
+		}
+	};
 	this.create = function(parent){
 		this.setParent2(parent);
 		var tpl = tpl_replace(TPL_WIN, {"pathimg": "../alzui/res/images/"});

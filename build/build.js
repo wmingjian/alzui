@@ -90,8 +90,8 @@ function writeFile1(path, content){
 		oStream.SaveToFile(path, 1);
 		oStream.Close();
 		oStream = null;
-	}catch(e){
-		print(e.description);
+	}catch(ex){
+		print(ex.description);
 	}
 }
 function parseJson(data){

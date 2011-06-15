@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ui ns="a">
 	<window clazz="alz.mui.Window" title="窗体">
-		<div class="ui-window">
+		<div class="ui-window undock">
 			<div class="win-title"><span class="icon"></span><label>{$caption}</label></div>
 			<div class="win-body" container="true"></div>
 		</div>
 	</window>
+	<toolwin clazz="alz.mui.ToolWin" title="工具窗体">
+		<div class="ui-toolwin">
+			<div class="win-title"><a class="close" href="#" _action="win_close"></a><label>{$caption}</label></div>
+			<div class="win-body" container="true"></div>
+		</div>
+	</toolwin>
 	<dialog clazz="alz.mui.Dialog" title="对话框">
 		<div class="ui-dialog">
 			<div class="skin"></div>
@@ -13,6 +19,9 @@
 			<div class="body" container="true"></div>
 		</div>
 	</dialog>
+	<popup>
+		<div class="ui-popup" container="true"></div>
+	</popup>
 	<popmenu clazz="alz.mui.PopupMenu" title="弹出式菜单">
 		<div class="ui-popmenu">
 			<ul container="true"></ul>
@@ -21,13 +30,19 @@
 	<rebar>
 		<div class="ui-rebar" container="true"></div>
 	</rebar>
-	<menubar title="菜单栏">
+	<menubar clazz="alz.mui.MenuBar" title="菜单栏">
 		<ul class="ui-menubar" container="true"></ul>
 	</menubar>
-	<menubutton>
-		<li class="menubutton" _action="pop_show" _id="{$_id}">{$text}(<u>{$key}</u>)</li>
+	<menubutton class="alz.mui.MenuButton">
+		<li class="ui-menubutton" _action="pop_show" _id="{$_id}">{$text}(<u>{$key}</u>)</li>
 	</menubutton>
-	<toolbar title="工具栏">
+	<menuitem clazz="alz.mui.MenuItem">
+		<li><a href="#" _action="{$action}"><!--{$text}(<u>{$key}</u>){$more}--></a></li>
+	</menuitem>
+	<menusep>
+		<li class="sep"></li>
+	</menusep>
+	<toolbar clazz="alz.mui.ToolBar" title="工具栏">
 		<ul class="ui-toolbar" container="true"><li class="hdl"></li></ul>
 	</toolbar>
 	<statusbar title="状态栏">
@@ -45,14 +60,20 @@
 			<div class="text">要获得帮助, 请按[F1]键</div>
 		</div>
 	</statusbar>
+	<hsplit title="水平分隔条">
+		<div class="ui-slider-h"></div>
+	</hsplit>
 	<vsplit title="垂直分隔条">
 		<div class="ui-slider-v"></div>
 	</vsplit>
 	<workspace>
 		<div class="ui-workspace" container="true"></div>
 	</workspace>
-	<panel>
-		<div container="true"></div>
+	<pane clazz="alz.mui.Pane">
+		<div class="ui-pane" container="true"></div>
+	</pane>
+	<panel clazz="alz.mui.Panel">
+		<div class="ui-panel" container="true"></div>
 	</panel>
 	<!--
 	<table></table>

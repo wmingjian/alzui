@@ -175,6 +175,7 @@ _class("Workspace", Container, function(){
 	this.onMouseDown = function(ev){
 		if(this._activePopup){
 			switch(this._activePopup._className){
+			case "alz.mui.Popup":
 			case "alz.mui.PopupMenu":
 				var target = ev.target || ev.srcElement;
 				if(this._activePopup._self == target || this._activePopup._self.contains(target)){

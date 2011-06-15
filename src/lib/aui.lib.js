@@ -5,7 +5,10 @@ import alz.copyright;
 (function(__global){  // Using a closure to keep global namespace clean.
 
 //import alz.changelog;
+//import alz.Profile;
 import alz.init;
+import alz.Clazz;
+import alz.LibContext;
 
 }(this)).regLib("aui", "", function(){with(arguments[0]){
 
@@ -30,9 +33,9 @@ import alz.core.TableIndex;
 import alz.core.TableFilter;
 import alz.core.MetaTable;
 import alz.core.DataModel;
-import alz.core.TagLib;
 import alz.template.TemplateElement;
 import alz.template.TemplateObject;
+import alz.core.TagLib;
 import alz.template.TrimPath;
 import alz.template.Template;
 import alz.template.ParseError;
@@ -61,14 +64,16 @@ import alz.core.ActionStack;
 import alz.core.ActionManager;
 import alz.core.ActionCollection;
 import alz.core.ProductManager;
+import alz.core.ToggleGroup;
+import alz.core.ToggleManager;
 import alz.core.WebRuntime_core;
 
 }});
 
 runtime.regLib("ui", "", function(){with(arguments[0]){
 
-import alz.mui.ToggleGroup;
-import alz.mui.ToggleManager;
+import alz.mui.IBoxModel;
+//import alz.mui.IDesignable;
 import alz.mui.SelectionManager;
 import alz.mui.Component;
 import alz.action.ActionElement;
@@ -81,6 +86,7 @@ import alz.action.CheckBox;
 import alz.action.ComboBox;
 import alz.action.Select;
 import alz.action.FormElement;
+import alz.mui.IAction;
 import alz.mui.ListItem;
 import alz.mui.ListBox;
 import alz.mui.DataRow;
@@ -95,6 +101,8 @@ import alz.mui.ToolButton;
 import alz.mui.BitButton;
 import alz.mui.ToggleButton;
 import alz.mui.ToolBar;
+import alz.mui.MenuItem;
+import alz.mui.MenuButton;
 import alz.mui.MenuBar;
 import alz.mui.ModalPanel;
 import alz.mui.Container;

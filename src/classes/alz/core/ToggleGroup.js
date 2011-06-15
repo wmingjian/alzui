@@ -1,4 +1,4 @@
-_package("alz.mui");
+_package("alz.core");
 
 /**
  * 状态按钮分组
@@ -12,11 +12,18 @@ _class("ToggleGroup", "", function(){
 	this.append = function(btn){
 		this._buttons.push(btn);
 	};
-	this.toggle = function(btn){
+	this.toggle = function(v){
+		if(this._activeButton == v){
+			if(this._activeButton){
+				this._activeButton.setToggled(false);
+				this._activeButton = null;
+			}
+			return;
+		}
 		if(this._activeButton){
 			this._activeButton.setToggled(false);
 		}
-		btn.setToggled(true);
-		this._activeButton = btn;
+		v.setToggled(true);
+		this._activeButton = v;
 	};
 });

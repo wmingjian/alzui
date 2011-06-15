@@ -59,9 +59,17 @@ _class("ToolBar", Component, function(){
 	this.createButtons = function(data, hash){
 		for(var i = 0, len = data.length; i < len; i++){
 			var k = data[i];
-			switch(k){
+			var t = k.charAt(0);
+			switch(t){
 			case "-":
 				this._createElement2(this, "li", "sep");
+				break;
+			case "#":
+				k = k.substr(1);
+				var btn = new ToggleButton();
+				btn.create(this, hash[k]);
+				this._buttons.push(btn);
+				runtime.toggleMgr.add(btn);
 				break;
 			default:
 				var btn = new ToolButton();

@@ -19,7 +19,7 @@ _class("EventTarget", "", function(){
 		 */
 		this._eventMaps = {};  //事件映射表
 		//this._listeners = {};
-		this._listener = null;
+		this._listener = {};
 		this._enableEvent = true;
 		this._parent = null;  //组件所属的父组件
 		this._disabled = false;
@@ -31,7 +31,9 @@ _class("EventTarget", "", function(){
 	this.dispose = function(){
 		if(this._disposed) return;
 		this._parent = null;
-		this._listener = null;
+		for(var k in this._listener){
+			delete this._listener[k];
+		}
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){
@@ -85,27 +87,39 @@ _class("EventTarget", "", function(){
 	 */
 	this.addEventListener1 =
 	this.addEventGroupListener = function(eventMap, listener){
-		this._listener = listener;
 		if(eventMap == "mouseevent"){
 			eventMap = "mousedown,mouseup,mousemove,mouseover,mouseout,click,dblclick";
 		}else if(eventMap == "keyevent"){
 			eventMap = "keydown,keypress,keypressup";
 		}
-		var maps = eventMap.split(",");
-		for(var i = 0, len = maps.length; i < len; i++){
-			if(this._self){
-				this._self["on" + maps[i]] = function(ev){
-					ev = ev || runtime.getWindow().event;
-					//if(ev.type == "mousedown") window.alert(121);
-					if(this._ptr._enableEvent){  //如果启用了事件相应机制，则触发事件
-						if(ev.type in this._ptr._listener){
-							this._ptr._listener[ev.type].call(this._ptr, ev);
-						}
-					}
-				};
+		//var maps = eventMap.split(",");
+		//for(var i = 0, len = maps.length; i < len; i++){
+		if(this._self){
+			for(var k in listener){
+				if(!(k in this._listener)){
+					this._self.addEventListener(k, function(ev){
+						return this._ptr.fireEvent1(ev || runtime.getWindow().event);
+					}, false);
+				}
+				this._listener[k] = listener[k];
 			}
 		}
-		maps = null;
+		//maps = null;
+	};
+	this.fireEvent1 = function(ev){
+		if(!this._enableEvent) return;
+		//如果启用了事件相应机制，则触发事件
+		var type = ev.type;
+		//if(type == "mousedown") window.alert(121);
+		var ret;
+		for(var el = this._self; el; el = el.parentNode){
+			var c = el._ptr;
+			if(c && c._listener && type in c._listener){
+				ret = c._listener[type].call(c, ev);
+				break;
+			}
+		}
+		return ret;
 	};
 	/**
 	 * @method removeEventGroupListener
@@ -122,11 +136,11 @@ _class("EventTarget", "", function(){
 		var maps = eventMap.split(",");
 		for(var i = 0, len = maps.length; i < len; i++){
 			if(this._self){
-				this._self["on" + maps[i]] = null;
+				//this._self.removeEventListener(maps[i], null, false);
 			}
 		}
 		maps = null;
-		this._listener = null;
+		//this._listener = null;
 	};
 	/**
 	 * 此方法允许在事件目标上注册事件侦听器。
