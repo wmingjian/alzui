@@ -55,7 +55,7 @@ _class("BitButton", ActionElement, function(){
 				this._self.style[name] = value;
 			}
 		}catch(ex){
-			window.alert(ex.description + "\n" + name + "=" + value);
+			window.alert(ex.message + "\n" + name + "=" + value);
 		}
 	};
 	this.setDisabled = function(v){

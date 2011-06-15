@@ -17,6 +17,8 @@ import alz.core.ActionStack;
 import alz.core.ActionManager;
 import alz.core.ActionCollection;
 import alz.core.ProductManager;
+import alz.core.ToggleGroup;
+import alz.core.ToggleManager;
 import alz.core.WebRuntime_core;
 
 }});

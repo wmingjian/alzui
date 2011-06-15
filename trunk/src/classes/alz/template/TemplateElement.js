@@ -12,13 +12,15 @@ _class("TemplateElement", "", function(){
 		this._container = null;
 		//this._tpl  = null;  //元素创建时参照的模板对象
 		this._vars = {};    //所有的模板变量(key关联DOM更新信息)
+		this._attributes = null;
 		this._hash = null;  //批量更新临时存储
 	};
-	this.create = function(parent, tpl, argv){
+	this.create = function(parent, tpl, attributes){
+		this._attributes = attributes;
 		//this._tpl = tpl;
 		var obj = tpl.createElement(parent, this);
 		this.init(obj);
-		this.update(argv);  //应用argv参数
+		this.update(attributes);  //应用attributes
 		return obj;
 	};
 	this.init = function(obj){
@@ -27,6 +29,7 @@ _class("TemplateElement", "", function(){
 	};
 	this.dispose = function(){
 		this._hash = null;
+		this._attributes = null;
 		for(var k in this._vars){
 			var v = this._vars[k];
 			var refs = v.refs;
@@ -77,11 +80,11 @@ _class("TemplateElement", "", function(){
 	/**
 	 * 更新一组模版变量的值
 	 */
-	this.update = function(data){
-		for(var k in data){
-			var v = data[k];
+	this.update = function(attributes){
+		for(var k in attributes){
+			var v = attributes[k];
 			if(k in this._vars){
-				this._setVar(k, v, data);
+				this._setVar(k, v, attributes);
 			}else{
 				console.log("[TemplateElement::update]有多余字段" + k);
 			}
@@ -90,7 +93,7 @@ _class("TemplateElement", "", function(){
 	/**
 	 * 更新一个模版变量的值
 	 */
-	this._setVar = function(key, value, hash){
+	this._setVar = function(key, value, attributes){
 		var v = this._vars[key];
 		v.value = value;  //[TODO]需要检查和原值是否相等，避免重复更新
 		var refs = v.refs;
@@ -98,25 +101,25 @@ _class("TemplateElement", "", function(){
 			var ref = refs[i];
 			switch(ref.type){
 			case "attr":  //属性值
-				ref.el.setAttribute(ref.name, this._calcValue(ref.val, hash));
+				ref.el.setAttribute(ref.name, this._calcValue(ref.val, attributes));
 				break;
 			case "text":  //文本节点
-				ref.el.nodeValue = this._calcValue(ref.val, hash);
+				ref.el.nodeValue = this._calcValue(ref.val, attributes);
 				break;
 			case "style":  //css属性值
-				ref.el.style[ref.name] = this._calcCssValue(ref, hash);
+				ref.el.style[ref.name] = this._calcCssValue(ref, attributes);
 				break;
 			}
 		}
 	};
-	this._calcValue = function(val, hash){
+	this._calcValue = function(val, attributes){
 		return val.value.replace(RE_TVAR, function(_0, key){
-			return hash[key];
+			return attributes[key];
 		});
 	};
-	this._calcCssValue = function(ref, hash){
+	this._calcCssValue = function(ref, attributes){
 		return ref.val.value.replace(RE_TVAR, function(_0, key){
-			var value = hash[key];
+			var value = attributes[key];
 			switch(typeof value){
 			case "boolean":
 				switch(ref.name){

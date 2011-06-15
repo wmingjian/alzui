@@ -1,7 +1,7 @@
 _package("alz.core");
 
 //_import("alz.core.ActionManager");
-_import("alz.mui.ToggleManager");
+_import("alz.core.ToggleManager");
 _import("alz.mui.Workspace");
 _import("alz.mui.Dialog");
 

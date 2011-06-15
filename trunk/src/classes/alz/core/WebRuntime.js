@@ -220,8 +220,9 @@ _class("WebRuntime", "", function(){
 			}
 		}
 		//按顺序执行构造扩展
-		//for(var i = 1, len = this._clazz._exts.length; i < len; i++){
-		//	this._clazz._exts[i].init.call(this);
+		//var clazz = this.__cls__;
+		//for(var i = 1, len = clazz._exts.length; i < len; i++){
+		//	clazz._exts[i].init.call(this);
 		//}
 		this._pluginManager.create(this, this.findConf("plugin"));
 		this._libManager.initLoadLib();

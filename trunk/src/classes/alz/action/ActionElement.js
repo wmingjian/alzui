@@ -35,12 +35,21 @@ _class("ActionElement", Component, function(){
 	};
 	this.bind = function(obj, actionManager){
 		this._actionManager = actionManager;
+		var c = obj._ptr;
 		this.init(obj);
+		if(c && c instanceof Component){
+			c._plugins["action"] = this;
+			obj._ptr = c;  //还原DOM元素的_ptr属性值
+		}
 	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
-		this._disabled = this._self.getAttribute("_disabled") == "true";
-		this.setAction(this._self.getAttribute("_action"));
+		var data = {
+			"disabled": this._self.getAttribute("_disabled") == "true",
+			"action"  : this._self.getAttribute("_action")
+		};
+		this._disabled = data.disabled;
+		this.setAction(data.action);
 		if(this._className == "ActionElement"){
 			var _this = this;
 			this._self.onclick = function(ev){

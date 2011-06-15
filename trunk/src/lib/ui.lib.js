@@ -5,8 +5,6 @@ import alz.copyright;
  */
 runtime.regLib("ui", "", function(){with(arguments[0]){
 
-import alz.mui.ToggleGroup;
-import alz.mui.ToggleManager;
 import alz.mui.SelectionManager;
 import alz.mui.Component;
 import alz.action.ActionElement;

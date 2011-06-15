@@ -107,10 +107,10 @@ _class("TemplateObject", "", function(){
 	};
 	this.parse = function(){
 	};
-	this.render = function(parent, data){
+	this.render = function(parent, attributes){
 		var el = new TemplateElement();
 		this._elements.push(el);  //注册模板元素
-		el.create(parent, this, data);
+		el.create(parent, this, attributes);
 		return el;
 	};
 	this.node2html = function(node){

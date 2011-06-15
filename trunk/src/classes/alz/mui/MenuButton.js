@@ -3,12 +3,11 @@ _package("alz.mui");
 _import("alz.mui.Component");
 
 /**
- * 工具窗体
+ * 菜单栏按钮
  */
-_class("ToolWin", Component, function(){
+_class("MenuButton", Component, function(){
 	this._init = function(){
 		_super._init.call(this);
-		this._dock = false;
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
