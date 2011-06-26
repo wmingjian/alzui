@@ -12,7 +12,6 @@ _class("PopupMenu", Popup, function(){
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
 		this.setVisible(false);
-		this.initActionElements();
 	};
 	this.dispose = function(){
 		if(this._disposed) return;

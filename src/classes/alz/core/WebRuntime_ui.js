@@ -113,7 +113,11 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 		}
 		*/
 		if(this._appManager){
-			this._appManager.onResize(rect.w, rect.h);  //调整所有应用的大小
+			this._appManager.onResize({
+				"type": "resize",
+				"w"   : rect.w,
+				"h"   : rect.h
+			});  //调整所有应用的大小
 		}
 	};
 	/**

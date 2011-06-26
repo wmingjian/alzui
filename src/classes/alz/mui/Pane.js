@@ -37,7 +37,7 @@ _class("Pane", Container, function(){
 	this.createTplElement = function(parent, tpl, app){
 		app = app || this._app;
 		var tag;
-		var str = app.getTpl(tpl);
+		var str = app.getTplData(tpl);
 		str.replace(/^<([a-z0-9]+)[ >]/, function(_0, _1){
 			tag = _1;
 		});
@@ -46,8 +46,12 @@ _class("Pane", Container, function(){
 			if(parent.getContainer){
 				parent = parent.getContainer();
 			}
-			var node = app._template.createXMLDocument(str).documentElement;
-			return this.createElementByXmlNode(parent, node, app/*, {}*/);
+			var tpldoc = app.getTplDoc();
+			tpldoc.push(parent);  //设置当前父节点
+			var rootNode = app._template.createXMLDocument(str).documentElement;
+			var tplEl = tpldoc.createTplElement(conf, rootNode);
+			tpldoc.pop();
+			return tplEl._self;
 		}else{
 			return this.createDomElement(parent, str/*, ".module"*/);
 		}

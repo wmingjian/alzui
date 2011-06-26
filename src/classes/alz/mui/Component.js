@@ -33,6 +33,7 @@ _class("Component", EventTarget, function(){
 	]);
 	this._init = function(){
 		_super._init.call(this);
+		//console.log("new " + this._className);
 		this._tag = "Component";
 		this._domCreate = false;
 		/*
@@ -90,16 +91,23 @@ _class("Component", EventTarget, function(){
 		this._inited = false;     //是否已初始化
 	};
 	this.build = function(el){
+		el._component = this;
 		this._tplel = el;
 		this._self = el._self;
-		this._container = el._container;
+		this._self._ptr = this;
+		this._containerNode = el._container;
+		/*
 		var attributes = el._attributes;
 		if(attributes.id){
 			this._self.setAttribute("id", attributes.id);
 		}
 		if(attributes["class"]){
-			runtime.dom.addClass(this._container, attributes["class"]);
+			runtime.dom.addClass(this._containerNode, attributes["class"]);
 		}
+		if(attributes.size){
+			this.setSize(attributes.size);
+		}
+		*/
 	};
 	/**
 	 * @method bind
@@ -172,10 +180,21 @@ _class("Component", EventTarget, function(){
 	 * @desc 以create方式初始化一个DOM元素
 	 */
 	this.init = function(obj){
+		if(this._inited){
+			if(this._self !== obj){
+				console.log("[Component::init]error");
+			}else{
+				console.log("[Component::init]repeated");
+			}
+			return;
+		}
 		//_super.init.apply(this, arguments);
 		this.__init(obj, 0);
 		//runtime.actionManager.add(this);
 		//this.setVisible(this._visible);
+		this._inited = true;
+	};
+	this.rendered = function(){
 	};
 	/**
 	 * @method dispose
@@ -237,7 +256,7 @@ _class("Component", EventTarget, function(){
 			}
 		}
 		if(!this._doc){
-			window.alert("[Component::setParent2]未能正确识别DocEnv环境，默认使用runtime.getDocument()");
+			console.error("[Component::setParent2]未能正确识别DocEnv环境，默认使用runtime.getDocument()");
 			this._doc = runtime.getDocument();  //this._win.document
 		}
 		this._win = this._doc.parentWindow || this._doc.defaultView;  //runtime.getWindow();
@@ -249,7 +268,9 @@ _class("Component", EventTarget, function(){
 	 */
 	this.getDoc = function(){
 		if(!this._doc){
-			this.initDocEnv(this._self/*, this._parent*/);
+			//this.initDocEnv(this._self/*, this._parent*/);
+			this._doc = this._self.ownerDocument;
+			this._win = this._doc.parentWindow || this._doc.defaultView;
 		}
 		return this._doc;
 	};
@@ -276,85 +297,6 @@ _class("Component", EventTarget, function(){
 		}
 		if(parent){
 			(parent._self || parent).appendChild(obj);
-		}
-		return obj;
-	};
-	this.createElementByXmlNode = function(parent, node, app/*, scope*/){
-		var obj, doc = document;
-		switch(node.nodeType){
-		case 1:  //NODE_ELEMENT
-			var container;
-			var tagName = node.tagName;
-			var conf = app._taglib.getTagConf(tagName);
-			var c;
-			if(conf){
-				var attributes = {};  //id,class,dock
-				for(var i = 0, len = node.attributes.length; i < len; i++){
-					var attr = node.attributes[i];
-					var name = attr.nodeName;
-					var value = attr.nodeValue;
-					attributes[name] = value;
-				}
-				var template = conf.template;
-				var el = template.render(parent, attributes);
-				obj = el._self;
-				container = el._container;
-				/*
-				var aaa = {};
-				obj = this.createElementByXmlNode(parent, conf.node.firstChild, app, aaa);
-				container = aaa.container;
-				*/
-				var clazz = conf.getClass(node.getAttribute("clazz"));
-				if(clazz){
-					console.log("build " + tagName + "," + clazz.__cls__._fullName);
-					c = new clazz();
-					c.build(el);
-				}
-				if(attributes.id){
-					obj.setAttribute("id", attributes.id);
-				}
-				if(attributes["class"]){
-					runtime.dom.addClass(container, attributes["class"]);
-				}
-			}else{
-				obj = container = doc.createElement(tagName);
-				for(var i = 0, len = node.attributes.length; i < len; i++){
-					var attr = node.attributes[i];
-					var name = attr.nodeName;
-					var value = attr.nodeValue;
-					//if(name == "container" && value == "true"){
-					//	scope.container = obj;
-					//}else{
-						obj.setAttribute(name, value);
-					//}
-				}
-				parent.appendChild(obj);
-			}
-			if(node.hasChildNodes()){
-				var nodes = node.childNodes;
-				for(var i = 0, len = nodes.length; i < len; i++){
-					this.createElementByXmlNode(container, nodes[i], app/*, scope*/);
-				}
-			}
-			if(c && c.rendered){
-				c.rendered();
-			}
-			break;
-		case 3:  //NODE_TEXT
-			obj = doc.createTextNode(node.nodeValue);
-			parent.appendChild(obj);
-			break;
-		case 4:  //NODE_CDATA_SECTION
-			obj = doc.createCDATASection(node.data);
-			parent.appendChild(obj);
-			break;
-		case 8:  //NODE_COMMENT
-			//obj = doc.createComment(node.data);
-			//parent.appendChild(obj);
-			break;
-		default:
-			//runtime.warning("无法处理的nodeType" + node.nodeType + "\n");
-			break;
 		}
 		return obj;
 	};
@@ -854,5 +796,10 @@ _class("Component", EventTarget, function(){
 		if(type in this && typeof this[type] == "function"){
 			this[type].apply(this, params);
 		}
+	};
+	this.setSize = function(v){
+		var s = v.split(",");
+		this._self.style.width = s[0] + "px";
+		this._self.style.height = s[1] + "px";
 	};
 });

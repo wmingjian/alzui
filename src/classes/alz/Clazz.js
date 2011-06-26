@@ -30,7 +30,8 @@ function ClazzImp(){
 	//"__conf__": 1,  //配置数据注册方法
 		"bind"    : 1,  //组件创建方法
 		"build"   : 1,  //
-		"create"  : 1   //
+		"create"  : 1,  //
+		"rendered": 1
 	};
 	this.getClass = function(){
 		return this._clazz;
@@ -76,9 +77,9 @@ function ClazzImp(){
 			//实只是一个属性声明的集中地，真正的create动作在这个方法内部实现，并期望它不
 			//仅仅是一个参数。
 			//如果参数个数不为0，执行 create 方法
-			if(arguments.length != 0 && this.create){  //this._className.indexOf("alz.ui.") == 0
-				this.create.apply(this, arguments);  //调用create方法并传递参数
-			}
+			//if(arguments.length != 0 && this.create){  //this._className.indexOf("alz.ui.") == 0
+			//	this.create.apply(this, arguments);  //调用create方法并传递参数
+			//}
 		};
 		__inDeclare = true;
 		clazz[__proto] = new this._superClass();  //通过原型实现继承

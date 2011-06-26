@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<div class="wui-Dialog2">
+	<div class="skin"></div>
+	<div class="head" html="true" aui="{align:'top',height:18;}">
+		<label class="caption">{$caption}</label>
+		<div class="icon"></div>
+	</div>
+	<div class="body" aui="{align:'client'}"></div>
+</div>

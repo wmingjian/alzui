@@ -5,6 +5,7 @@ _import("alz.mui.Component");
 _class("WindowSkinWIN2K", Component, function(){
 	this._cssData = {
 		"resizable":{
+			/*
 			"_skin1" :{"background-position":"0px -10px"},
 			"_skin2" :{"background-position":"-10px 0px"},
 			"_skin3" :{"background-position":"0px 0px"},
@@ -12,8 +13,10 @@ _class("WindowSkinWIN2K", Component, function(){
 			"_skin5" :{"background-position":"0px -33px"},
 			"_skin6" :{"background-position":"0px -3px"},
 			"_skin7" :{"background-position":"-9px -33px"}
+			*/
 		},
 		"normal":{
+			/*
 			"_skin1" :{"background-position":"0px -7px"},
 			"_skin2" :{"background-position":"-11px 0px"},
 			"_skin3" :{"background-position":"-8px 0px"},
@@ -21,6 +24,7 @@ _class("WindowSkinWIN2K", Component, function(){
 			"_skin5" :{"background-position":"0px -30px"},
 			"_skin6" :{"background-position":"0px 0px"},
 			"_skin7" :{"background-position":"-10px -30px"}
+			*/
 		}
 	};
 	this._cssHash = {
@@ -70,31 +74,36 @@ _class("WindowSkinWIN2K", Component, function(){
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
 		this._xpath = ".aui-Window-win2k";
-		for(var i = 0, len = this._cursors.length; i < len; i++){
-			var o = this._createElement2(this._self, "div", this._cursors[i]/*, {
-				"position"       : "absolute",
-				"overflow"       : "hidden",
-				"backgroundColor": "#000000",
-				"filter"         : "Alpha(Opacity=20)",
-				"zIndex"         : 10,
-				"cursor"         : this._cursors[i] + "-resize"
-			}*/);
-			this._ee["_skin" + i] = o;
+		if(runtime.ie){
+			for(var i = 0, len = this._cursors.length; i < len; i++){
+				var o = this._createElement2(this._self, "div", this._cursors[i]/*, {
+					"position"       : "absolute",
+					"overflow"       : "hidden",
+					"backgroundColor": "#000000",
+					"filter"         : "Alpha(Opacity=20)",
+					"zIndex"         : 10,
+					"cursor"         : this._cursors[i] + "-resize"
+				}*/);
+				this._ee["_skin" + i] = o;
+			}
+			this._title = this._createElement2(this._self, "img", "", {
+				"src"        : runtime.getConfigData("pathimg") + "win-2k-title-bg.gif",
+				"ondragstart": function(){return false;},
+				"onmousedown": function(ev){this._dlg._parent.onMouseDown(ev || window.event);}
+			});
+			this._title._dlg = this;
 		}
-		this._title = this._createElement2(this._self, "img", "", {
-			"src"        : "../alzui/res/images/win-2k-title-bg.gif",
-			"ondragstart": function(){return false;},
-			"onmousedown": function(ev){this._dlg._parent.onMouseDown(ev || window.event);}
-		});
-		this._title._dlg = this;
 		//runtime.dom.applyCssStyle(this, _cssName, "resizable");
 		this.setState("resizable");
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
-		this._title.onmousedown = null;
-		this._title.ondragstart = null;
-		this._title._dlg = null;
+		if(runtime.ie){
+			this._title.onmousedown = null;
+			this._title.ondragstart = null;
+			this._title._dlg = null;
+			this._title = null;
+		}
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){
@@ -102,32 +111,34 @@ _class("WindowSkinWIN2K", Component, function(){
 	this.resize = function(w, h){
 		//if(_super.resize.apply(this, arguments)) return true;
 		_super.resize.apply(this, arguments);
-		if(this._parent.getResizable()){
-			var w1 =  4;  //顶宽
-			var w2 =  4;  //中宽
-			var w3 =  5;  //底宽
-			var h0 =  4   //顶高
-			var h1 = 23;  //顶高
-			var h3 =  4;  //底高
-		}else{
-			var w1 =  3;  //顶宽
-			var w2 =  3;  //中宽
-			var w3 =  4;  //底宽
-			var h0 =  3   //顶高
-			var h1 = 22;  //顶高
-			var h3 =  3;  //底高
+		if(runtime.ie){
+			if(this._parent.getResizable()){
+				var w1 =  4;  //顶宽
+				var w2 =  4;  //中宽
+				var w3 =  5;  //底宽
+				var h0 =  4   //顶高
+				var h1 = 23;  //顶高
+				var h3 =  4;  //底高
+			}else{
+				var w1 =  3;  //顶宽
+				var w2 =  3;  //中宽
+				var w3 =  4;  //底宽
+				var h0 =  3   //顶高
+				var h1 = 22;  //顶高
+				var h3 =  3;  //底高
+			}
+			this.setElementRect(this._ee["_skin0"],    0 ,    0 ,     w1 ,      h1);
+			this.setElementRect(this._ee["_skin1"],   w1 ,    0 , w-2*w1 ,      h0);
+			this.setElementRect(this._title     ,   w1 ,   h0 , w-2*w1 , h1-h0-1);
+			this.setElementRect(this._ee["_skin2"], w-w1 ,    0 ,     w1 ,      h1);
+
+			this.setElementRect(this._ee["_skin3"],    0 ,   h1 ,     w2 , h-h1-h3);
+			this.setElementRect(this._ee["_skin4"], w-w2 ,   h1 ,     w2 , h-h1-h3);
+
+			this.setElementRect(this._ee["_skin5"],    0 , h-h3 ,     w3 ,      h3);
+			this.setElementRect(this._ee["_skin6"],   w3 , h-h3 , w-2*w3 ,      h3);
+			this.setElementRect(this._ee["_skin7"], w-w3 , h-h3 ,     w3 ,      h3);
 		}
-		this.setElementRect(this._ee["_skin0"],    0 ,    0 ,     w1 ,      h1);
-		this.setElementRect(this._ee["_skin1"],   w1 ,    0 , w-2*w1 ,      h0);
-		this.setElementRect(this._title       ,   w1 ,   h0 , w-2*w1 , h1-h0-1);
-		this.setElementRect(this._ee["_skin2"], w-w1 ,    0 ,     w1 ,      h1);
-
-		this.setElementRect(this._ee["_skin3"],    0 ,   h1 ,     w2 , h-h1-h3);
-		this.setElementRect(this._ee["_skin4"], w-w2 ,   h1 ,     w2 , h-h1-h3);
-
-		this.setElementRect(this._ee["_skin5"],    0 , h-h3 ,     w3 ,      h3);
-		this.setElementRect(this._ee["_skin6"],   w3 , h-h3 , w-2*w3 ,      h3);
-		this.setElementRect(this._ee["_skin7"], w-w3 , h-h3 ,     w3 ,      h3);
 	};
 	this.onResizableChange = function(){
 		//runtime.dom.applyCssStyle(this, _cssName, this._parent.getResizable() ? "resizable" : "normal");

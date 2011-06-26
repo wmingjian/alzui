@@ -38,6 +38,7 @@ _class("Application", EventTarget, function(){
 		this._doc = runtime.getDocument();
 		this._domTemp = null;
 		this._pluginManager = null;  //插件管理者
+		this._tpldoc = null;
 		this._contentPane = null;
 		//this._template = null;  //模版引擎
 		//this._template = runtime.getTemplate();  //模版引擎
@@ -51,8 +52,11 @@ _class("Application", EventTarget, function(){
 			}
 		};
 		*/
-		this._popups = {};   //弹出式组件
-		this._dialogs = {};  //所有对话框组件
+		this._appworkspace = null;  //子窗体工作区
+		this._windows = {};    //所有子窗体组件
+		this._mainwin = null;  //主窗体组件
+		this._dialogs = {};    //所有对话框组件
+		this._popups = {};     //弹出式组件
 	};
 	this.init = function(){
 		//_super.init.apply(this, arguments);
@@ -90,6 +94,12 @@ _class("Application", EventTarget, function(){
 			this._dialogs[k].dispose();
 			delete this._dialogs[k];
 		}
+		this._mainwin = null;
+		for(var k in this._windows){
+			this._windows[k].dispose();
+			delete this._windows[k];
+		}
+		this._appworkspace = null;
 		if(this.__keydown){
 			this.__keydown = null;
 			runtime.getDom().removeEventListener(runtime.getDocument(), "keydown", this.__keydown);
@@ -97,6 +107,7 @@ _class("Application", EventTarget, function(){
 		this._pluginManager.dispose();
 		this._pluginManager = null;
 		this._contentPane = null;
+		this._tpldoc = null;
 		this._domTemp = null;
 		this._doc = null;
 		//runtime.getDocument().onkeydown = null;
@@ -119,10 +130,17 @@ _class("Application", EventTarget, function(){
 		this._model.regModels(this.findConf("model"));
 		//注册组件的自定义标签
 		this._taglib.regTags(this.findConf("taglib"));
-		var str = runtime.getTplData("aui.tpl")["ui.xml"];
-		this._taglib.regXmlTags(this._template.createXMLDocument(str).documentElement);
 		//注册模板库
 		this._template.reg(runtime.getTplData(tpl));
+
+		var str = runtime.getTplData("aui.tpl")["ui.xml"];
+		this._taglib.regXmlTags(this._template.createXMLDocument(str).documentElement);
+		if(this._template.exist("ui.xml")){
+			str = this._template.getTplData("ui.xml");
+			if(str){
+				this._taglib.regXmlTags(this._template.createXMLDocument(str).documentElement);
+			}
+		}
 	};
 	/**
 	 * 注册系统热键
@@ -171,6 +189,9 @@ _class("Application", EventTarget, function(){
 	this.getParams = function(){
 		return this._params;
 	};
+	this.getTplDoc = function(){
+		return this._tpldoc;
+	};
 	this.setContentPane = function(v){
 		this._contentPane = v;
 	};
@@ -190,7 +211,38 @@ _class("Application", EventTarget, function(){
 	this.getTpl = function(name){
 		return this._template.getTpl(name);
 	};
+	this.getTplData = function(name){
+		return this._template.getTplData(name);
+	};
 	this.navPane = function(pid, params){
+	};
+	this.getAppWorkspace = function(){
+		return this._contentPane.find(".ui-workspace")._ptr;
+	};
+	/**
+	 * 创建一个窗体组件
+	 */
+	this.createWindow = function(name, app, params){
+		var key = name.split("#")[0];
+		var win = this._windows[name];
+		if(!win){
+			var conf = this.findConf("dialog", key);
+			var parent = params.main ? this._workspace : this.getAppWorkspace();
+			/*
+			win = new conf.clazz();
+			if(params.main){
+				this._mainwin = win;
+			}
+			win.setConf(conf);
+			win.create(parent, app || this, params, conf.tpl);
+			*/
+			var tplEl = this._tpldoc.createTplElement2(parent, conf.tpl, [conf, parent, this, params]);
+			win = tplEl._component;
+			this._windows[name] = win;
+		}
+		win.setZIndex(runtime.getNextZIndex());
+		win.setVisible(true);
+		return win;
 	};
 	/**
 	 * 调用一个对话框组件（创建，重置）
@@ -208,9 +260,13 @@ _class("Application", EventTarget, function(){
 		var dlg = this._dialogs[name];
 		if(!dlg){
 			var conf = this.findConf("dialog", key);
-			dlg = new conf.clazz();
-			dlg.setOwnerApp(this);
-			dlg.create(runtime.getWorkspace(), app || this, params, conf.tpl);
+			//dlg = new conf.clazz();
+			//dlg.setConf(conf);
+			//dlg.setOwnerApp(this);
+			//dlg.create(runtime.getWorkspace(), app || this, params, conf.tpl);
+			var parent = runtime.getWorkspace();
+			var tplEl = this._tpldoc.createTplElement2(parent, conf.tpl, [conf, parent, app || this, params, this]);
+			dlg = tplEl._component;
 			this._dialogs[name] = dlg;
 		}
 		if(agent){
@@ -236,8 +292,11 @@ _class("Application", EventTarget, function(){
 		var popup = this._popups[name];
 		if(!popup){
 			var conf = this.findConf("popup", name);
-			popup = new conf.clazz();
-			popup.create(runtime.getWorkspace(), this, owner, params, conf.tpl);
+			//popup = new conf.clazz();
+			//popup.create(runtime.getWorkspace(), this, owner, params, conf.tpl);
+			var parent = runtime.getWorkspace();
+			var tplEl = this._tpldoc.createTplElement2(parent, conf.tpl, [conf, parent, this, params, owner]);
+			popup = tplEl._component;
 			this._popups[name] = popup;
 		}
 		if(agent){
@@ -249,6 +308,11 @@ _class("Application", EventTarget, function(){
 		popup.show();
 		popup.reset(params);
 		return popup;
+	};
+	/**
+	 * 创建一个面板组件
+	 */
+	this.createPane = function(name, parent, app, params){
 	};
 	this.doAction = function(act, sender){
 		if("execAction" in this){

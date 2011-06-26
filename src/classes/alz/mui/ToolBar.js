@@ -56,6 +56,9 @@ _class("ToolBar", Component, function(){
 	};
 	this.destroy = function(){
 	};
+	this.setApp = function(v){
+		this._app = v;
+	};
 	this.createButtons = function(data, hash){
 		for(var i = 0, len = data.length; i < len; i++){
 			var k = data[i];

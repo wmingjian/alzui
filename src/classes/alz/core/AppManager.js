@@ -53,11 +53,11 @@ _class("AppManager", Plugin, function(){
 	/**
 	 * 调整所有应用的大小
 	 */
-	this.onResize = function(w, h){
+	this.onResize = function(ev){
 		for(var i = 0, len = this._list.length; i < len; i++){
 			if(this._list[i].onResize){
 				try{
-					this._list[i].onResize(w, h);
+					this._list[i].onResize(ev);
 				}catch(ex){
 				}
 			}

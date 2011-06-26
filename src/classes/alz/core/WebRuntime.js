@@ -851,7 +851,11 @@ _class("WebRuntime", "", function(){
 			//if(application) application = null;
 			break;
 		case "resize":
-			this.fireEvent(ev);
+			this.fireEvent({
+				"type": "resize",
+				"w"   : document.documentElement.clientWidth,
+				"h"   : document.documentElement.clientHeight
+			});
 			break;
 		/*
 		case "contextmenu":

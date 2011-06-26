@@ -33,14 +33,20 @@ _class("TagLib", Plugin, function(){
 		for(var i = 0, len = nodes.length; i < len; i++){
 			var node = nodes[i];
 			var k = node.tagName;
-			var tpl = new TemplateObject();
-			tpl.create(node.firstChild);
+			var tplobj;  //{TemplateObject}
+			if(node.getAttribute("tpl")){
+				tplobj = this.getApp()._template.getTplObj(node.getAttribute("tpl"));
+			}else{
+				tplobj = new TemplateObject();
+				tplobj.create(node.firstChild);
+			}
 			this._hash[k] = {  //{TagConf}
 				"id"      : k,     //{String}
 				"clazz"   : node.getAttribute("clazz"),
 				"class"   : null,  //{Clazz}用的时候再去查找
 				"node"    : node,  //{XMLNode}
-				"template": tpl,   //{TemplateObject}
+				"tag"     : tplobj.getRoot().tagName,
+				"tplobj"  : tplobj,  //{TemplateObject}
 				getClass  : function(clazz){
 					var name = clazz || this.clazz;
 					return name && name in __classes__ ? __classes__[name] : null;
