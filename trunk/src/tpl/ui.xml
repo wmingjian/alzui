@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ui ns="a">
 	<window clazz="alz.mui.Window" title="窗体">
-		<div class="ui-window undock">
-			<div class="win-title"><span class="icon"></span><label>{$caption}</label></div>
-			<div class="win-body" container="true"></div>
+		<div class="aui-Window-win2k" dock="false">
+			<div class="head">
+				<span class="icon"></span>
+				<label>{$caption}</label>
+				<div class="sysbtn">
+					<div class="icon-min" title="最小化"></div>
+					<div class="icon-max" title="最大化"></div>
+					<div class="icon-close" title="关闭"></div>
+				</div>
+			</div>
+			<div class="body" container="true"></div>
 		</div>
 	</window>
 	<toolwin clazz="alz.mui.ToolWin" title="工具窗体">
@@ -19,7 +27,7 @@
 			<div class="body" container="true"></div>
 		</div>
 	</dialog>
-	<popup>
+	<popup clazz="alz.mui.Popup">
 		<div class="ui-popup" container="true"></div>
 	</popup>
 	<popmenu clazz="alz.mui.PopupMenu" title="弹出式菜单">
@@ -66,7 +74,7 @@
 	<vsplit title="垂直分隔条">
 		<div class="ui-slider-v"></div>
 	</vsplit>
-	<workspace>
+	<workspace clazz="alz.mui.AppWorkspace">
 		<div class="ui-workspace" container="true"></div>
 	</workspace>
 	<pane clazz="alz.mui.Pane">
@@ -75,6 +83,9 @@
 	<panel clazz="alz.mui.Panel">
 		<div class="ui-panel" container="true"></div>
 	</panel>
+	<codeeditor clazz="alz.mui.CodeEditor">
+		<textarea></textarea>
+	</codeeditor>
 	<!--
 	<table></table>
 	<textarea></textarea>

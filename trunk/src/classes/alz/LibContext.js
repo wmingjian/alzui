@@ -54,8 +54,12 @@ function contextImp(/*_super*/){
 			superProto = null;  //保证根类 _super 属性为 null
 			superClass = Object;  //[TODO]如果框架没有扩展Object，则无需继承Object
 		}else{
-			if(superClass === ""){
-				superClass = this.__classes__["alz.lang.AObject"];
+			if(typeof superClass === "string"){
+				if(superClass === ""){
+					superClass = this.__classes__["alz.lang.AObject"];
+				}else{
+					superClass = this.__context__[superClass];
+				}
 			}
 			superProto = superClass[__proto];
 		}

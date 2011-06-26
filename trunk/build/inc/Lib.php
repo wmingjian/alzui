@@ -274,7 +274,6 @@ class LibTool{
 	}
 	function do_import_class($matches){
 		global $path_base, $path_classes;
-		$re_import = '/_class\(\"(\w+)\", (\w+|\"\"), function\(\)\{/';
 		$name = preg_replace('/\./', "/", $matches[1]) . '.js';
 		$fdata = '';
 		for($i = 0, $len = count($path_classes); $i < $len; $i++){
@@ -284,7 +283,8 @@ class LibTool{
 				break;
 			}
 		}
-		$fdata = preg_replace($re_import, '_class("\1", \2, function(_super){', $fdata);
+		$fdata = preg_replace('/_class\(\"(\w+)\", (\w+), function\(\)\{/', '_class("\1", \2, function(_super){', $fdata);
+		$fdata = preg_replace('/_class\(\"(\w+)\", \"(\w*)\", function\(\)\{/', '_class("\1", "\2", function(_super){', $fdata);
 		return "\n/*<file name=\"" . $name . "\">*/"
 			. "\n" . $fdata
 			. "\n/*</file>*/";

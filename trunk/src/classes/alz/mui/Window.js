@@ -1,6 +1,6 @@
 _package("alz.mui");
 
-_import("alz.mui.Component");
+_import("alz.mui.Pane");
 _import("alz.mui.SysBtn");
 _import("alz.mui.WindowSkinWINXP");
 _import("alz.mui.WindowSkinWIN2K");
@@ -25,22 +25,13 @@ _import("alz.mui.WindowSkinWIN2K");
 		</div>
 	</div>
 */
-_class("Window", Component, function(){
-	var TPL_WIN = '<div id="win2" class="aui-Window-win2k" _icon="{$pathimg}win-icon.gif" _caption="alzui调试器 - Windown 2000" _align="none">'
-		+ '<div class="body">'
-		//+ '<input type="checkbox" checked="checked" /> Resizable'
-		+ '</div></div>';
-	var TPL_HEAD = '<div class="head">'
-		+ '<img />'
-		+ '<label></label>'
-		+ '<div class="sysbtn">'
-		+ '<div class="icon-min" title="最小化"></div>'
-		+ '<div class="icon-max" title="最大化"></div>'
-		+ '<div class="icon-close" title="关闭"></div>'
-		+ '</div>'
-		+ '</div>';
+_class("Window", Pane, function(){
+	//<input type="checkbox" checked="checked" /> Resizable
 	this._init = function(){
 		_super._init.call(this);
+		this._conf = null;
+		this._app = null;
+		this._params = null;
 		this._head = null;
 		this._icon = null;
 		this._title = null;
@@ -64,14 +55,22 @@ _class("Window", Component, function(){
 				runtime.dom.addClass(this._self, "undock");
 			}
 		}
+		this.setParent2(this._self.parentNode);
+		this._params = {};
+		this.init(this._self);
+		this.resize(800, 600);
 	};
-	this.create = function(parent){
+	this.create2 = function(conf, parent, app, params){
+		this.setConf(conf);
 		this.setParent2(parent);
-		var tpl = tpl_replace(TPL_WIN, {"pathimg": "../alzui/res/images/"});
-		var obj = runtime.createDomElement(tpl);
-		if(parent){
-			parent.appendChild(obj);
-		}
+		this.setApp(app);
+		this.setParams(params);
+	};
+	this.create = function(parent, app, params, tpl){
+		this.setParent2(parent);
+		this.setApp(app);
+		this.setParams(params || {});
+		var obj = this.createTplElement(parent, tpl);
 		this.init(obj);
 		return obj;
 	};
@@ -90,25 +89,30 @@ _class("Window", Component, function(){
 		maxbtn   .head > .sysbtn > .icon-max
 		closebtn .head > .sysbtn > .icon-close
 		*/
+		//_icon="{$pathimg}win-icon.gif" _caption="alzui调试器 - Windown 2000" _align="none"
+		var data = {
+			"icon"   : obj.getAttribute("_icon") || "",
+			"caption": this._params.caption || obj.getAttribute("_caption") || "标题栏"
+		};
 		this._cssName = "." + this._self.className;
 		this._xpath = this._cssName;
-		this._body = this._self.childNodes[0];
-		this._head = runtime.createDomElement(TPL_HEAD, this._self);
+		this._body = this.find(".body");
+		this._head = this.find(".head");
 		this._head._dlg = this;
 		this._head.onselectstart = function(){return false;};
 		this._head.onmousedown = function(ev){return this._dlg.onMouseDown(ev || window.event);};
-		this._icon = this._head.childNodes[0];  //this._head.getElementsByTagName("img")[0];
-		this._icon.src = obj.getAttribute("_icon").replace(/^images\//, runtime.getConfigData("pathimg"));
+		this._icon = this.find(".icon");
+		this._icon.src = data.icon.replace(/^images\//, runtime.getConfigData("pathimg"));
 		this._icon.ondragstart = function(){return false;};
-		this._title = this._head.childNodes[1];  //this._head.getElementsByTagName("label")[0];
-		this._title.innerHTML = obj.getAttribute("_caption");
+		this._title = this.find(".head label");
+		this._title.innerHTML = data.caption;
 		this._title.onselectstart = function(){return false;};
 		this._minbtn = new SysBtn();
-		this._minbtn.init(this._head.childNodes[2].childNodes[0], this);
+		this._minbtn.init(this.find(".icon-min"), this);
 		this._maxbtn = new SysBtn();
-		this._maxbtn.init(this._head.childNodes[2].childNodes[1], this);
+		this._maxbtn.init(this.find(".icon-max"), this);
 		this._closebtn = new SysBtn();
-		this._closebtn.init(this._head.childNodes[2].childNodes[2], this);
+		this._closebtn.init(this.find(".icon-close"), this);
 		if(this._self.className == "aui-Window-winxp"){
 			this._skin = new WindowSkinWINXP();
 		}else{
@@ -132,9 +136,18 @@ _class("Window", Component, function(){
 		this._head.onmousedown = null;
 		this._head.onselectstart = null;
 		this._head._dlg = null;
+		this._params = null;
+		this._app = null;
+		this._conf = null;
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){
+	};
+	this.setConf = function(v){
+		this._conf = v;
+	};
+	this.setParams = function(v){
+		this._params = v;
 	};
 	/*this.xquery = function(xpath){
 		return runtime._xpq.query(xpath, this._self);
@@ -191,7 +204,7 @@ _class("Window", Component, function(){
 		if(w < this._skin._model["min_width"] ) w = this._skin._model["min_width"];
 		if(h < this._skin._model["min_height"]) h = this._skin._model["min_height"];
 		if(_super.resize.apply(this, arguments)) return true;
-		this.tune(w, h);
+		//this.tune(w, h);
 		this._resizeBorder(w, h);
 		this._skin.resize(w, h);
 	};

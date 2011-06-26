@@ -7,20 +7,44 @@ _class("TemplateElement", "", function(){
 	var RE_TVAR = /\{\$(\w+)\}/g;  //模板变量语法
 	this._init = function(){
 		_super._init.call(this);
-		this._doc  = document;  //所属文档对象
-		this._self = null;  //关联的DOM元素
+		this._tpldoc = null;  //所属文档对象
+		this._tplobj = null;  //元素创建时参照的模板对象
+		this._confStack = null;  //TagConf堆栈
+		this._component = null;  //对应的组件实例
+		this._self = null;    //关联的DOM元素
 		this._container = null;
-		//this._tpl  = null;  //元素创建时参照的模板对象
 		this._vars = {};    //所有的模板变量(key关联DOM更新信息)
 		this._attributes = null;
 		this._hash = null;  //批量更新临时存储
 	};
-	this.create = function(parent, tpl, attributes){
-		this._attributes = attributes;
-		//this._tpl = tpl;
-		var obj = tpl.createElement(parent, this);
+	/**
+	 * [TODO]存在子类化问题
+	 * panemain 继承自 pane 组件，所以 pane 需要使用 PaneMain 类来实例化
+	 */
+	this.create = function(tpldoc, tagConf, xmlNode, clazz){
+		var tplobj = tagConf.tplobj;
+		var tagName = xmlNode.tagName;
+		this._confStack = tpldoc.getStack(tagConf);
+		this._tpldoc = tpldoc;
+		this._tplobj = tplobj;
+		this._attributes = tpldoc.getAttrs(xmlNode);
+		tplobj.regTplEl(this);  //注册模板元素
+		clazz = clazz || tagConf.getClass(xmlNode.getAttribute("clazz"));
+		var obj = tpldoc.createElementByXmlNode(this, tplobj.getRoot(), this._confStack, {
+			"xmlnode": xmlNode,
+			"clazz": clazz,
+			"tplel": clazz ? this : null
+		});
+		tpldoc._node.appendChild(obj);
 		this.init(obj);
-		this.update(attributes);  //应用attributes
+		this.update(this._attributes);  //应用attributes
+		if(clazz){
+			//console.log("build <" + tagName + "> " + clazz.__cls__._fullName);
+			var c = new clazz();
+			if(c.setApp) c.setApp(tpldoc._app);
+			c.build(this);
+			this._component = c;
+		}
 		return obj;
 	};
 	this.init = function(obj){
@@ -43,14 +67,25 @@ _class("TemplateElement", "", function(){
 			v.value = "";
 			delete this._vars[k];
 		}
-		//this._tpl = null;
+		this._tplobj = null;
 		this._self._ptr = null;
 		this._self = null;
-		this._doc = null;
+		this._component = null;
+		this._confStack = null;
+		this._tpldoc = null;
 		_super.dispose.apply(this);
 	};
-	this.getDoc = function(){
-		return this._doc;
+	this.getTplObj = function(){
+		return this._tplobj;
+	};
+	this.setTplObj = function(v){
+		this._tplobj = v;
+	};
+	this.getTplDoc = function(){
+		return this._tpldoc;
+	};
+	this.onAttr = function(type, el, name, value){
+		this._tplobj.onAttr(this, type, el, name, value);
 	};
 	/**
 	 * 添加一个模板变量引用
@@ -65,7 +100,7 @@ _class("TemplateElement", "", function(){
 			};
 		}
 		this._vars[name].refs.push(ref);
-		//this._tpl.addRef(name, ref);
+		//this._tplobj.addRef(name, ref);
 	};
 	this.updateBegin = function(){
 		this._hash = {};
@@ -86,7 +121,7 @@ _class("TemplateElement", "", function(){
 			if(k in this._vars){
 				this._setVar(k, v, attributes);
 			}else{
-				console.log("[TemplateElement::update]有多余字段" + k);
+				//console.log("[TemplateElement::update]有多余字段" + k);
 			}
 		}
 	};

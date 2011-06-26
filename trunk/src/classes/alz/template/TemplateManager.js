@@ -97,23 +97,29 @@ _class("TemplateManager", Plugin, function(){
 			}else{
 				this.checkSyntax(v);
 			}
-			var tpl = new TemplateObject();
-			tpl.create(v);
+			var tplobj = new TemplateObject();
+			tplobj.create(v);
 			this._hash[k] = {
-				"type": "xml",
-				"name": k,
-				"data": v,
-				"template": tpl
+				"type"  : "xml",
+				"name"  : k,
+				"data"  : v,
+				"tplobj": tplobj
 			};
-			if(k == "ui.xml"){
-				this.getApp()._taglib.regXmlTags(this.createXMLDocument(v).documentElement);
-			}
 		}
 		if(arr.length > 0){
 			runtime.error("下列这些模板不存在，请检查：" + arr.join(","));
 		}
 	};
+	this.exist = function(name){
+		return name in this._hash;
+	};
 	this.getTpl = function(name){
+		return this._hash[name];
+	};
+	this.getTplObj = function(name){
+		return this._hash[name].tplobj;
+	};
+	this.getTplData = function(name){
 		if(!(name in this._hash)){
 			runtime.error("[ERROR]模版库中没有指定的模板(name=" + name + ")");
 			return "";

@@ -29,7 +29,7 @@ _class("AppTestWin", Application, function(){
 	};
 	this.init = function(){
 		_super.init.apply(this, arguments);
-		var obj = runtime.dom.createDomElement(this._template.getTpl("pane_main.xml"));
+		var obj = runtime.dom.createDomElement(this._template.getTplData("pane_main.xml"));
 		document.body.appendChild(obj);
 		var sb = [];
 		for(var i = 0, len = pane_conf.length; i < len; i++){

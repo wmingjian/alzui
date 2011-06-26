@@ -1,9 +1,10 @@
 _package("alz.template");
 
 _import("alz.template.TemplateElement");
+_import("alz.template.TplDocument");
 
 /**
- * 一个模板对象
+ * 一个模板文件或者文件片段的封装对象
  * 1)支持xml语法
  * 2)支持模板变量
  * 3)支持数据绑定
@@ -24,6 +25,8 @@ _class("TemplateObject", "", function(){
 		_super._init.call(this);
 		this._xmldoc   = null;  //{XMLDocument}
 		this._root     = null;
+		this._tag      = "";
+	//this._tagConf  = null;
 		this._elements = [];  //{TemplateElement} 所有模板元素实例(内部包装了对应的DOM元素)
 		this._vars     = {};  //所有的模板变量
 		this._uid      = 0;   //value对象编号
@@ -37,6 +40,7 @@ _class("TemplateObject", "", function(){
 		}else{
 			this._root = xml;
 		}
+		this._tag = this._root.tagName;
 	};
 	this.dispose = function(){
 		for(var k in this._values){
@@ -73,22 +77,20 @@ _class("TemplateObject", "", function(){
 			return null;
 		}
 	};
-	this.createElement = function(parent, element){
-		var obj = this.node2element(this.getRoot(), element.getDoc(), element, this, function(type, el, name, value){
-			if(!this.hasVar(value)) return;  //快速判断是否包含模板变量
-			if(type == "attr" && name == "style"){
-				var hash = this.parseStyle(value, true);
-				for(var k in hash){
-					this.createTplRef(element, "style", el, k, hash[k]);
-				}
-			}else{
-				this.createTplRef(element, type, el, name, value);
+	//注册模板元素
+	this.regTplEl = function(v){
+		this._elements.push(v);
+	};
+	this.onAttr = function(element, type, el, name, value){
+		if(!this.hasVar(value)) return;  //快速判断是否包含模板变量
+		if(type == "attr" && name == "style"){
+			var hash = this.parseStyle(value, true);
+			for(var k in hash){
+				this.createTplRef(element, "style", el, k, hash[k]);
 			}
-		});
-		if(parent){
-			parent.appendChild(obj);
+		}else{
+			this.createTplRef(element, type, el, name, value);
 		}
-		return obj;
 	};
 	this.createTplRef = function(element, type, el, name, value){
 		var val = this.parseValue(value);
@@ -106,12 +108,6 @@ _class("TemplateObject", "", function(){
 		return this._root;
 	};
 	this.parse = function(){
-	};
-	this.render = function(parent, attributes){
-		var el = new TemplateElement();
-		this._elements.push(el);  //注册模板元素
-		el.create(parent, this, attributes);
-		return el;
 	};
 	this.node2html = function(node){
 		var sb = [];
@@ -171,69 +167,6 @@ _class("TemplateObject", "", function(){
 			break;
 		}
 		return sb.join("");
-	};
-	this.node2element = function(node, doc, element, agent, func){
-		var el;
-		switch(node.nodeType){
-		case 1:  //NODE_ELEMENT
-			var tagName = node.tagName;
-			el = doc.createElement(tagName);
-			var attributes = node.attributes;
-			for(var i = 0, len = attributes.length; i < len; i++){
-				var attr = attributes[i];
-				var name = attr.nodeName;
-				var value = attr.nodeValue;
-				if(name == "container" && value == "true"){
-					element._container = el;
-					continue;
-				}
-				switch(name){
-				case "_datasrc":
-					break;
-				case "_action":
-				case "_tag":
-				default:
-					func.call(agent, "attr", el, name, value);
-					if(name == "style"){
-						var hash = this.parseStyle(value);
-						for(var k in hash){
-							el.style[k] = hash[k];
-						}
-					}else{
-						el.setAttribute(name, value);
-					}
-					break;
-				}
-			}
-			if(node.hasChildNodes()){
-				var nodes = node.childNodes;
-				for(var i = 0, len = nodes.length; i < len; i++){
-					el.appendChild(this.node2element(nodes[i], doc, element, agent, func));
-				}
-			}
-			break;
-		case 3:  //NODE_TEXT
-			var value = node.nodeValue;
-			el = doc.createTextNode(value);
-			func.call(agent, "text", el, "", value);
-			break;
-		case 4:  //NODE_CDATA_SECTION
-			//var value = node.data;
-			//el = doc.createCDATASection(value);
-			//func.call(agent, "cdata", el, "", value);
-			//sb.push("<![CDATA[" + value + "]]>");
-			break;
-		case 8:  //NODE_COMMENT
-			//var value = node.data;
-			//el = doc.createComment(value);
-			//func.call(agent, "comment", el, "", value);
-			//sb.push("<!--" + value + "-->");
-			break;
-		default:
-			//runtime.warning("无法处理的nodeType" + node.nodeType + "\n");
-			break;
-		}
-		return el;
 	};
 	this.hasVar = function(str){
 		return str.indexOf("{$") != -1;

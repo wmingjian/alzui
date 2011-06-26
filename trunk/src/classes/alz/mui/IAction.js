@@ -34,13 +34,25 @@ _interface("IAction", "", function(){
 		this._lastTime = 0;
 		//this._lastAct = "";
 	};
-	this.init = function(obj){
-		this._actionManager = new ActionManager();
-		this._actionManager.init(this);
+	this.init = function(){
+		if(!this._actionManager){
+			this._actionManager = new ActionManager();
+			this._actionManager.init(this);
+		}
+	};
+	this.rendered = function(){
+		console.log("[IAction::rendered]");
+		if(!this._actionManager){
+			this._actionManager = new ActionManager();
+			this._actionManager.init(this);
+		}
+		this.initActionElements();
 	};
 	this.dispose = function(){
-		this._actionManager.dispose();
-		this._actionManager = null;
+		if(this._actionManager){
+			this._actionManager.dispose();
+			this._actionManager = null;
+		}
 	};
 	this.getActionEngine = function(){
 		return this;

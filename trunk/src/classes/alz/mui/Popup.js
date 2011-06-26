@@ -8,16 +8,24 @@ _import("alz.mui.Pane");
 _class("Popup", Pane, function(){
 	this._init = function(){
 		_super._init.call(this);
+		this._conf = null;
 		this._app = null;
 		this._params = null;
 		this._owner = null;  //所有者(必须是一个UI组件)
 		this._req = null;
 	};
+	this.create2 = function(conf, parent, app, params, owner){
+		this.setConf(conf);
+		this.setParent2(parent);
+		this.setApp(app);
+		this.setParams(params);
+		this.setOwner(owner);
+	};
 	this.create = function(parent, app, owner, params, tpl){
 		this.setParent2(parent);
 		this.setApp(app);
-		this._owner = owner;
-		this._params = params;
+		this.setOwner(owner);
+		this.setParams(params);
 		var obj = this.createTplElement(parent, tpl);
 		this.init(obj);
 		return obj;
@@ -46,11 +54,20 @@ _class("Popup", Pane, function(){
 	};
 	this.destroy = function(){
 	};
+	this.setConf = function(v){
+		this._conf = v;
+	};
 	this.setApp = function(v){
 		this._app = v;
 	};
 	this.getOwner = function(){
 		return this._owner;
+	};
+	this.setOwner = function(v){
+		this._owner = v;
+	};
+	this.setParams = function(v){
+		this._params = v;
 	};
 	this.setReq = function(v){
 		this._req = v;
