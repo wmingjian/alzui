@@ -72,7 +72,7 @@ _interface("IBoxModel", "", function(){
 			var v0 = PROPS[k][0];
 			if(v0 == 0) continue;
 			var key = "_" + k;
-			this[key] = this.parseNum(obj.tagName, this.getPropertyValue(style, k) || obj.style[k]);
+			this[key] = this.parseNum(/*obj.tagName, */this.getPropertyValue(style, k) || obj.style[k]);
 			if(v0 == 1){
 				this[key] = this[key] || obj[PROPS[k][1]];
 			}

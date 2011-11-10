@@ -1,0 +1,10 @@
+/* 工具窗体组件 */
+.undock{position:absolute;border:2px solid #404040;padding:2px;font:8pt tahoma;
+	background-color:#D4D0C8;-webkit-border-image:url(../images/border-outset.gif) 2 stretch stretch;
+}
+.ui-toolwin{}
+.ui-toolwin .win-head{position:relative;overflow:hidden;height:15px;margin-bottom:1px;white-space:nowrap;font-weight:bold;color:white;/*background-color:#0A246A;*/background-image:-webkit-gradient(linear,left top,right top,color-stop(0, #0A246A),color-stop(1, #A6CAF0));}
+.ui-toolwin .win-head .icon-close{position:absolute;top:2px;right:2px;width:9px;height:7px;line-height:7px;background:#D4D0C8 url(../images/btn-close.gif) 0px 0px;border-width:2px;-webkit-border-image:url(../images/btn-outset.gif) 2 stretch stretch;}
+.ui-toolwin .win-head .icon-close:active{-webkit-border-image:url(../images/btn-inset.gif) 2 stretch stretch;background-position:0px -7px;}
+.ui-toolwin .win-head label{display:block;margin:0px 17px 0px 2px;height:14px;line-height:14px;vertical-align:baseline;}
+.ui-toolwin .win-body{overflow:hidden;}

@@ -98,7 +98,7 @@ _class("LineEdit", Component, function(){
 	this.create = function(parent, app){
 		this.setParent2(parent);
 		if(app) this._app = app;
-		var obj = this._createElement2(parent ? parent._self : null, "div", "aui-LineEdit");
+		var obj = this._createElement2(parent ? parent._self : null, "div", "ui-lineedit");
 		this.init(obj);
 		return obj;
 	};
@@ -111,28 +111,23 @@ _class("LineEdit", Component, function(){
 				"maxLength": "78"
 			});
 			//if(debug) this._input.style.backgroundColor = "#444444";
-			this._input.onkeydown = function(ev){
-				return _this.onKeyDown1(ev || window.event, this);
-			};
-			this._input.onkeyup = function(){
-				//_this._timer = runtime.addThread(200, this, getCursorIndex);
-			};
-			this._input.onkeypress = function(ev){
-				return _this.onKeyPress(ev || window.event, this);
-			};
+			this.addListener(this._input, "keydown", this, "onKeyDown1");
+			this.addListener(this._input, "keyup", this, function(){
+				//this._timer = runtime.addThread(200, this, getCursorIndex);
+			});
+			this.addListener(this._input, "keypress", this, "onKeyPress");
 			//this._input.onfocus = function(){};
 			//this._input.onblur = function(){};
-			this._input.ondblclick = function(){
-				if(_this._timer != 0){
-					window.clearTimeout(timer);
-					_this._timer = 0;
+			this.addListener(this._input, "dblclick", this, function(ev){
+				if(this._timer != 0){
+					window.clearTimeout(this._timer);
+					this._timer = 0;
 				}
-			};
-			this._input.onclick = function(ev){
-				ev = ev || window.event;
-				//_this._timer = runtime.addThread(200, this, getCursorIndex);
+			});
+			this.addListener(this._input, "click", this, function(ev){
+				//this._timer = runtime.addThread(200, this, getCursorIndex);
 				ev.cancelBubble = true;
-			};
+			});
 		}else{
 			/*
 			if(runtime.moz){
@@ -140,9 +135,7 @@ _class("LineEdit", Component, function(){
 					return _this.onKeyDown(ev || window.event, _this._self);
 				};
 			}else{
-				this._self.onkeydown = function(ev){
-					return this._ptr.onKeyDown(ev || window.event, this);
-				};
+				this.addListener(this._self, "keydown", this, "onKeyDown");
 			}
 			*/
 		}
@@ -168,16 +161,16 @@ _class("LineEdit", Component, function(){
 		this._items = [];
 		this._app = null;
 		if(this._useInput){
-			this._input.onclick = null;
-			this._input.ondblclick = null;
+			this.removeListener(this._input, "click");
+			this.removeListener(this._input, "dblclick");
 			//this._input.onblur = null;
 			//this._input.onfocus = null;
-			this._input.onkeypress = null;
-			this._input.onkeyup = null;
-			this._input.onkeydown = null;
+			this.removeListener(this._input, "keypress");
+			this.removeListener(this._input, "keyup");
+			this.removeListener(this._input, "keydown");
 			this._input = null;
 		}else{
-			this._self.onkeydown = null;
+			this.removeListener(this._self, "keydown");
 		}
 		_super.dispose.apply(this);
 	};
@@ -436,7 +429,8 @@ _class("LineEdit", Component, function(){
 		}*/
 	};
 	//使用input元素的实现
-	this.onKeyDown1 = function(ev, sender){
+	this.onKeyDown1 = function(ev){
+		var sender = this._input;
 		var redraw = true;
 		var kc = ev.keyCode;
 		if(this._app){
@@ -661,6 +655,6 @@ _class("LineEdit", Component, function(){
 		}
 		return true;
 	};
-	this.onKeyUp = function(ev, sender){
+	this.onKeyUp = function(ev){
 	};
 });

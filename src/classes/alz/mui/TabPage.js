@@ -15,8 +15,8 @@ _class("TabPage", Component, function(){
 	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
-		this._head = this._createElement2(this._self, "div", "aui-TabPage-Head");
-		this._body = this._createElement2(this._self, "div", "aui-TabPage-Body");
+		this._head = this._createElement2(this._self, "div", "ui-tabpage-head");
+		this._body = this._createElement2(this._self, "div", "ui-tabpage-body");
 		this._body.innerHTML =
 				'<table width="95%" border="1" cellspacing="0" cellpadding="2" bordercolor="#869FA1"><tbody></tbody></table>'
 			+ '<table width="95%" border="1" cellspacing="0" cellpadding="2" bordercolor="#869FA1"><tbody></tbody></table>'

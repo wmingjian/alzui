@@ -1,10 +1,20 @@
 @charset "utf-8";
 
-@import "aui-LineEdit.css";
-@import "aui-ListBox.css";
-@import "aui-Window.css";
-@import "aui-Table.css";
-@import "aui-WindowSkin.css";
+@import "ui-workspace.css";
+@import "ui-modalpanel.css";
+@import "ui-window.css";
+@import "ui-window-skin.css";
+@import "ui-dialog.css";
+@import "ui-toolwin.css";
+@import "ui-lineedit.css";
+@import "ui-listbox.css";
+@import "ui-table.css";
+@import "ui-popup.css";
+@import "ui-popmenu.css";
+@import "ui-menubar.css";
+@import "ui-toolbar.css";
+@import "ui-statusbar.css";
+@import "ui-treeview.css";
 
 /* 公共样式 */
 html,body{position:relative;overflow:hidden;width:100%;height:100%;margin:0px;border:none;padding:0px;/*background-color:background;*/}
@@ -20,3 +30,22 @@ p{margin:0px;font:12px "宋体"}
 	-moz-border-right-colors:ThreeDDarkShadow ThreeDShadow;
 	-moz-border-bottom-colors:ThreeDDarkShadow ThreeDShadow;
 }
+
+/* 富工具栏容器 */
+.ui-rebar{background-color:#D4D0C8;}
+
+/* 面板组件 */
+.ui-panel{}
+
+/* 可独立工作的面板组件 */
+.ui-pane{}
+
+/* 垂直分隔条 */
+.ui-slider-v{float:left;width:3px;height:100%;cursor:w-resize;}
+
+/* 水平分隔条 */
+.ui-slider-h{height:3px;cursor:n-resize;}
+
+/* 代码编辑器 */
+.ui-codeeditor{background-color:#EBEBEB;border-width:2px;-webkit-border-image:url(../images/border-inset.gif) 2 stretch stretch;}
+.CodeMirror-line-numbers{text-align:right;font-family:monospace;font-size:9pt;padding:0px 9px;color:#0000A0;background-color:#008080;}

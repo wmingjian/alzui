@@ -1,0 +1,8 @@
+/* 菜单栏 */
+.ui-menubar{overflow:hidden;height:auto !important;*height:20px;margin:0px;padding:1px 0px;/*border-top:1px solid #FFFFFF;*/border-bottom:1px solid #808080;}
+.ui-menubar li{float:left;list-style:none;height:18px;line-height:18px;border:1px solid #D4D0C8;}
+.ui-menubar li.ui-menubutton{width:50px;text-align:center;}
+.ui-menubar li.ui-menubutton.hover{border-left:1px solid #FFFFFF;border-top:1px solid #FFFFFF;border-right:1px solid #808080;border-bottom:1px solid #808080;}
+.ui-menubar li.ui-menubutton.active{border-left:1px solid #808080;border-top:1px solid #808080;border-right:1px solid #FFFFFF;border-bottom:1px solid #FFFFFF;}
+.ui-menubar li.icon{width:18px;}
+.ui-menubar li.icon span{display:inline-block;margin:1px;width:16px;height:16px;line-height:16px;background:url(../images/ep_icon.gif) no-repeat -16px 0px;}

@@ -15,7 +15,7 @@ _class("ModalPanel", Component, function(){
 	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
-		this._self.className = "wui-ModalPanel";
+		this._self.className = "ui-modalpanel";
 		this.moveTo(0, 0);
 		this.setOpacity(0.01);
 		if(runtime.ie){

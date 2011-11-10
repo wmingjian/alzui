@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ui ns="a">
 	<window clazz="alz.mui.Window" title="窗体">
-		<div class="aui-Window-win2k" dock="false">
-			<div class="head">
+		<div class="ui-window-win2k" dock="false">
+			<div class="win-head">
 				<span class="icon"></span>
 				<label>{$caption}</label>
 				<div class="sysbtn">
-					<div class="icon-min" title="最小化"></div>
-					<div class="icon-max" title="最大化"></div>
-					<div class="icon-close" title="关闭"></div>
+					<a class="icon-min" href="#" title="最小化" _action="win_min"></a>
+					<a class="icon-max" href="#" title="最大化" _action="win_max"></a>
+					<a class="icon-close" href="#" title="关闭" _action="win_close"></a>
 				</div>
 			</div>
-			<div class="body" container="true"></div>
+			<div class="win-body" container="true"></div>
 		</div>
 	</window>
 	<toolwin clazz="alz.mui.ToolWin" title="工具窗体">
 		<div class="ui-toolwin">
-			<div class="win-title"><a class="close" href="#" _action="win_close"></a><label>{$caption}</label></div>
+			<div class="win-head"><a class="icon-close" href="#" _action="win_close"></a><label>{$caption}</label></div>
 			<div class="win-body" container="true"></div>
 		</div>
 	</toolwin>
 	<dialog clazz="alz.mui.Dialog" title="对话框">
 		<div class="ui-dialog">
 			<div class="skin"></div>
-			<h1 class="head"><label>{$caption}</label><a class="close" href="#" _action="dlg_cancel"></a></h1>
-			<div class="body" container="true"></div>
+			<h1 class="win-head"><label>{$caption}</label><a class="icon-close" href="#" _action="dlg_cancel"></a></h1>
+			<div class="win-body" container="true"></div>
 		</div>
 	</dialog>
 	<popup clazz="alz.mui.Popup">
@@ -75,7 +75,7 @@
 		<div class="ui-slider-v"></div>
 	</vsplit>
 	<workspace clazz="alz.mui.AppWorkspace">
-		<div class="ui-workspace" container="true"></div>
+		<div class="ui-appworkspace" container="true"></div>
 	</workspace>
 	<pane clazz="alz.mui.Pane">
 		<div class="ui-pane" container="true"></div>
@@ -83,6 +83,9 @@
 	<panel clazz="alz.mui.Panel">
 		<div class="ui-panel" container="true"></div>
 	</panel>
+	<dockpanel>
+		<panel container="true"></panel>
+	</dockpanel>
 	<codeeditor clazz="alz.mui.CodeEditor">
 		<textarea></textarea>
 	</codeeditor>

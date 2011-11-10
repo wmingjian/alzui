@@ -11,7 +11,7 @@ _class("TableView", Component, function(){
 	};
 	this.create = function(parent){
 		var sb = [];
-		sb.push('<table class="aui-Table" border="1" bordercolor="gray" cellspacing="0" cellpadding="1">');
+		sb.push('<table class="ui-table" border="1" bordercolor="gray" cellspacing="0" cellpadding="1">');
 		sb.push('<thead>');
 		sb.push('<tr><th>id</th><th>name</th><th>value</th><th>col3</th><th>col4</th><th>col5</th><th>col6</th><th>col7</th><th>col8</th><th>col9</th><th>col10</th></tr>');
 		sb.push('</thead>');

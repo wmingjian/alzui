@@ -1,6 +1,11 @@
 /*
- * alzui-mini ÎÄµµÖĞĞÄÄ£°å¿â
+ * alzui-mini æ¡†æ¶æ–‡æ¡£æ¨¡æ¿åº“
  */
-runtime.regTpl("docs", {
-pane_main.xml
+runtime.regTpl("docs.tpl", {
+home.xml,
+doc.xml,
+app_list.xml,
+app_add.xml,
+app_pkg.xml,
+app_check.xml
 });

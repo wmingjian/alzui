@@ -45,7 +45,7 @@ _class("Workspace", Container, function(){
 	};
 	this.create = function(parent){
 		this.setParent2(parent);
-		var obj = this._createElement2(parent, "div", "wui-Workspace wui-PaneApp");
+		var obj = this._createElement2(parent, "div", "ui-workspace wui-PaneApp");
 		this.init(obj);
 		return obj;
 	};
@@ -197,7 +197,7 @@ _class("Workspace", Container, function(){
 	this.onMouseMove = null;
 	this.onMouseUp = function(ev){
 	};
-	/**
+	/*
 	 * 偏移量的修正依赖于 getPos 方法的正确性，如果本身计算就不正确，修正结果也将不对
 	 * [TODO]在第一次onMouseMove事件中执行修正偏移量的计算
 	 */

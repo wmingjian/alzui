@@ -1,8 +1,8 @@
 _package("alz.mui");
 
-_import("alz.tools.filemanager.FileType");
+_import("alz.util.FileType");
 _import("alz.mui.Component");
-_import("alz.tools.filemanager.Label");
+_import("alz.mui.Label");
 _import("alz.mui.TreeView");
 _import("alz.core.Ajax");
 
@@ -10,6 +10,7 @@ _import("alz.core.Ajax");
  * TreeNode 类
  */
 _class("TreeNode", Component, function(){
+	TreeNode.iconCache = {};  //树节点图标缓存
 	this._init = function(){
 		_super._init.call(this);
 		//this._parent = null;   //TreeView组件(父DOM元素)
@@ -48,8 +49,7 @@ _class("TreeNode", Component, function(){
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
 		var _this = this;
-		if(!TreeNode.iconCache){
-			TreeNode.iconCache = {};
+		if(!("preIcon" in TreeNode.iconCache)){
 			TreeNode.useImg = true;
 			var obj;
 			if(TreeNode.useImg){
@@ -72,7 +72,7 @@ _class("TreeNode", Component, function(){
 				obj = this._createElement("img");
 				obj.src = this._tree._pathSkin + "win2k_tree_blank.gif";  //this._tree._pathSkin + "win2k_" + type + ".gif"
 			}else{
-				obj = this._createElement2(null, "span", "icon16", /*{
+				obj = this._createElement2(null, "span", "icon16"/*, {
 					"styleFloat"   : "left",
 					"display"      : "block",
 					"width"        : "16px",
@@ -85,6 +85,7 @@ _class("TreeNode", Component, function(){
 			obj.style.backgroundImage = "url(" + this._tree._pathSkin + "imagelist_build.gif)";
 			TreeNode.iconCache["icon"] = document.body.appendChild(obj);
 		}
+
 		this._preIcon = TreeNode.iconCache["preIcon"].cloneNode(true);
 		this._self.appendChild(this._preIcon);
 		this._preIcon.style.display = "";
@@ -149,7 +150,7 @@ _class("TreeNode", Component, function(){
 	//this.getIconIndex = function(){
 	//	return this._tree.getIconIndex(this._data.type);
 	//};
-	this.doEvent = function(ev, target){
+	this.handleEvent = function(ev, target){
 		switch(ev.type){
 		case "mousedown":
 			if(target == this._icon){
@@ -189,8 +190,9 @@ _class("TreeNode", Component, function(){
 			}
 			if(!this._subTree){
 				this._subTree = this.createSubTree();
+				this._subTree.setVisible(false);
 			}
-			this._subTree.setVisible(!this._subTree.getVisible());  // && this._subTree.childNodes.length > 0
+			this._subTree.setVisible(!this._subTree.getVisible());  //&& this._subTree.childNodes.length > 0
 			this._preIndex += this._subTree.getVisible() ? 6 : -6;
 			this._preIcon.style.backgroundPosition = "-" + (this._preIndex * 16) + "px 0px";
 		}
@@ -245,7 +247,7 @@ _class("TreeNode", Component, function(){
 	this.cancelRename = function(){
 		this._label.setVisible(true);
 		if(this._tree._input.parentNode != this._self){
-			window.alert(this._tree._input.parentNode.outerHTML);
+			runtime.error(this._tree._input.parentNode.outerHTML);
 		}
 		this._self.removeChild(this._tree._input);
 		this._tree._input.style.display = "none";
@@ -273,7 +275,7 @@ _class("TreeNode", Component, function(){
 					//}
 					this._label.setText(name);
 				}else{
-					window.alert("[ERROR]改名失败");
+					runtime.error("[ERROR]改名失败");
 				}
 				this.cancelRename();
 			});

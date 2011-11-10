@@ -31,6 +31,7 @@ _class("Component", EventTarget, function(){
 		/*1*/"value,nowrap,src,unselectable,_action,_action1,_align,_fid,_layout,_name,_position,_showArrow,_needSel,scrolling,frameBorder,frameSpacing",
 		/*2*/"backgroundColor,backgroundPosition,backgroundRepeat,border,borderBottom,color,cursor,display,filter,font,fontWeight,fontFamily,fontSize,height,left,lineHeight,overflow,overflowX,padding,position,styleFloat,textAlign,top,whiteSpace,width,verticalAlign,zIndex,tableLayout,zoom"
 	]);
+	this._cursors = ["nw", "n", "ne", "w", "e", "sw", "s", "se"];
 	this._init = function(){
 		_super._init.call(this);
 		//console.log("new " + this._className);
@@ -73,7 +74,6 @@ _class("Component", EventTarget, function(){
 		this._cssName = "";  //组件自身的DOM元素的className的替代名称
 		this._xpath = "";
 		this._state = "normal";
-		this._cursors = ["nw", "n", "ne", "w", "e", "sw", "s", "se"];
 		/*
 		UI组件插件
 		key    名字   影响属性
@@ -323,8 +323,8 @@ _class("Component", EventTarget, function(){
 	 * @return {Number}
 	 * @desc 把 v 转换成十进制表示的数字
 	 */
-	this.parseNum = function(tag, v){
-		return this._dom.parseNum(tag, v);
+	this.parseNum = function(v){  //(tag, v)
+		return this._dom.parseNum(/*tag, */v);
 	};
 	this.getPropertyValue = function(style, name){
 		return this._dom.getPropertyValue(style, name);
@@ -693,7 +693,6 @@ _class("Component", EventTarget, function(){
 		if(v == this._state) return;
 		this._state = v;
 		//runtime.dom.applyCssStyle1(this, this._xpath, v);
-		runtime.dom.applyCssStyle(this, this._cssData, v);
 	};
 	this._cssKeyToJsKey = function(str){
 		return str.replace(/-([a-z])/g, function(_0, _1){
@@ -784,6 +783,13 @@ _class("Component", EventTarget, function(){
 			}
 		}
 		return el._ptr;
+	};
+	//事件绑定接口
+	this.addListener = function(el, type, agent, func){
+		runtime._eventManager.addListener(el, type, agent, func);
+	};
+	this.removeListener = function(el, type){
+		runtime._eventManager.removeListener(el, type);
 	};
 	/**
 	 * @method dispatchEvent

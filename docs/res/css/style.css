@@ -1,28 +1,13 @@
-@charset "gb2312";
+@charset "utf-8";
 
-html{padding:0px;height:100%}
-body{font:12px "宋体";padding:0px;height:100%;background-color:#EEEEEE}
-.wui-Document{margin-left:auto;margin-right:auto;width:600px;text-align:left;border:1px solid #CCCCCC;padding:20px}
-a:link,
-a:visited{color:#1E5494}
-a:hover{color:#CC3333}
-a:active{color:#CC3333}
-p{margin:4px 0px 4px 40px;font:12px "宋体"}
-p.title{height:40px;margin:2px 0px 2px 0px;text-align:center;font:bold 20px "宋体";line-height:40px;background-color:#EEEEEE}
-pre{margin:2px 0px 2px 0px;border:1px solid #DDDDDD;background-color:#EEEEEE}
-h1.title{margin:0px;font:bold 15px "宋体"}
-h1{font:bold 18px "宋体";background-color:#EEEEEE}
-h2{font:bold 17px "宋体";margin-bottom:4px;border-bottom:1px solid #DDDDDD}
-h3{font:bold 16px "宋体";margin-bottom:4px}
-h4{font:bold 15px "宋体"}
-h5{font:bold 14px "宋体"}
-h6{font:bold 13px "宋体"}
-table{font-size:12px;border-collapse:collapse}
-th{height:16px;background-color:#EEEEEE}
-td{height:16px}
-ul{margin-top:4px;margin-left:16px;margin-bottom:4px;/*margin:4px 4px 4px 20px;*/padding:0px}
-li{/*list-style:none;*/line-height:14px;margin-top:4px;margin-bottom:4px}
-dl{margin:4px 0px 4px 40px}
-dd{margin-bottom:4px}
-blockquote{margin-left:24px}
-.code{border:1px solid gray;background-color:#D5D5D5}
+body,table,th{font:12px "瀹嬩綋";}
+table{border-collapse:collapse;}
+ul{margin:0px;padding:0px;}
+li{list-style:none;}
+
+ul.class-list{overflow:auto;height:600px;border:1px solid gray;}
+.class-list li a:link,
+.class-list li a:visited{color:#808080;text-decoration:none;}
+.class-list li a:hover{text-decoration:underline;}
+
+h1{margin:8px 0px;}

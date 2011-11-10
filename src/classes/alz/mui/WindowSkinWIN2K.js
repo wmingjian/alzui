@@ -67,13 +67,13 @@ _class("WindowSkinWIN2K", Component, function(){
 				this._parent[k]._cssData = this._cssHash[k];
 			}
 		}
-		var obj = this._createElement2(parent ? parent._self : null, "div", "wui-skin");
+		var obj = this._createElement2(parent ? parent._self : null, "div", "ui-skin");
 		this.init(obj);
 		return obj;
 	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
-		this._xpath = ".aui-Window-win2k";
+		this._xpath = ".ui-window-win2k";
 		if(runtime.ie){
 			for(var i = 0, len = this._cursors.length; i < len; i++){
 				var o = this._createElement2(this._self, "div", this._cursors[i]/*, {
@@ -87,11 +87,10 @@ _class("WindowSkinWIN2K", Component, function(){
 				this._ee["_skin" + i] = o;
 			}
 			this._title = this._createElement2(this._self, "img", "", {
-				"src"        : runtime.getConfigData("pathimg") + "win-2k-title-bg.gif",
-				"ondragstart": function(){return false;},
-				"onmousedown": function(ev){this._dlg._parent.onMouseDown(ev || window.event);}
+				"src": runtime.getConfigData("pathimg") + "win-2k-title-bg.gif"
 			});
-			this._title._dlg = this;
+			this._title.ondragstart = function(){return false;};
+			this.addListener(this._title, "mousedown", this._parent, "onMouseDown");
 		}
 		//runtime.dom.applyCssStyle(this, _cssName, "resizable");
 		this.setState("resizable");
@@ -99,9 +98,8 @@ _class("WindowSkinWIN2K", Component, function(){
 	this.dispose = function(){
 		if(this._disposed) return;
 		if(runtime.ie){
-			this._title.onmousedown = null;
+			this.removeListener(this._title, "mousedown");
 			this._title.ondragstart = null;
-			this._title._dlg = null;
 			this._title = null;
 		}
 		_super.dispose.apply(this);
@@ -144,5 +142,11 @@ _class("WindowSkinWIN2K", Component, function(){
 		//runtime.dom.applyCssStyle(this, _cssName, this._parent.getResizable() ? "resizable" : "normal");
 		this.setState(this._parent.getResizable() ? "resizable" : "normal");
 		this.resize(this._width, this._height);
+	};
+	this.setState = function(v){
+		if(v == this._state) return;
+		this._state = v;
+		//runtime.dom.applyCssStyle1(this, this._xpath, v);
+		runtime.dom.applyCssStyle(this, this._cssData, v);
 	};
 });

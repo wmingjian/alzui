@@ -85,6 +85,7 @@ _class("EventTarget", "", function(){
 	 * @param {Function} listener 事件响应函数
 	 * @desc 注册事件侦听器
 	 */
+	/*
 	this.addEventListener1 =
 	this.addEventGroupListener = function(eventMap, listener){
 		if(eventMap == "mouseevent"){
@@ -106,6 +107,7 @@ _class("EventTarget", "", function(){
 		}
 		//maps = null;
 	};
+	*/
 	this.fireEvent1 = function(ev){
 		if(!this._enableEvent) return;
 		//如果启用了事件相应机制，则触发事件
@@ -126,6 +128,7 @@ _class("EventTarget", "", function(){
 	 * @param {String} eventMap 事件名的序列，用,隔开，也可传入mouseevent或keyevent，这表示一个事件集
 	 * @desc 移除事件侦听器
 	 */
+	/*
 	this.removeEventListener1 =
 	this.removeEventGroupListener = function(eventMap){
 		if(eventMap == "mouseevent"){
@@ -142,6 +145,7 @@ _class("EventTarget", "", function(){
 		maps = null;
 		//this._listener = null;
 	};
+	*/
 	/**
 	 * 此方法允许在事件目标上注册事件侦听器。
 	 * @java void addEventListener(String type, EventListener listener, boolean useCapture);

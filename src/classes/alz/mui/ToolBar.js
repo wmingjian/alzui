@@ -10,9 +10,9 @@ _import("alz.mui.ToggleButton");
  */
 _class("ToolBar", Component, function(){
 	var HASH = {
-		"ui-toolbutton"   : ToolButton,
-		"wui-BitButton"   : BitButton,
-		"wui-ToggleButton": ToggleButton
+		"ui-toolbutton"  : ToolButton,
+		"ui-bitbutton"   : BitButton,
+		"ui-togglebutton": ToggleButton
 	};
 	this._init = function(){
 		_super._init.call(this);

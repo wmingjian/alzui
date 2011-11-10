@@ -278,7 +278,7 @@ _class("DOMUtil", Plugin, function(){
 	 */
 	this.getStyleProperty = function(el, name){
 		var style = this.getStyle(el);
-		return this.parseNum(el.tagName, this.getPropertyValue(style, name) || el.style[name]);
+		return this.parseNum(/*el.tagName, */this.getPropertyValue(style, name) || el.style[name]);
 	};
 	/**
 	 * @method setStyleProperty

@@ -59,6 +59,20 @@ _class("DataModel", Plugin, function(){
 	this.setConfData = function(key, value){
 		this._conf[key] = value;
 	};
+	this.getCache = function(key){
+		var data = this.getConfData(key);
+		if(data && (data.expire == -1 || new Date().getTime() <= data.expire || !this._app.isNetAvailable())){
+			return data.value;
+		}else{
+			return null;
+		}
+	};
+	this.setCache = function(key, value, expire){
+		this._conf[key] = {
+			"value" : value,
+			"expire": typeof expire == "number" ? new Date().getTime() + expire : -1
+		};
+	};
 	this.getConf = function(){
 		return this._conf;
 	};

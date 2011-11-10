@@ -41,6 +41,7 @@ _class("LibLoader", "", function(){
 		for(var i = 0, len = libs.length; i < len; i++){
 			var lib = libs[i];
 			if(typeof lib == "string"){
+				if(lib == "") continue;
 				var type;  //lib|tpl
 				var name = lib;
 				var inApp = name.charAt(0) == "#";
@@ -100,7 +101,9 @@ _class("LibLoader", "", function(){
 	};
 	this._loadLib = function(){
 		if(this._index >= this._libs.length){  //如果没有库代码，则直接执行回调
-			this._agent[this._func]();  //注意没有库名
+			var argv = [null, null, true];  //注意没有库名
+			var func = typeof this._func == "function" ? this._func : this._agent[this._func];
+			func.apply(this._agent, argv);
 			return;
 		}
 		//var url = runtime._pathLib + libs[i] + ".lib.js";

@@ -18,7 +18,7 @@ _class("SilverButton", Component, function(){
 	};
 	this.create = function(btn){
 		var obj = this._createElement("span");
-		obj.className = "wui-SilverButton";
+		obj.className = "ui-silverbutton";
 		if(btn){
 			btn.parentNode.replaceChild(obj, btn);
 			this._btn = obj.appendChild(btn);

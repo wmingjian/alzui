@@ -288,6 +288,10 @@ _class("AjaxEngine", Plugin, function(){
 			"func"    : func,
 			"args"    : cbArgs
 		};
+		if(method == "GET" && req.data != ""){
+			req.url = req.url + (req.url.indexOf("?") == -1 ? "?" : "&") + req.data;
+			req.data = "";
+		}
 		this._queue.push(req);
 		req = null;
 		if(this._timer == 0){
@@ -350,7 +354,6 @@ _class("AjaxEngine", Plugin, function(){
 					//}
 				};
 				http.send(req.data);
-				http = null;
 			}
 		}
 		req = null;

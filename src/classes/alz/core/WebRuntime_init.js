@@ -65,7 +65,7 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 		if(!this._info){
 			var body = this.getBody();
 			var obj = this._doc.createElement("div");
-			obj.className = "wui-Loging";
+			obj.className = "ui-loging";
 			obj.style.display = "none";
 			this._info = body.appendChild(obj);
 			obj = null;

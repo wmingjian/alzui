@@ -9,17 +9,18 @@ _import("alz.core.DataChangeEvent");
  * 元数据表
  */
 _class("MetaTable", EventTarget, function(){
-	this._init = function(key){
+	this._init = function(pid){
 		_super._init.call(this);
 	//this._parent = null;
 	//this._listeners = [];     //数据监听组件列表
 		this._conf = null;        //配置信息
 		this._id = "";            //数据表ID标识
-		this._primaryKey = key || "id";
+		this._primaryKey = pid || "id";  //主键
 		this._hash = {};          //(哈希表)数据列表
-		this._list = [];        //数据数组(当含有排序信息后，可以当作主索引使用)
+		this._list = null;        //数据数组(当含有排序信息后，可以当作主索引使用)
 		this._hashIndex = {};     //索引哈希(每个元素是一个TableIndex对象)
 		this._filters = {};       //过滤器及过滤器对应的结果
+		this._maxId = 0;          //最大ID
 	};
 	this.create = function(parent, id, path){
 		var index = this.createIndex("+" + this._primaryKey);
@@ -38,11 +39,12 @@ _class("MetaTable", EventTarget, function(){
 			this._hashIndex[k].dispose();
 			delete this._hashIndex[k];
 		}
+		/*
 		for(var i = 0, len = this._list.length; i < len; i++){
 			this._list[i] = null;
 		}
-		//this._list = this._list.splice(0, this._list.length);
-		this._list = [];
+		*/
+		this._list = null;
 		for(var k in this._hash){
 			delete this._hash[k];
 		}
@@ -251,8 +253,10 @@ _class("MetaTable", EventTarget, function(){
 	 * 添加一条记录
 	 */
 	this.insertRecord = function(data, list){
-		data[this._primaryKey] = parseInt(data[this._primaryKey]);  //默认主键数字型
 		var id = data[this._primaryKey];
+		if(/^\d+$/.test(id)){
+			id = data[this._primaryKey] = parseInt(id);  //默认主键数字型
+		}
 		//1)保证主键(id)唯一性
 		if(id in this._hash){  //如果已经存在，忽略
 			runtime.warning("新增记录(type=" + this._id + ")已经存在id=" + id);

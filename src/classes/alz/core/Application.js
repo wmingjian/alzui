@@ -217,7 +217,7 @@ _class("Application", EventTarget, function(){
 	this.navPane = function(pid, params){
 	};
 	this.getAppWorkspace = function(){
-		return this._contentPane.find(".ui-workspace")._ptr;
+		return this._contentPane ? this._contentPane.find(".ui-appworkspace")._ptr : this._workspace;
 	};
 	/**
 	 * 创建一个窗体组件
@@ -246,14 +246,14 @@ _class("Application", EventTarget, function(){
 	};
 	/**
 	 * 调用一个对话框组件（创建，重置）
-	 * @param name {String} 要创建的对话框的名字（类名 + "#" + id）
-	 * @param app {Application} 对话框所属的应用
-	 * @param params {Hash} 创建参数
+	 * @param {String} name 要创建的对话框的名字（类名 + "#" + id）
+	 * @param {Application} app 对话框所属的应用
+	 * @param {Hash} params 创建参数
 	 *   params["p2" ] 这是一个附加的参数[TODO]需要重构掉
 	 *   params["act"]
 	 *   params["url"] urlCode
-	 * @param agent {Object} 回调代理对象
-	 * @param func {String|Function} 回调函数
+	 * @param {Object} agent 回调代理对象
+	 * @param {String|Function} func 回调函数
 	 */
 	this.dlgInvoke = function(name, app, params, agent, func){
 		var key = name.split("#")[0];
@@ -281,13 +281,13 @@ _class("Application", EventTarget, function(){
 	};
 	/**
 	 * 调用一个弹出式组件（创建，重置）
-	 * @param name {String} 要创建的弹出式组件的名字
-	 * @param app {Application} 弹出式组件所属的组件
-	 * @param params {Hash} 创建参数
-	 * @param agent {Object} 回调代理对象
-	 * @param func {String|Function} 回调函数
+	 * @param {String} name 要创建的弹出式组件的名字
+	 * @param {Component} owner 弹出式组件所属的组件
+	 * @param {Hash} params 创建参数
+	 * @param {Object} agent 回调代理对象
+	 * @param {String|Function} func 回调函数
+	 * @return {Popup}
 	 */
-	this.popupInvoke = 
 	this.popInvoke = function(name, owner, params, agent, func){
 		var popup = this._popups[name];
 		if(!popup){
@@ -309,8 +309,14 @@ _class("Application", EventTarget, function(){
 		popup.reset(params);
 		return popup;
 	};
+	this.popupInvoke = this.popInvoke;
 	/**
 	 * 创建一个面板组件
+	 * @param {String} name
+	 * @param {Component} parent
+	 * @param {Application} app
+	 * @param {Hash} params
+	 * @return {Pane}
 	 */
 	this.createPane = function(name, parent, app, params){
 	};
@@ -329,5 +335,11 @@ _class("Application", EventTarget, function(){
 			runtime.error("[Application::doAction]未定义的act=" + act);
 			return false;
 		}
+	};
+	/**
+	 * @see AjaxEngine::netInvoke
+	 */
+	this.netInvoke = function(method, url, params, type, agent, func){
+		return runtime._ajax.netInvoke.apply(runtime._ajax, arguments);
 	};
 });

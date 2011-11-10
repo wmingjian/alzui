@@ -19,6 +19,7 @@ $path_cache   = $path_root . 'build/cache/';
 $path_upload = $path_root . '/' . $install_dir . '/upload/';
 $path_classes = array('/' . $install_dir . '/src/classes/');
 $path_xml     = '';
+$path_css     = '';
 if(!file_exists($path_cache)){
 	mkdir($path_cache);
 }

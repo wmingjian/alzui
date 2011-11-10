@@ -1,0 +1,7 @@
+/* 弹出式组件 */
+.ui-popup{position:absolute;font:8pt tahoma;
+	-moz-box-shadow:3px 3px 3px rgba(128, 128, 128, 0.8);box-shadow:2px 2px 2px rgba(128, 128, 128, 0.8);
+	background-color:#D4D0C8;border-width:2px;-webkit-border-image:url(../images/border-outset.gif) 2 stretch stretch;
+}
+.ui-popup .ui-pane,
+.ui-popup .ui-panel{margin:1px;}

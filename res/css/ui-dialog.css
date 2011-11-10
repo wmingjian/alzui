@@ -1,0 +1,14 @@
+/* 对话框组件 */
+.ui-dialog{position:absolute;min-width:250px;min-height:150px;/*border:1px solid #808080;*/-moz-border-radius:2px;-moz-box-shadow:0px 0px 7px rgba(128,128,128,0.8);border-radius:2px;box-shadow:0px 0px 7px rgba(128,128,128,0.8);}
+.ui-dialog .skin{position:absolute;z-index:1;top:0px;left:0px;width:100%;height:100%;background-color:#F7F7F7;opacity:0.5/*0.95*/;}
+.ui-dialog .border{position:absolute;overflow:hidden;z-index:3;}
+.ui-dialog h1.win-head{position:relative;z-index:2;height:21px;margin:0px;background-color:#F1F1F1;font:bold 9pt tahoma;line-height:21px;padding-left:4px;opacity:0.5;}
+.ui-dialog .win-head .icon-close{position:absolute;display:block;top:3px;right:5px;width:14px;height:14px;background:url(../images/close2.gif) no-repeat 0px 0px;}
+.ui-dialog .win-head .icon-close:hover{background-position:-14px 0px;}
+.ui-dialog .win-body{position:relative;overflow:hidden;height:auto;z-index:2;}
+.ui-dialog .win-body{z-index:4;font-size:12px;}
+.ui-dialog .row{position:relative;margin:4px 4px;}
+.ui-dialog .btn{position:relative;margin:10px 4px;text-align:right;}
+.ui-dialog .btn-r{float:right;width:87px;margin:0px 4px 4px 0px;text-align:center;}
+.ui-dialog .btn-r input{width:64px;}
+.ui-dialog .row-l{position:relative;margin:4px 91px 4px 4px;}

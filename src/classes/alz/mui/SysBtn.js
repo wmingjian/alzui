@@ -17,62 +17,60 @@ _class("SysBtn", Component, function(){
 		this._cssName = "." + this._self.className;
 		this._xpath = this._win._cssName + " .head " + this._cssName;
 		this._capture = false;
-		this._self.onclick = function(ev){
-		};
-		this._self.onmousedown = function(ev){
-			return this._ptr.onMouseDown(ev || window.event);
-			/*
-			ev = ev || window.event;
-			//this.style.backgroundPosition = "0px -" + _win._skin._model["sbtn_height"] + "px";
-			this._ptr._capture = true;
-			this.setCapture();
-			this._ptr.setState("active");
-			ev.cancelBubble = true;
-			return false;
-			*/
-		};
-		/*
-		this._self.onmouseup = function(ev){
-			ev = ev || window.event;
-			//this.style.backgroundPosition = "0px 0px";
-			this._ptr.setState("normal");
-			this.releaseCapture();
-			this._ptr._capture = false;
-			ev.cancelBubble = true;
-			return false;
-		};
-		this._self.onmouseover = function(ev){
-			ev = ev || window.event;
-			_doc.title = "over";
-			if(this._ptr._capture){
-				this._ptr.setState("active");
-			}else{
-				//this._ptr.setState("normal");
-			}
-			//return false;
-		};
-		this._self.onmouseout = function(ev){
-			ev = ev || window.event;
-			_doc.title = "out";
-			if(this._ptr._capture){
-				this._ptr.setState("normal");
-			}else{
-				//this._ptr.setState("normal");
-			}
-			//return false;
-		};
-		*/
+		this.addListener(this._self, "click", this, "onClick1");
+		this.addListener(this._self, "mousedown", this, "onMouseDown1");
+		//this.addListener(this._self, "mouseup", this, "onMouseUp1");
+		//this.addListener(this._self, "mouseover", this, "onMouseOver1");
+		//this.addListener(this._self, "mouseout", this, "onMouseOut1");
 	}
 	this.dispose = function(){
 		if(this._disposed) return;
-		this._self.onmouseout = null;
-		this._self.onmouseover = null;
-		this._self.onmousedown = null;
-		this._self.onmouseup = null;
-		this._self.onclick = null;
+		//this.removeListener(this._self, "mouseout");
+		//this.removeListener(this._self, "mouseover");
+		//this.removeListener(this._self, "mouseup");
+		this.removeListener(this._self, "mousedown");
+		this.removeListener(this._self, "click");
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){
+	};
+	this.onMouseDown1 = function(ev){
+		/*
+		//this._self.style.backgroundPosition = "0px -" + this._win._skin._model["sbtn_height"] + "px";
+		this._capture = true;
+		this._self.setCapture();
+		this.setState("active");
+		ev.cancelBubble = true;
+		return false;
+		*/
+	};
+	this.onMouseUp1 = function(ev){
+		//this._self.style.backgroundPosition = "0px 0px";
+		this.setState("normal");
+		this._self.releaseCapture();
+		this._capture = false;
+		ev.cancelBubble = true;
+		return false;
+	};
+	this.onMouseOver1 = function(ev){
+		document.title = "over";
+		if(this._capture){
+			this.setState("active");
+		}else{
+			//this.setState("normal");
+		}
+		//return false;
+	};
+	this.onMouseOut1 = function(ev){
+		document.title = "out";
+		if(this._capture){
+			this.setState("normal");
+		}else{
+			//this.setState("normal");
+		}
+		//return false;
+	};
+	this.onClick1 = function(ev){
 	};
 	this.onMouseDown = function(ev){
 		this.setCapture(true);
@@ -82,9 +80,8 @@ _class("SysBtn", Component, function(){
 		if(runtime._host.env == "ie"){
 			body.setCapture();
 		}
-		body.onmousemove = function(ev){_this.onMouseMove(ev || window.event);};
-		body.onmouseup = function(ev){_this.onMouseUp(ev || window.event);};
-		body = null;
+		this.addListener(body, "mousemove", this, "onMouseMove");
+		this.addListener(body, "mouseup", this, "onMouseUp");
 		*/
 		this.setState("active");
 		ev.cancelBubble = true;
@@ -99,8 +96,8 @@ _class("SysBtn", Component, function(){
 		this.setCapture(false);
 		/*
 		var body = window.document.body;
-		body.onmousemove = null;
-		body.onmouseup = null;
+		this.removeListener(body, "mousemove");
+		this.removeListener(body, "mouseup");
 		if(runtime._host.env == "ie"){
 			body.releaseCapture();
 		}
