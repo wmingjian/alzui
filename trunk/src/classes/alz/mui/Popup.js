@@ -142,7 +142,7 @@ _class("Popup", Pane, function(){
 	this.show = function(){
 		runtime._workspace.setActivePopup(this);
 		var pos = this.getPos(this._owner);
-		this.moveTo(pos.x + 2, pos.y + this._owner.offsetHeight + 2);
+		this.moveTo(pos.x, pos.y + this._owner.offsetHeight);
 	};
 	this.hide = function(){
 		runtime._workspace.setActivePopup(null);

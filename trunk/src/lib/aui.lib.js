@@ -2,10 +2,11 @@
  * 单文件框架库
  */
 import alz.copyright;
+import alz.util;
 (function(__global){  // Using a closure to keep global namespace clean.
 
 //import alz.changelog;
-//import alz.Profile;
+import alz.Profile;
 import alz.init;
 import alz.Clazz;
 import alz.LibContext;
@@ -45,6 +46,8 @@ import alz.template.TemplateManager;
 import alz.core.HistoryManager;
 import alz.core.Application;
 import alz.core.AppManager;
+import alz.core.Element;
+import alz.core.EventManager;
 import alz.core.WebRuntime;
 import alz.core.WebRuntime_init;
 
@@ -67,6 +70,9 @@ import alz.core.ActionCollection;
 import alz.core.ProductManager;
 import alz.core.ToggleGroup;
 import alz.core.ToggleManager;
+import alz.core.Animate;
+import alz.core.AnimateData;
+import alz.core.AnimationEngine;
 import alz.core.WebRuntime_core;
 
 }});
@@ -116,6 +122,11 @@ import alz.mui.Popup;
 import alz.mui.Menu;
 import alz.mui.PopupMenu;
 import alz.mui.TableView;
+import alz.util.FileType;
+import alz.mui.Label;
+import alz.mui.TreeNode;
+import alz.mui.TreeView;
+import alz.mui.BaseWindow;
 import alz.mui.Dialog;
 //import alz.mui.Dialog1;
 import alz.mui.TabPage;

@@ -1,0 +1,13 @@
+/* Ê÷ÊÓÍ¼×é¼þ */
+.ui-treeview{position:relative;overflow:auto;margin:0px;/*border:1px solid gray;background-color:#EEEEEE;*/padding:2px;}
+.ui-treeview ul{margin:0px;padding-left:16px;background-image:url("../images/win2k_tree_line0.gif");background-position:left 0px;background-repeat:repeat-y;}
+.ui-treeview li{list-style:none;/*overflow:auto;*/height:auto !important;height:16px;font:12px ??;line-height:16px;white-space:nowrap;}
+.ui-treeview li img{width:16px;height:16px;vertical-align:bottom !important;vertical-align:middle;/*margin-right:3px;*/}
+.ui-treeview li span.icon16{float:left;display:block;width:16px;height:16px;vertical-align:bottom !important;vertical-align:middle;/*margin-right:3px;*/}
+.ui-treeview li input    {height:12px;margin:-1px 0px -1px 0px;line-height:12px;font:12px ??;color:#000000;border:1px solid #000000;vertical-align:middle;}
+.ui-treeview li label    {height:16px;padding:1px;line-height:14px;color:#000000;}
+.ui-treeview li a:link   {text-decoration:none;color:#000000;}
+.ui-treeview li a:visited{text-decoration:none;color:#000000;}
+.ui-treeview li a:hover  {text-decoration:none;color:#0000FF;}
+.ui-treeview li a:active {text-decoration:none;color:#FFFFFF;background-color:#0A246A;}
+.ui-treeview .DragRect{position:absolute;height:16px;padding:1px;line-height:14px;color:#000000;z-index:10;border:1px solid gray;background-color:#DDDDDD;}

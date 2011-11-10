@@ -8,8 +8,6 @@ _import("alz.mui.Pane");
 _class("PaneBase", Pane, function(){
 	this._init = function(){
 		_super._init.call(this);
-		this._params = null;  //参数
-		this._pid = "";       //pageid
 	};
 	this.create = function(parent, app, tpl){
 		this.setParent2(parent);
@@ -32,15 +30,6 @@ _class("PaneBase", Pane, function(){
 		if(this._disposed) return;
 		this._params = null;
 		_super.dispose.apply(this);
-	};
-	this.getPid = function(){
-		return this._pid;
-	};
-	this.setPid = function(v){
-		this._pid = v;
-	};
-	this.setParams = function(v){
-		this._params = v;
 	};
 	this.setActionState = function(act, v, next){
 		var nodes = this._actionManager._nodes[act];

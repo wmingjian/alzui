@@ -123,7 +123,9 @@ function ClazzImp(){
 		for(var i = 0, len = this._imps.length; i < len; i++){
 			this.initVMethods(this._imps[i], "vlist");
 		}
-		//__profile.hackClass(clazz, proto);
+		if(typeof __profile !== "undefined"){
+			__profile.hackClass(clazz, proto);
+		}
 	};
 	function __super__(obj, name, args){
 		obj.__cls__.callSuper(obj, name, args);

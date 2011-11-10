@@ -17,7 +17,7 @@ _class("DropDown", Component, function(){
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
-		this._self.onmousedown = null;
+		this.removeListener(this._self, "mousedown");
 		this._self.onclick = null;
 		if(this._menu){
 			this._menu.dispose();
@@ -34,7 +34,7 @@ _class("DropDown", Component, function(){
 			this._menu = runtime.initComponent(runtime._workspace, id);
 			if(!this._menu) throw "未找到DropDown组件的下拉列表[Popup,id=\"" + id + "\"]";
 			this._menu.setVisible(false);
-			this._self.onmousedown = function(ev){return this._ptr.onMouseDown(ev || this._ptr._win.event);};
+			this.addListener(this._self, "mousedown", this, "onMouseDown");
 			this._self.onclick = function(ev){return false;};
 			this._menu._self.onmousedown = function(ev){
 				ev = ev || this._ptr._win.event;

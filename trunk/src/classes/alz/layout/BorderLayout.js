@@ -5,7 +5,7 @@ _import("alz.layout.AbstractLayout");
 
 _class("BorderLayout", AbstractLayout, function(){
 	var TAGS = {"NOSCRIPT": 1, "INPUT": 1};
-	var CLASSES = {"wui-ModalPanel": 1, "wui-Dialog": 1};
+	var CLASSES = {"ui-modalpanel": 1, "ui-dialog": 1};
 	this._init = function(){
 		_super._init.call(this);
 		this._component = null;

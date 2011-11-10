@@ -26,14 +26,16 @@ _class("ThreadPool", Plugin, function(){
 	 * @param {Number} msec 启动延迟时间
 	 * @param {Object} agent 代理对象
 	 * @param {Function|String} func 匿名函数或者代理对象的方法名
+	 * @param {Boolean} system 是否系统级线程
 	 * @return {Number} 定时器id
 	 */
-	this._createThread = function(msec, agent, func){
+	this._createThread = function(msec, agent, func, system){
 		var f = typeof func == "string" ? agent[func] : func;
 		//var cbid = runtime._task.add(agent, func);
 		var thread = {
 		//"cbid"    : cbid,        //回调任务编号
 			"id"      : this._tid++, //线程编号
+			"system"  : system || false,  //是否系统级线程
 			"type"    : "",          //类型
 			"status"  : "wait",      //状态(wait|ready|done|cancel|quit) -- 和任务对象的状态保持一致，方便以后实现统一
 			"agent"   : agent,       //代理对象
@@ -43,7 +45,7 @@ _class("ThreadPool", Plugin, function(){
 			"time_add": new Date().getTime()  //当前时间
 		};
 		this._hash[thread.id] = thread;
-		if(!this._suspend){
+		if(!this._suspend || system){
 			this._start(thread);
 		}
 		return thread;
@@ -94,7 +96,7 @@ _class("ThreadPool", Plugin, function(){
 		thread.status = "wait";
 		thread.timer = window.setTimeout(function(){
 			thread.status = "ready";
-			if(!_this._suspend){
+			if(!_this._suspend || thread.system){
 				_this.run(thread);
 			}
 		}, thread.msec);
@@ -159,10 +161,11 @@ _class("ThreadPool", Plugin, function(){
 	 * @param {Number} msec 启动延迟时间(毫秒)
 	 * @param {Object} agent 代理对象
 	 * @param {Function|String} func 匿名函数或者代理对象的方法名
+	 * @param {Boolean} system 是否系统级线程
 	 * @return {Number} 定时器id
 	 */
-	this.startThread = function(msec, agent, func){
-		return this._createThread(msec, agent, func).id;
+	this.startThread = function(msec, agent, func, system){
+		return this._createThread(msec, agent, func, system).id;
 	};
 	/**
 	 * 停止一个定时器

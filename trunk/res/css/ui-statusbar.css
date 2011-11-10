@@ -1,0 +1,5 @@
+/* 状态栏 */
+.ui-statusbar{overflow:hidden;height:17px;padding-top:2px;line-height:17px;background-color:#D4D0C8;border-top:1px solid #FFFFFF;}
+.ui-statusbar .text{position:relative;z-index:2;min-width:324px;margin-left:5px;margin-right:327px;line-height:15px;border:1px solid transparent;background-color:#D4D0C8;}
+.ui-statusbar .grids{z-index:1;margin:0px;padding:0px;float:right;overflow:hidden;width:327px;height:17px;}
+.ui-statusbar .grid{list-style:none;float:left;text-align:center;line-height:15px;border-left:1px solid #808080;border-top:1px solid #808080;border-right:1px solid #FFFFFF;border-bottom:1px solid #FFFFFF;}

@@ -1,0 +1,9 @@
+/* 工具栏 */
+.ui-toolbar{overflow:hidden;height:22px;/*height:22px;*/margin:0px;padding:1px 0px;border-top:1px solid #FFFFFF;border-bottom:1px solid #808080;}
+.ui-toolbar li{float:left;list-style:none;}
+.ui-toolbar li.hdl{width:9px;height:22px;background:url(../images/tb-bg.gif) no-repeat 0px 0px;cursor:move;}
+.ui-toolbar li.sep{width:6px;height:22px;background:url(../images/tb-bg.gif) no-repeat 0px -22px;}
+.ui-toolbar .ui-toolbutton{width:20px;height:20px;border:1px solid #D4D0C8;}
+.ui-toolbar .ui-toolbutton label{display:block;width:16px;height:16px;margin:2px;background:url(../images/tb-icon.gif) no-repeat;}
+.ui-toolbar .ui-toolbutton.hover{border-left:1px solid #FFFFFF;border-top:1px solid #FFFFFF;border-right:1px solid #808080;border-bottom:1px solid #808080;}
+.ui-toolbar .ui-toolbutton.active{border-left:1px solid #808080;border-top:1px solid #808080;border-right:1px solid #FFFFFF;border-bottom:1px solid #FFFFFF;}

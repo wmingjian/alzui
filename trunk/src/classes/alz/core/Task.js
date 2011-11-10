@@ -13,7 +13,7 @@ _class("Task", "", function(){
 		this._parent = null;
 		this.id         = 0;       //任务编号
 		this.type       = "";      //任务类型(event=事件响应任务)
-		this.status     = "wait";  //任务状态(wait|ready|done|cancel|quit)
+		this.status     = "wait";  //任务状态(wait|ready|done|cancel|quit|hold=保留)
 		this.dependence = [];      //任务依赖的其他任务
 		this.agent      = null;    //代理对象
 		this.func       = null;    //回调函数
@@ -44,21 +44,26 @@ _class("Task", "", function(){
 		this._parent = null;
 		_super.dispose.apply(this);
 	};
+	this.setStatus = function(v){
+		//runtime.log("[Task::setStatus]" + v + "(" + this.id + ")");
+		if(this.status == v) return;
+		this.status = v;
+	};
 	this.invoke = function(args){
 		var ret;
-		if(this.status != "wait" && this.status != "ready"){
+		if(this.status != "wait" && this.status != "ready" && this.status != "hold"){
 			console.log("invoke----", this);
 		}
-		args = args ? args.concat(this.args) : this.args;
+		var argv = args ? args.concat(this.args) : this.args;
 		var result = true;
 		for(var i = 0, len = this.dependence.length; i < len; i++){
-			result = result && this._parent.execute(this.dependence[i], args);
+			result = result && this._parent.execute(this.dependence[i], argv);
 		}
 		if(result){  //所有依赖任务成功，才执行当前任务
 			if(runtime.getConfData("core_shield")){
 				try{
 					this.time_begin = new Date().getTime();
-					ret = this.func.apply(this.agent, args);
+					ret = this.func.apply(this.agent, argv);
 					this.time_end = new Date().getTime();
 				}catch(ex){
 					runtime.error("[Task::invoke]" + ex.message);
@@ -66,7 +71,7 @@ _class("Task", "", function(){
 				}
 			}else{
 				this.time_begin = new Date().getTime();
-				ret = this.func.apply(this.agent, args);
+				ret = this.func.apply(this.agent, argv);
 				this.time_end = new Date().getTime();
 			}
 			this.total_count++;  //执行次数
@@ -74,7 +79,7 @@ _class("Task", "", function(){
 		}else{
 			ret = false;
 		}
-		if(this.type == "event"){
+		if(this.type == "event" || this.status == "hold"){  //保留事件响应型和明确指定保留状态的任务
 			this.status = "wait";
 		}else{
 			this.status = "done";  //标识回调已经执行完毕

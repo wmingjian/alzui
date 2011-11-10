@@ -6,18 +6,25 @@ _import("alz.core.PluginManager");
 _import("alz.core.ThreadPool");
 _import("alz.core.TaskSchedule");
 _import("alz.core.AppManager");
+_import("alz.core.Element");
+_import("alz.core.EventManager");
 //_import("alz.core.DOMUtil");
 //_import("alz.core.AjaxEngine");
 //_import("alz.mui.Component");
 //_import("alz.mui.Workspace");
 
+/**
+ * WEB运行时环境
+ */
 _class("WebRuntime", "", function(){
 	_implements(this, IConfigurable);
 	this.__conf__(__context__, {
 		"plugin": [  //插件配置列表
-			{"id": "thread"    , "clazz": "ThreadPool"  },  //伪线程池
-			{"id": "task"      , "clazz": "TaskSchedule"}   //任务调度器
-		//{"id": "appManager", "clazz": "AppManager"  }   //应用管理者
+			{"id": "thread"      , "clazz": "ThreadPool"  },  //伪线程池
+			{"id": "task"        , "clazz": "TaskSchedule"},  //任务调度器
+		//{"id": "appManager"  , "clazz": "AppManager"  },  //应用管理者
+			{"id": "element"     , "clazz": "Element"     },  //DOM元素操作
+			{"id": "eventManager", "clazz": "EventManager"}   //事件管理
 		]
 	});
 	this._init = function(){
@@ -46,7 +53,7 @@ _class("WebRuntime", "", function(){
 		this._host     = null;  //运行时环境的宿主对象（宿主环境）
 		this._hostenv  = "";    //宿主环境(特别的宿主:hta,chm)
 		this._config   = {};    //系统配置变量（含义参见文档说明）
-		/**
+		/*
 		 * conf配置信息说明
 		 * debug   boolean 是否调试状态
 		 * runmode number  运行模式
@@ -1038,8 +1045,9 @@ _class("WebRuntime", "", function(){
 				libConf = null;
 			}
 		}else{  //找不到，则认为库已经加载完毕
+			console.log(lib);
 			this._appManager.loadAppFiles(this._appManager._activeAppName, null, this, function(){
-				if(lib.type == "lib" || lib.type == "tpl"){
+				if(lib && (lib.type == "lib" || lib.type == "tpl") || !lib){
 					if(typeof this.onLoad == "function"){
 						this.onLoad();
 					}
@@ -1075,13 +1083,13 @@ _class("WebRuntime", "", function(){
 	 */
 	this.exportInterface = function(scope){
 		scope.runtime = this;  //导出全局对象 runtime
-		/**
+		/*
 		 * 这个函数是为了过渡性考虑因素，模拟 Prototype 等系统而设计的，在这里并不建
 		 * 议使用这样的系统函数。在获取 DOM 元素之后，仍然建议通过脚本组件操作 DOM元
 		 * 素的相关属性。
 		 */
-		/*scope.$ = function(id){return this.runtime.getElement(id);};*/
-		/**
+		//scope.$ = function(id){return this.runtime.getElement(id);};
+		/*
 		 * 获取 DOM 元素对应的脚本组件
 		 */
 		//scope.$get = function(id){return this.runtime.getComponentById(id);};
@@ -1276,7 +1284,6 @@ _class("WebRuntime", "", function(){
 	 * @param {Object} json 局部变量区
 	 * @param {Object} hash 全局变量区
 	 */
-	this.tpl_replace =
 	this.formatTpl = function(tpl, json, hash){
 		hash = hash || {};
 		return tpl.replace(/\{\$(\w+)\}/ig, function(_0, _1){
@@ -1284,6 +1291,7 @@ _class("WebRuntime", "", function(){
 			return _1 in hash ? hash[_1] : (_1 in json ? json[_1] : _0);
 		});
 	};
+	this.tpl_replace = this.formatTpl;
 	/**
 	 * 将模板解析为一个 JS 函数的代码形式
 	 * @param {String} code 模板的内容

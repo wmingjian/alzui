@@ -28,52 +28,19 @@ _class("BitButton", ToolButton, function(){
 		if(this._tip != ""){
 			this._self.title = this._tip;
 		}
-		this.addEventGroupListener("mouseevent", {
-			mouseover: function(ev){
-				runtime.dom.addClass(this._self, "hover");
-				/*
-				this._self.style.borderLeft = "1px solid buttonhighlight";
-				this._self.style.borderTop = "1px solid buttonhighlight";
-				this._self.style.borderRight = "1px solid buttonshadow";
-				this._self.style.borderBottom = "1px solid buttonshadow";
-				*/
-			},
-			mouseout: function(ev){
-				var target = ev.target || ev.toElement;
-				if(!runtime.dom.contains(this._self, target)){
-					runtime.dom.removeClass(this._self, "hover");
-					runtime.dom.removeClass(this._self, "active");
-					//this._self.style.border = "1px solid buttonface";
-				}
-			},
-			mousedown: function(ev){
-				runtime.dom.addClass(this._self, "active");
-				/*
-				this._self.style.borderLeft = "1px solid buttonshadow";
-				this._self.style.borderTop = "1px solid buttonshadow";
-				this._self.style.borderRight = "1px solid buttonhighlight";
-				this._self.style.borderBottom = "1px solid buttonhighlight";
-				*/
-				var sender = ev.target || ev.srcElement;
-				//this._app.doAction(sender.getAttribute("_action"), sender);
-			},
-			mouseup: function(ev){
-				runtime.dom.replaceClass(this._self, "active", "hover");
-				/*
-				this._self.style.borderLeft = "1px solid buttonhighlight";
-				this._self.style.borderTop = "1px solid buttonhighlight";
-				this._self.style.borderRight = "1px solid buttonshadow";
-				this._self.style.borderBottom = "1px solid buttonshadow";
-				*/
-			}/*,
-			click: function(ev){
-				var sender = ev.target || ev.srcElement;
-				this._app.doAction(sender.getAttribute("_action"), sender);
-			}*/
-		});
+		this.addListener(this._self, "mouseover", this, "onMouseOver");
+		this.addListener(this._self, "mouseout", this, "onMouseOut");
+		this.addListener(this._self, "mousedown", this, "onMouseDown");
+		this.addListener(this._self, "mouseup", this, "onMouseUp");
+		//this.addListener(this._self, "click", this, "onClick");
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
+		this.removeListener(this._self, "mouseover", this, "onMouseOver");
+		this.removeListener(this._self, "mouseout", this, "onMouseOut");
+		this.removeListener(this._self, "mousedown", this, "onMouseDown");
+		this.removeListener(this._self, "mouseup", this, "onMouseUp");
+		//this.removeListener(this._self, "click", this, "onClick");
 		this._app = null;
 		this._label = null;
 		_super.dispose.apply(this);
@@ -88,4 +55,47 @@ _class("BitButton", ToolButton, function(){
 			this._label.disabled = v;
 		}
 	};
+	this.onMouseOver = function(ev){
+		runtime.dom.addClass(this._self, "hover");
+		/*
+		this._self.style.borderLeft = "1px solid buttonhighlight";
+		this._self.style.borderTop = "1px solid buttonhighlight";
+		this._self.style.borderRight = "1px solid buttonshadow";
+		this._self.style.borderBottom = "1px solid buttonshadow";
+		*/
+	};
+	this.onMouseOut = function(ev){
+		var target = ev.target || ev.toElement;
+		if(!runtime.dom.contains(this._self, target)){
+			runtime.dom.removeClass(this._self, "hover");
+			runtime.dom.removeClass(this._self, "active");
+			//this._self.style.border = "1px solid buttonface";
+		}
+	};
+	this.onMouseDown = function(ev){
+		runtime.dom.addClass(this._self, "active");
+		/*
+		this._self.style.borderLeft = "1px solid buttonshadow";
+		this._self.style.borderTop = "1px solid buttonshadow";
+		this._self.style.borderRight = "1px solid buttonhighlight";
+		this._self.style.borderBottom = "1px solid buttonhighlight";
+		*/
+		var sender = ev.target || ev.srcElement;
+		//this._app.doAction(sender.getAttribute("_action"), sender);
+	};
+	this.onMouseUp = function(ev){
+		runtime.dom.replaceClass(this._self, "active", "hover");
+		/*
+		this._self.style.borderLeft = "1px solid buttonhighlight";
+		this._self.style.borderTop = "1px solid buttonhighlight";
+		this._self.style.borderRight = "1px solid buttonshadow";
+		this._self.style.borderBottom = "1px solid buttonshadow";
+		*/
+	};
+	/*
+	this.onClick = function(ev){
+		var sender = ev.target || ev.srcElement;
+		this._app.doAction(sender.getAttribute("_action"), sender);
+	};
+	*/
 });

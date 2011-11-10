@@ -37,8 +37,8 @@ _class("CodeEditor", Component, function(){
 					runtime.eventHandle(ev);
 				}, false);
 				zen_editor.bind(editor);
-				var code = _this._app._testcode;  //win._params.code;
-				editor.setCode(code);
+				//editor.setCode(win._params.code);
+				_this._app.loadFile(editor);
 			}
 		});
 		this._editor.wrapping.className = "ui-codeeditor";

@@ -1,33 +1,22 @@
 _package("alz.mui");
 
-_import("alz.mui.Pane");
+_import("alz.mui.BaseWindow");
 
 /**
  * 对话框组件
  */
-_class("Dialog", Pane, function(){
+_class("Dialog", BaseWindow, function(){
 	var KEY_ESC = 27;
-	var CURSORS = ["nw", "n", "ne", "w", "e", "sw", "s", "se"];
 	this._init = function(){
 		_super._init.call(this);
-		this._conf = null;
 		//对话框的双态特性，和PaneAppContent相似，主要用来屏蔽环境差异
 		this._ownerApp = null;  //身在曹营
-		this._app = null;       //心在汉
-		this._params = null;
+		//this._app = null;     //心在汉
 		this._skin = null;
-		this._head = null;
-		this._body = null;
 		this._caption = "对话框标题";
-		this._req = null;
-		this._btnClose = null;
-		this._borders = null;   //{Array}
 	};
 	this.create2 = function(conf, parent, app, params, ownerApp){
-		this.setConf(conf);
-		this.setParent2(parent);
-		this.setApp(app);
-		this.setParams(params);
+		_super.create2.apply(this, arguments);
 		this.setOwnerApp(ownerApp);
 	};
 	this.create = function(parent, app, params, tpl){
@@ -54,17 +43,8 @@ _class("Dialog", Pane, function(){
 		//this.fixedOffset();  //计算坐标修正的偏移量
 		this.initActionElements();
 		//this._skin = this._self.childNodes[0];
-		this._head = this._self.childNodes[1];
-		//this._btnClose = this._dom.selectNodes(this._head, "*")[1];
-		//this._body = this._self.childNodes[2];
-		var _this = this;
-		this._head.onmousedown = function(ev){
-			return _this.onMouseDown(ev || _this._win.event);
-		};
-		this._head.onselectstart = function(ev){
-			return false;
-		};
 		if(this._btnClose){
+			var _this = this;
 			this._btnClose.style.backgroundPosition = "-48px 0px";
 			this._btnClose.onselectstart = function(ev){return false;};
 			this._btnClose.ondragstart = function(ev){return false;};
@@ -101,54 +81,23 @@ _class("Dialog", Pane, function(){
 				ev.cancelBubble = true;
 			};
 		}
-		//this._createBorders();
-	};
-	this.reset = function(params){
-		this.setParams(params);
-	};
-	this.rendered = function(){
-		_super.rendered.apply(this);
+		//this.createBorders();
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
-		if(this._borders){
-			for(var i = 0, len = this._borders.length; i < len; i++){
-				this._borders[i] = null;
-			}
-		}
 		if(this._btnClose){
 			this._btnClose.onmousedown = null;
 			this._btnClose.ondragstart = null;
 			this._btnClose.onselectstart = null;
 			this._btnClose = null;
 		}
-		this._req = null;
-		this._body = null;
-		this._head.onselectstart = null;
-		this._head.onmousedown = null;
-		this._head = null;
-		this._params = null;
-		this._app = null;
 		this._ownerApp = null;
-		this._conf = null;
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){
 	};
-	this.setConf = function(v){
-		this._conf = v;
-	};
 	this.setOwnerApp = function(v){
 		this._ownerApp = v;
-	};
-	this.setApp = function(v){
-		this._app = v;
-	};
-	this.setParams = function(v){
-		this._params = v;
-	};
-	this.setReq = function(v){
-		this._req = v;
 	};
 	this.showModal = function(v){
 		_super.showModal.apply(this, arguments);
@@ -169,7 +118,7 @@ _class("Dialog", Pane, function(){
 		this._dom.setHeight(this._body, hh - 4 - 19);
 		this._dom.resizeElement(this._skin, w, h);
 		if(/*this._resizable && */this._borders){
-			this._resizeBorder(w, h);
+			this.resizeBorder(w, h);
 		}
 	};
 	this.close = function(){
@@ -179,40 +128,7 @@ _class("Dialog", Pane, function(){
 			this.setVisible(false);
 		}
 	};
-	this._createBorders = function(){
-		this._borders = [];
-		for(var i = 0, len = CURSORS.length; i < len; i++){
-			var o = this._createElement2(this._self, "div", "", {
-				"position": "absolute",
-				"overflow": "hidden",
-				"zIndex"  : 3,
-				"cursor"  : CURSORS[i] + "-resize"
-			});
-			//if(i % 2 == 0) o.style.backgroundColor = "red";
-			this._borders.push(o);
-			o = null;
-		}
-	};
-	this._resizeBorder = function(w, h){
-		var bw4 = 4, bw8 = 8;
-		this._setElementRect(this._borders[0], 0    , 0    , bw8    , bw8);
-		this._setElementRect(this._borders[1], bw8  , 0    , w-2*bw8, bw4);
-		this._setElementRect(this._borders[2], w-bw8, 0    , bw8    , bw8);
-
-		this._setElementRect(this._borders[3], 0    , bw8  , bw4    , h-2*bw8);
-		this._setElementRect(this._borders[4], w-bw4, bw8  , bw4    , h-2*bw8);
-
-		this._setElementRect(this._borders[5], 0    , h-bw8, bw8    , bw8);
-		this._setElementRect(this._borders[6], bw8  , h-bw4, w-2*bw8, bw4);
-		this._setElementRect(this._borders[7], w-bw8, h-bw8, bw8    , bw8);
-	};
-	this._setElementRect = function(obj, x, y, w, h, bg){
-		obj.style.left   = x + "px";
-		obj.style.top    = y + "px";
-		obj.style.width  = w + "px";
-		obj.style.height = h + "px";
-	};
-	/**
+	/*
 	 * [TODO]TT差出来的这两像素可能是由于 BODY 的默认边框宽度计算不准确导致的
 	 */
 	/*
@@ -252,8 +168,8 @@ _class("Dialog", Pane, function(){
 	this.onMouseDown = function(ev){
 		//if(runtime.ie) this._head.setCapture();
 		//var _this = this;
-		//this._head.onmousemove = function(ev){return _this.onMouseMove(ev || window.event);};
-		//this._head.onmouseup   = function(ev){return _this.onMouseUp(ev || window.event);};
+		//this.addListener(this._head, "mousemove", this, "onMouseMove");
+		//this.addListener(this._head, "mouseup", this, "onMouseUp");
 		this.setCapture(true);
 		//var pos = this._dom.getPos(ev.srcElement, this._self);
 		//window.document.title = pos.x + "+" + ev.offsetX + "=" + (pos.x + ev.offsetX) + "#" + ev.clientX
@@ -308,8 +224,8 @@ _class("Dialog", Pane, function(){
 		workspace = null;
 	};
 	this.onMouseUp = function(ev){
-		this._head.onmousemove = null;
-		this._head.onmouseup = null;
+		//this.removeListener(this._head, "mousemove");
+		//this.removeListener(this._head, "mouseup");
 		//if(runtime.ie) this._head.releaseCapture();
 		this.setCapture(false);
 	};
@@ -317,7 +233,7 @@ _class("Dialog", Pane, function(){
 		if(this._caption === v) return;
 		this._caption = v;
 		if(this._self){
-			this._head.childNodes[0].innerHTML = runtime.encodeHTML(v);
+			this._title.innerHTML = runtime.encodeHTML(v);
 		}
 	};
 	this.onKeyUp = function(ev){
@@ -327,26 +243,15 @@ _class("Dialog", Pane, function(){
 			break;
 		}
 	};
-	this.callback = function(){
-		var args = [this];  //回调函数的第一个参数一定是对话框组件本身
-		for(var i = 0, len = arguments.length; i < len; i++){
-			args.push(arguments[i]);
-		}
-		if(this._req){
-			this._req.func.apply(this._req.agent, args);
-			this._req = null;  //只允许被调用一次
-		}
+	this.setClientBgColor = function(color){
+		this._body.style.backgroundColor = color;
 	};
 	this.do_dlg_ok = function(act, sender){
 		this.callback(act, sender);
 	};
 	//点击取消
 	this.do_dlg_cancel = function(act, sender){
-		//this.setVisible(false);
 		this.showModal(false);
 		this.callback(act, sender);
-	};
-	this.setClientBgColor = function(color){
-		this._body.style.backgroundColor = color;
 	};
 });

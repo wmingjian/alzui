@@ -1,0 +1,12 @@
+/* 弹出式菜单 */
+.ui-popmenu{
+	position:absolute;z-index:3;*width:180px;min-width:100px;/*border:1px solid #808080;background-color:#F7F7F7;*/
+	/*border-left:1px solid #FFFFFF;border-top:1px solid #FFFFFF;border-right:1px solid #808080;border-bottom:1px solid #808080;*/
+	/*-moz-border-radius:2px;border-radius:2px;*/-moz-box-shadow:3px 3px 3px rgba(128, 128, 128, 0.8);box-shadow:2px 2px 2px rgba(128, 128, 128, 0.8);
+	background-color:#D4D0C8;border-width:2px;-webkit-border-image:url(../images/border-outset.gif) 2 stretch stretch;
+}
+.ui-popmenu ul{margin:1px;padding:0px;}
+.ui-popmenu li{list-style:none;}
+.ui-popmenu li a{text-decoration:none;display:block;vertical-align:middle;width:160px;height:16px;border:1px solid #D4D0C8;padding:0px 0px 0px 18px;font:8pt tahoma;line-height:16px;color:black;white-space:nowrap;}
+.ui-popmenu li a:hover{color:white;background-color:#0A246A;border:1px solid #0A246A;}
+.ui-popmenu li.sep{height:9px;font-size:9px;line-height:9px;background:url(../images/menu-sep.gif) repeat-x;border-left:1px solid #D4D0C8;border-right:1px solid #D4D0C8;}

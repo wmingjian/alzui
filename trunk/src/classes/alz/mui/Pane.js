@@ -11,6 +11,8 @@ _class("Pane", Container, function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._app = null;
+		this._params = null;  //参数
+		this._pid = "";       //pageid
 	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
@@ -27,6 +29,15 @@ _class("Pane", Container, function(){
 	};
 	this.setApp = function(v){
 		this._app = v;
+	};
+	this.setParams = function(v){
+		this._params = v;
+	};
+	this.getPid = function(){
+		return this._pid;
+	};
+	this.setPid = function(v){
+		this._pid = v;
 	};
 	/**
 	 * 通过模板名创建一组DOM元素

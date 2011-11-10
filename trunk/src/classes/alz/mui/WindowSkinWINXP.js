@@ -3,7 +3,7 @@ _package("alz.mui");
 _import("alz.mui.Component");
 
 /*
-	<div class="wui-skin">
+	<div class="ui-skin">
 		<div class="nw"></div>
 		<div class="n"></div>
 		<div class="ne"></div>
@@ -86,13 +86,13 @@ _class("WindowSkinWINXP", Component, function(){
 				this._parent[k]._cssData = this._cssHash[k];
 			}
 		}
-		var obj = this._createElement2(parent ? parent._self : null, "div", "wui-skin");
+		var obj = this._createElement2(parent ? parent._self : null, "div", "ui-skin");
 		this.init(obj);
 		return obj;
 	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
-		this._xpath = ".aui-Window-winxp";
+		this._xpath = ".ui-window-winxp";
 		//this._skins = [];
 		for(var i = 0, len = this._cursors.length; i < len; i++){
 			var o = this._createElement2(this._self, "div", this._cursors[i]/*, {
@@ -116,26 +116,20 @@ _class("WindowSkinWINXP", Component, function(){
 		this._self.appendChild(this._title2);
 		this._title1.src = runtime.getConfigData("pathimg") + "win-xp-title-bg1.gif";
 		this._title2.src = runtime.getConfigData("pathimg") + "win-xp-title-bg2.gif";
-		this._title1._dlg = this;
-		this._title2._dlg = this;
 		this._title1.ondragstart = function(){return false;};
 		this._title2.ondragstart = function(){return false;};
-		this._title1.onmousedown =
-		this._title2.onmousedown = function(ev){
-			this._dlg._parent.onMouseDown(ev || window.event);
-		};
+		this.addListener(this._title1, "mousedown", this._parent, "onMouseDown");
+		this.addListener(this._title2, "mousedown", this._parent, "onMouseDown");
 		this.setState("resizable");
 		//runtime.dom.applyCssStyle(this, _cssName, "resizable");
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
 		this._title = null;
-		this._title1.onmousedown = null;
-		this._title2.onmousedown = null;
+		this.removeListener(this._title1, "mousedown");
+		this.removeListener(this._title2, "mousedown");
 		this._title1.ondragstart = null;
 		this._title2.ondragstart = null;
-		this._title1._dlg = null;
-		this._title2._dlg = null;
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){
@@ -177,5 +171,11 @@ _class("WindowSkinWINXP", Component, function(){
 			this._title = this._title2;
 		}
 		this.resize(this._width, this._height);
+	};
+	this.setState = function(v){
+		if(v == this._state) return;
+		this._state = v;
+		//runtime.dom.applyCssStyle1(this, this._xpath, v);
+		runtime.dom.applyCssStyle(this, this._cssData, v);
 	};
 });

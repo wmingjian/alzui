@@ -1,0 +1,20 @@
+/**
+ * 控制台组件
+ */
+.ui-console{position:relative/*absolute*/;overflow:auto;width:567px;height:200px;margin:0px;border:1px solid #181818;padding:1px;color:#00B400;background-color:#000000;cursor:text}
+
+/* 行编辑组件 */
+.ui-lineedit{position:relative;overflow:hidden;height:12px;font:12px "Lucida Console","宋体";line-height:12px;white-space:nowrap;color:#33D011;background-color:#181818;margin-bottom:1px}
+.ui-lineedit span{font:12px "Lucida Console","宋体";line-height:12px}
+.ui-lineedit .cursor{position:relative;display:-moz-inline-box;display:inline-block;width:6px;height:12px;line-height:12px;color:#181818;background-color:#33D011}
+.ui-lineedit .gray{background-color:gray}
+.ui-lineedit .input{position:relative;top:-1px;/*width:100%;*/border:0px;padding:0px;margin:0px;line-height:100%;height:12px;color:lightgreen;background-color:transparent}
+.ui-lineedit .input{position:absolute;display:block;color:#FF0000;z-index:2;filter:alpha(opacity=80)}
+.ui-lineedit .input textarea{position:relative;overflow:hidden;margin:-1px;border:0px;height:13px;width:3px;font:12px "Lucida Console","宋体";line-height:14px;/*background:url(../images/input_bg.gif);*/}
+.ui-lineedit .in{color:lightgreen}
+.ui-lineedit .out{color:#888888}
+.ui-lineedit .sys{color:#00B400}
+.ui-lineedit .warn{color:#800000}
+.ui-lineedit .err{color:#FF0000}
+.ui-lineedit .dbg{color:gray}
+.ui-lineedit .log{color:#00B400;/*#808040font-style:italic;*/}

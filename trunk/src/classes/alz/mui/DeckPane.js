@@ -9,6 +9,7 @@ _class("DeckPane", Component, function(){
 	this._init = function(){
 		_super._init.call(this);
 		this._app = null;
+		this._conf = {};  //Pane类配置信息
 		this._hash = {};
 		this._activePane = null;  //当前活动的Pane页
 	};
@@ -50,6 +51,7 @@ _class("DeckPane", Component, function(){
 		var k = key.split("#")[0];
 		var conf = this._app.findConf("pane", k);
 		var pane = new conf.clazz();
+		pane.setPid(k);
 		pane.setData(conf);
 		pane.setParams(params);
 		if(parent instanceof Pane){
@@ -61,8 +63,10 @@ _class("DeckPane", Component, function(){
 		return pane;
 	};
 	this.navPane = function(pid, params){
+		params = params || {};
 		var pane = this.getPane2(pid, params);
 		if(this._activePane == pane){
+			pane.setVisible(true);
 			pane.reset(params);
 			return;
 		}

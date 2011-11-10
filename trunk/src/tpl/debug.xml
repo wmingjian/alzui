@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <template name="debug.tpl" type="html">
-	<div class="wui-PaneDebug" _layout="BorderLayout" _align="bottom">
+	<div class="ui-panedebug" _layout="BorderLayout" _align="bottom">
 		<div class="toolbar" _align="top">
 			<a href="#" _action="test_component">组件测试</a>
 			<span>|</span>

@@ -70,7 +70,7 @@ _class("TaskSchedule", Plugin, function(){
 		for(var i = 0, len = tasks.length; i < len; i++){
 			var task = tasks[i];
 			task.func.apply(task.agent);
-			task.status = "done";
+			task.setStatus("done");
 			task = null;
 		}
 		if(this._undoQueue.length >= 20){  //延迟批量清理策略
@@ -171,14 +171,21 @@ _class("TaskSchedule", Plugin, function(){
 	/**
 	 * 向任务发送所需数据(状态会变更为ready)
 	 */
-	this.send = function(tid, data){
+	this.send = function(tid, data, isArray){
 		//console.log("send " + tid);
 		var task = this._hash[tid];
-		if(task.status != "wait"){
+		if(task.status != "wait" && task.status != "hold"){
 			console.log("[TaskSchedule::send]task status error(task.status=" + task.status + ")");
 		}
-		task.ret = data;
-		task.status = "ready";
+		if(isArray){
+			for(var i = 0, len = data.length; i < len; i++){
+				task.args.push(data[i]);
+			}
+			//task.ret = data instanceof Array ? data : [data];
+		}else{
+			task.ret = data;
+		}
+		task.setStatus("ready");
 		this.addUndo(tid, task);
 	};
 	/**
@@ -187,7 +194,7 @@ _class("TaskSchedule", Plugin, function(){
 	this.ready = function(tid){
 		//console.log("ready " + tid);
 		var task = this._hash[tid];
-		task.status = "ready";
+		task.setStatus("ready");
 		this.addUndo(tid, task);
 	};
 	/**
@@ -196,7 +203,7 @@ _class("TaskSchedule", Plugin, function(){
 	this.cancel = function(tid){
 		//console.log("cancel " + tid);
 		var task = this._hash[tid];
-		task.status = "cancel";
+		task.setStatus("cancel");
 		this.addUndo(tid, task);
 	};
 	/**
@@ -204,7 +211,17 @@ _class("TaskSchedule", Plugin, function(){
 	 */
 	this.done = function(tid){
 		//console.log("done " + tid);
-		this._hash[tid].status = "done";
+		this._hash[tid].setStatus("done");
+	};
+	/**
+	 * 保留一个任务
+	 */
+	this.hold = function(tid){
+		var task = this._hash[tid];
+		task.setStatus("hold");
+		for(var i = 0, len = task.dependence.length; i < len; i++){
+			this.hold(task.dependence[i]);
+		}
 	};
 	this.checkThread = function(){
 		switch(this._status){
@@ -236,19 +253,22 @@ _class("TaskSchedule", Plugin, function(){
 			case "cancel":
 				task.time_begin =
 				task.time_end = new Date();
-				task.status = "quit";  //放弃
+				task.setStatus("quit");  //放弃
 				this.remove(tid);
 				break;
 			case "ready":
 				task.invoke(task.ret ? [task.ret] : []);
 				task.ret = null;
-				this.remove(tid);
+				if(task.status != "wait"){  //有可能被保留下来
+					this.remove(tid);
+				}
 				break;
 			case "quit":
 			case "done":
 				this.remove(tid);
 				break;
 			case "wait":
+			case "hold":
 				break;
 			default:
 				console.log("[warning]runloop status error(" + task.status + ")");
@@ -288,7 +308,7 @@ _class("TaskSchedule", Plugin, function(){
 				this.pop();
 				task.time_begin =
 				task.time_end = new Date();
-				task.status = "quit";  //放弃
+				task.setStatus("quit");  //放弃
 				break;
 			case "ready":
 				this.pop();  //提前出栈，放置后面的流程有压栈动作
@@ -339,7 +359,7 @@ _class("TaskSchedule", Plugin, function(){
 			if(task.status == "cancel"){  //已经取消的任务，放弃处理
 				task.time_begin =
 				task.time_end = new Date();
-				task.status = "quit";  //放弃
+				task.setStatus("quit");  //放弃
 			}else if(task.status == "done"){
 			}else{
 				task.invoke(data ? [data] : []);
@@ -353,7 +373,7 @@ _class("TaskSchedule", Plugin, function(){
 	this.cancelTop = function(){
 		if(this._stack.length > 0){
 			var task = this.top();
-			task.status = "cancel";
+			task.setStatus("cancel");
 			return task.id;
 		}
 	};

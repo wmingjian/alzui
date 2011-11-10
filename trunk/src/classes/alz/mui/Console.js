@@ -22,16 +22,16 @@ _class("Console", Component, function(){
 	this.create = function(parent, app){
 		this.setParent2(parent);
 		this._app = app;
-		var obj = this._createElement2(parent, "div", "aui-Console");
+		var obj = this._createElement2(parent, "div", "ui-console");
 		this.init(obj);
 		return obj;
 	};
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
-		//<div class="aui-LineEdit">&gt;<input class="input" type="text" value="" /></div>
+		//<div class="ui-lineedit">&gt;<input class="input" type="text" value="" /></div>
 		//this.setFont("12px 宋体");
 		/*
-		this._lastLine = this._createElement2("div", "aui-LineEdit", {
+		this._lastLine = this._createElement2("div", "ui-lineedit", {
 			"backgroundColor": "#888888",
 			"innerHTML"      : encodeHTML(this._prompt)
 		});
@@ -55,9 +55,7 @@ _class("Console", Component, function(){
 			};
 			window.document.addEventListener("keydown", this.__onkeydown, false);
 		}else{
-			this._self.onkeydown = function(ev){
-				return this._ptr._lineEdit.onKeyDown(ev || window.event, this._ptr._lineEdit._self);
-			};
+			this.addListener(this._self, "keydown", this._lineEdit, "onKeyDown");
 		}
 		//this._lastLine = this._lineEdit._self;
 		this._lineEdit.setIomode("out");
@@ -78,7 +76,7 @@ _class("Console", Component, function(){
 		if(!runtime.ie){
 			window.document.removeEventListener("keydown", this.__onkeydown, false);
 		}else{
-			this._self.onkeydown = null;
+			this.removeListener(this._self, "keydown");
 		}
 		this._self.onblur = null;
 		this._self.onfocus = null;
@@ -148,13 +146,13 @@ _class("Console", Component, function(){
 		return this._callback;
 	};
 	this.insertBlankLine = function(){
-		var line = this._createElement2(this._self, "div", "aui-LineEdit");
+		var line = this._createElement2(this._self, "div", "ui-lineedit");
 		this._lines.push(line);
 		return line;
 	};
 	this.insertLine = function(text, refNode, type){
 		var line = this._createElement("div");
-		line.className = "aui-LineEdit";
+		line.className = "ui-lineedit";
 		if(text){
 			//line.innerHTML = runtime.encodeHTML(text);
 			var span = this._createElement2(line, "span", type);

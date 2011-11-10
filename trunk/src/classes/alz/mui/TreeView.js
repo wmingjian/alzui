@@ -1,6 +1,6 @@
 _package("alz.mui");
 
-_import("alz.tools.filemanager.FileType");
+_import("alz.util.FileType");
 _import("alz.mui.Component");
 _import("alz.mui.TreeNode");
 
@@ -8,6 +8,9 @@ _import("alz.mui.TreeNode");
  * TreeView 类
  */
 _class("TreeView", Component, function(){
+	var KEY_TAB       = 9;   //'\t'
+	var KEY_ENTER     = 13;  //'\n'
+	var KEY_ESC       = 27;
 	this._init = function(){
 		_super._init.call(this);
 		this._pathSkin = "images/";
@@ -20,11 +23,12 @@ _class("TreeView", Component, function(){
 		this._dragOverNode = null;
 		this._captureComponent = null;
 		this._activePopup = null;
+		this._readonly = true;
 	};
 	this.create = function(parent, data, w, h){
 		this.setParent2(parent);
 		if(data) this._data = data;
-		var obj = this._createElement2(null, "ul", !this._tree ? "aui-TreeView" : "", {  //只有最外层的 TreeView 才有该样式
+		var obj = this._createElement2(null, "ul", !this._tree ? "ui-treeview" : "", {  //只有最外层的 TreeView 才有该样式
 			"display": "none"
 		});
 		if(w) obj.style.width = typeof w == "string" ? w : w + "px";
@@ -80,11 +84,14 @@ _class("TreeView", Component, function(){
 		}
 		_super.dispose.apply(this);
 	};
+	this.getReadonly = function(){
+		return this._readonly;
+	};
 	this.setTree = function(v){
 		this._tree = v;
 	};
 	this.loadData = function(){
-		window.alert("TreeView::loadData方法必须被使用者重载，以实现特定的数据加载方式");
+		runtime.error("[TreeView::loadData]当前方法必须被使用者重载，以实现特定的数据加载方式");
 	};
 	this.getActiveNode = function(){
 		return this._activeNode;
@@ -104,33 +111,15 @@ _class("TreeView", Component, function(){
 		if(!this._input){
 			this._input = this._createElement("input");
 			this._input.type = "text";
+			this.addListener(this._input, "keydown", this, "onKeyDown");
 			var _this = this;
-			this._input.onkeydown = function(ev){
-				ev = ev || window.event;
-				runtime.addThread(0, _this, "autoSizeInput");
-				switch(ev.keyCode){
-				case KEY_ESC:
-					if(_this._activeNode){
-						_this._activeNode.cancelRename();
-						_this._activePopup = null;
-					}
-					ev.cancelBubble = true;
-					return false;
-				case KEY_TAB:
-				case KEY_ENTER:
-					if(_this._activeNode){
-						_this._activeNode.doRename(this.value);
-						_this._activePopup = null;
-					}
-					break;
-				}
-				return true;
-			};
-			this._input.doEvent = function(ev, target){
+			this._input.handleEvent = function(ev, target){
 				switch(ev.type){
 				case "mousedown":
-					if(target != this){  // && _this._activeNode && _this._activeNode._modify
-						_this._activeNode.doRename(this.value);
+					if(!_this._readonly){
+						if(target != this){  //&& _this._activeNode && _this._activeNode._modify
+							_this._activeNode.doRename(this.value);
+						}
 					}
 					break;
 				case "mouseup":
@@ -138,8 +127,8 @@ _class("TreeView", Component, function(){
 					break;
 				case "click":
 					//!!!也不能是LI，因为mousedown不来源自input
-					if(!_this._activeNode) window.alert("error");
-					if(target == this.parentNode) window.alert("[input]target == this.parentNode");
+					if(!_this._activeNode) runtime.error("error");
+					if(target == this.parentNode) runtime.error("[input]target == this.parentNode");
 					if(target != this && target != this.parentNode && target != _this._activeNode._label.getElement()){
 						_this._activePopup = null;
 					}
@@ -158,6 +147,28 @@ _class("TreeView", Component, function(){
 		this.autoSizeInput();
 		return this._input;
 	};
+	this.onKeyDown = function(ev){
+		runtime.addThread(0, this, "autoSizeInput");
+		switch(ev.keyCode){
+		case KEY_ESC:
+			if(this._activeNode){
+				this._activeNode.cancelRename();
+				this._activePopup = null;
+			}
+			ev.cancelBubble = true;
+			return false;
+		case KEY_TAB:
+		case KEY_ENTER:
+			if(!this._readonly){
+				if(this._activeNode){
+					this._activeNode.doRename(this.value);
+					this._activePopup = null;
+				}
+			}
+			break;
+		}
+		return true;
+	};
 	this.autoSizeInput = function(){
 		var size = runtime.getTextSize(this._input.value, "12px 宋体");
 		this._input.style.width = Math.max(28/*32*/, Math.min(90, size.w + 11)) + "px";  //max-width: this._self.offsetWidth - 14
@@ -169,7 +180,7 @@ _class("TreeView", Component, function(){
 		var ret;
 		var control = this.getControl(target) || this;
 		if(/*ev.type == "mousedown" && */this._activePopup){
-			ret = this._activePopup.doEvent(ev, target);
+			ret = this._activePopup.handleEvent(ev, target);
 		}else{
 			if(ev.type == "mousedown" && control && !this._captureComponent){
 				this._captureComponent = control;
@@ -177,8 +188,8 @@ _class("TreeView", Component, function(){
 			if(this._captureComponent){
 				control = this._captureComponent;
 			}
-			if(control && control.doEvent){
-				ret = control.doEvent(ev, target);
+			if(control && control.handleEvent){
+				ret = control.handleEvent(ev, target);
 			}
 			if(ev.type == "click"){
 				this._captureComponent = null;
@@ -198,7 +209,7 @@ _class("TreeView", Component, function(){
 		control = null;
 		return ret;
 	};
-	this.doEvent = function(ev, target){
+	this.handleEvent = function(ev, target){
 		switch(ev.type){
 		case "mousedown":
 			break;
