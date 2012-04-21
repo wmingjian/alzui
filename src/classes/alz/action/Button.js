@@ -26,7 +26,6 @@ _class("Button", ActionElement, function(){
 			rows[i].onmouseover = function(){if(_this._disabled) return; this.className = "onHover";};
 			rows[i].onmouseout = function(){if(_this._disabled) return; this.className = "normal";};
 		}
-		rows = null;
 		*/
 	};
 	this.dispose = function(){
@@ -44,7 +43,6 @@ _class("Button", ActionElement, function(){
 			/*if(v){
 				var btn = this._self.getElementsByTagName("div")[0];
 				if(btn) btn.style.backgroundImage = "url(http://www.sinaimg.cn/rny/sinamail421/images/comm/icon_btn.gif)";
-				btn = null;
 			}*/
 		}
 	};

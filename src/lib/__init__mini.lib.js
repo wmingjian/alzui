@@ -2,10 +2,14 @@ import alz.copyright;
 /**
  * 框架基础库
  */
+import alz.util;
 (function(__global){  // Using a closure to keep global namespace clean.
 
 //import alz.changelog;
+import alz.Profile;
 import alz.init;
+import alz.Clazz;
+import alz.LibContext;
 
 }(this)).regLib("__init__", "", function(){with(arguments[0]){
 
@@ -30,9 +34,10 @@ import alz.core.TableIndex;
 import alz.core.TableFilter;
 import alz.core.MetaTable;
 import alz.core.DataModel;
-import alz.core.TagLib;
 import alz.template.TemplateElement;
+import alz.template.TplDocument;
 import alz.template.TemplateObject;
+import alz.core.TagLib;
 import alz.template.TrimPath;
 import alz.template.Template;
 import alz.template.ParseError;
@@ -41,6 +46,8 @@ import alz.template.TemplateManager;
 import alz.core.HistoryManager;
 import alz.core.Application;
 import alz.core.AppManager;
+import alz.core.Element;
+import alz.core.EventManager;
 import alz.core.WebRuntime;
 import alz.core.WebRuntime_init;
 

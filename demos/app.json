@@ -1,0 +1,13 @@
+{
+	"name": "demos.app",
+	"title": "alzui-mini框架演示应用",
+	"pathcss": "res/css/",
+	"pathimg": "res/images/",
+	"pathlib": "lib/",
+	"css": "demos.css",
+	"lib": "demos.tpl,demos.lib",
+	"conf": {
+		"debug": true
+	},
+	"active": true
+}

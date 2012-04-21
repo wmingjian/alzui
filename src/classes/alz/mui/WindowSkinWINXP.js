@@ -105,7 +105,6 @@ _class("WindowSkinWINXP", Component, function(){
 			}*/);
 			//this._skins.push(o);
 			this._ee["_skin" + i] = o;
-			o = null;
 		}
 		this._ee["_title1"] =
 		this._title =

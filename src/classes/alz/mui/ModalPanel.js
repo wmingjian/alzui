@@ -46,7 +46,7 @@ _class("ModalPanel", Component, function(){
 		for(var i = 0, len = this._targetList.length; i < len; i++){
 			this._targetList[i] = null;
 		}
-		this._targetList = [];
+		this._targetList.length = 0;
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){
@@ -85,7 +85,6 @@ _class("ModalPanel", Component, function(){
 		//	Math.max(screen.scrollWidth, screen.clientWidth),
 		//	Math.max(screen.scrollHeight, screen.clientHeight)
 		//);
-		//screen = null;
 		this.setVisible(true);  //!!v
 		this.setZIndex(runtime.getNextZIndex());
 	};

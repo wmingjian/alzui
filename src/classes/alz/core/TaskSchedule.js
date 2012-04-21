@@ -34,7 +34,7 @@ _class("TaskSchedule", Plugin, function(){
 		for(var i = 0, len = this._undoQueue.length; i < len; i++){
 			this._undoQueue[i] = null;
 		}
-		this._undoQueue = [];
+		this._undoQueue.length = 0;
 		*/
 		for(var k in this._hash){
 			this._hash[k].dispose();
@@ -71,7 +71,6 @@ _class("TaskSchedule", Plugin, function(){
 			var task = tasks[i];
 			task.func.apply(task.agent);
 			task.setStatus("done");
-			task = null;
 		}
 		if(this._undoQueue.length >= 20){  //延迟批量清理策略
 			var i = 0;

@@ -33,7 +33,7 @@ _class("TabPage", Component, function(){
 			this._tabs[i]._parent = this;
 			this._tabs[i] = null;
 		}
-		this._tabs = [];
+		this._tabs.length = 0;
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){
@@ -48,7 +48,6 @@ _class("TabPage", Component, function(){
 			nodes[i].style.width = (w - 4 - 16) + "px";
 			nodes[i].style.height = (h - 18 - 4) + "px";
 		}
-		nodes = null;
 	};
 	this.add = function(text){
 		var obj = window.document.createElement("label");

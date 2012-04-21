@@ -459,7 +459,6 @@ _class("AnimationEngine", Plugin, function(){
 				element.data(el, "width"  , element.width(el));
 				element.data(el, "opacity", element.css(el, "opacity"));
 			//}
-			element = null;
 			if(!speed){
 				speed = speeds._default;
 			}else if(typeof speed == "string"){

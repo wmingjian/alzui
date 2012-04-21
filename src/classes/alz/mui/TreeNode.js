@@ -240,7 +240,6 @@ _class("TreeNode", Component, function(){
 		}
 		runtime.addThread(0, this, function(){
 			input.select();
-			input = null;
 		});
 		this._label.setVisible(false);
 	};

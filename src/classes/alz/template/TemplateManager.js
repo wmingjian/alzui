@@ -530,7 +530,6 @@ _class("TemplateManager", Plugin, function(){
 		for(var i = 0, len = nodes.length; i < len; i++){
 			sb.push(this.node2html(nodes[i]));
 		}
-		nodes = null;
 		return sb.join("");
 	};
 	this._hashTag = {"meta":1,"link":1,"img":1,"input":1,"br":1};
@@ -566,7 +565,6 @@ _class("TemplateManager", Plugin, function(){
 				for(var i = 0, len = nodes.length; i < len; i++){
 					sb.push(this.node2html(nodes[i]));
 				}
-				nodes = null;
 				sb.push("</" + tagName + ">");
 			}else{
 				if(tagName in this._hashTag){

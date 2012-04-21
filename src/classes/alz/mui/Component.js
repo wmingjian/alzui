@@ -126,7 +126,6 @@ _class("Component", EventTarget, function(){
 		for(var i = 0, len = imps.length; i < len; i++){
 			imps[i].init.call(this, obj, style);  //执行接口的init方法
 		}
-		imps = null;
 
 		this._position = this.getPropertyValue(style, "position");
 		this._visible = this.getPropertyValue(style, "display") != "none";
@@ -666,7 +665,6 @@ _class("Component", EventTarget, function(){
 			}catch(ex){
 			}
 		}
-		panel = null;
 	};
 	/**
 	 * @method setElementRect
@@ -717,7 +715,6 @@ _class("Component", EventTarget, function(){
 						obj.style[name] = style[k][key];
 					}
 				}
-				obj = null;
 			}else{
 				var name = this._cssKeyToJsKey(k);
 				if(el.style[name] != style[k]){

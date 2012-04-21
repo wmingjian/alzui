@@ -64,7 +64,6 @@ _class("BoxElement", "", function(){
 					var node = new BoxElement();
 					node.create(this, data[k][i]);
 					this.appendNode(node);
-					node = null;
 				}
 			}else{
 				this.setattr(k, data[k]);
@@ -98,9 +97,7 @@ _class("BoxElement", "", function(){
 				if(node.nodeType == 1 && node.getAttribute("_align")){
 					this.appendNode(new BoxElement(node, this));
 				}
-				node = null;
 			}
-			nodes = null;
 			//runtime.log(this._self.tagName + "----" + this._nodes.length);
 		}
 		this._self.style.margin = "0px";

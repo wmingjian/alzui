@@ -37,17 +37,17 @@ _class("AnimateData", "", function(){
 		for(var i = 0, len = this._stopList.length; i < len; i++){
 			this._stopList[i] = null;
 		}
-		this._stopList = [];
+		this._stopList.length = 0;
 		for(var i = 0, len = this._startList.length; i < len; i++){
 			this._startList[i] = null;
 		}
-		this._startList = [];
+		this._startList.length = 0;
 		*/
 		for(var i = 0, len = this._list.length; i < len; i++){
 			this._list[i].dispose();
 			this._list[i] = null;
 		}
-		this._list = [];
+		this._list.length = 0;
 		this._startTime = 0;
 		this._stopTime = 0;
 		this._engine = null;

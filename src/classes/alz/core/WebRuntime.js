@@ -210,7 +210,6 @@ _class("WebRuntime", "", function(){
 			var plugin = plugins[i];
 			this._preLoadFile("css", this._pathPlugin + plugin + "/css/", [plugin + ".css"]);
 			this._preLoadFile("js" , this._pathPlugin + plugin + "/js/" , [plugin + ".js" ]);
-			plugin = null;
 		}
 	};
 	/**
@@ -280,7 +279,7 @@ _class("WebRuntime", "", function(){
 			this._components[i].dispose();
 			this._components[i] = null;
 		}
-		this._components = [];
+		this._components.length = 0;
 		this._testDiv = null;
 		this._info = null;
 		this._appManager.dispose();
@@ -449,7 +448,6 @@ _class("WebRuntime", "", function(){
 		if(rt && this._config["codeprovider"] == ""){
 			this._config["codeprovider"] = rt._config["codeprovider"];
 		}
-		rt = null;
 		var config = this._config;
 		var conf = this._conf;
 		for(var k in config){
@@ -468,8 +466,6 @@ _class("WebRuntime", "", function(){
 				}
 			});
 		}
-		conf = null;
-		config = null;
 
 		//路径检测
 
@@ -513,7 +509,6 @@ _class("WebRuntime", "", function(){
 					obj.charset = "utf-8";
 					obj.src = url;
 					this._doc.documentElement.appendChild(obj);
-					obj = null;
 				}
 			}
 		}
@@ -535,12 +530,10 @@ _class("WebRuntime", "", function(){
 				link.media = "all";
 				link.href  = url;
 				this._domScript.parentNode.appendChild(link, this._domScript);
-				link = null;
 			}else if(ext == "js"){
 				var loader = new ScriptLoader();
 				loader.create(this, function(){});
 				loader.load(url, "", true);  //this.getUrlByName(lib)
-				loader = null;
 			}
 		}
 	};
@@ -738,7 +731,6 @@ _class("WebRuntime", "", function(){
 				return  x[0];
 			};
 		}
-		_p = null;
 	};
 	this.addOnLoad = function(agent, func){
 		this._funs.push({
@@ -1042,7 +1034,6 @@ _class("WebRuntime", "", function(){
 					libConf.init.apply(this);  //绑定在 runtime 对象上面，这是对runtime对象的一种扩展机制
 					libConf._inited = true;
 				}
-				libConf = null;
 			}
 		}else{  //找不到，则认为库已经加载完毕
 			console.log(lib);

@@ -78,7 +78,6 @@ _class("BorderLayout", AbstractLayout, function(){
 				//node.style.overflow = "auto";
 			}
 		}
-		nodes = null;
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
@@ -90,7 +89,7 @@ _class("BorderLayout", AbstractLayout, function(){
 			//}
 			nodes[i] = null;
 		}
-		this._nodes = [];
+		this._nodes.length = 0;
 		this._self = null;
 		this._component = null;
 		_super.dispose.apply(this);
@@ -117,9 +116,6 @@ _class("BorderLayout", AbstractLayout, function(){
 			layout.init(cell);
 			layout.layoutElement(Math.max(0, w - 12), Math.max(0, h - 22));
 			layout.dispose();
-			layout = null;
-			cell = null;
-			tbl = null;
 		}else if(this._self.tagName != "BODY" && this._self.tagName != "TD"){
 			if(w) runtime.dom.setWidth(this._self, w);
 			if(h) runtime.dom.setHeight(this._self, h);
@@ -133,7 +129,6 @@ _class("BorderLayout", AbstractLayout, function(){
 				if(node != this._clientNode){
 					hh += runtime.dom.getHeight(node);
 				}
-				node = null;
 			}
 			var h_client = h - hh;
 			hh = 0;
@@ -148,9 +143,7 @@ _class("BorderLayout", AbstractLayout, function(){
 					borderLayout.init(node);
 					borderLayout.layoutElement(node.clientWidth, node.clientHeight);
 					borderLayout.dispose();
-					borderLayout = null;
 				}
-				node = null;
 			}
 		}else{  //this._direction == "horizontal"
 			//横向布局使用绝对定位，marginRight在其中并不起什么实际的作用，只是在计算两个结点之间margin时有用
@@ -163,7 +156,6 @@ _class("BorderLayout", AbstractLayout, function(){
 				if(node != this._clientNode){
 					ww += runtime.dom.getWidth(node);
 				}
-				node = null;
 			}
 			var w_client = w - ww;
 			ww = 0;
@@ -188,9 +180,7 @@ _class("BorderLayout", AbstractLayout, function(){
 					borderLayout.init(node);
 					borderLayout.layoutElement(node.clientWidth, node.clientHeight);
 					borderLayout.dispose();
-					borderLayout = null;
 				}
-				node = null;
 			}
 		}
 	};
@@ -215,7 +205,6 @@ _class("BorderLayout", AbstractLayout, function(){
 			if(node.className in CLASSES) continue;
 			if(node.style.display == "none") continue;
 			this._nodes.push(node);
-			node = null;
 		}
 		return this._nodes;
 	};
@@ -234,7 +223,6 @@ _class("BorderLayout", AbstractLayout, function(){
 				node.__ptr__ = new BoxElement(node, runtime.dom);
 			}
 			nodes.push(node.__ptr__);
-			node = null;
 		}
 		return nodes;
 	};
@@ -264,7 +252,6 @@ _class("BorderLayout", AbstractLayout, function(){
 			}else{  //i == len - 1 考虑最后一个元素的marginRight
 				nn += node._marginRight;
 			}
-			node = null;
 		}
 		return w - nn;
 	};
@@ -290,7 +277,6 @@ _class("BorderLayout", AbstractLayout, function(){
 //				console.log(nn)
 //			}
 //			nn += top;
-			node = null;
 		}
 		return h - nn;
 	};
@@ -317,10 +303,7 @@ _class("BorderLayout", AbstractLayout, function(){
 			layout.init(cell);
 			layout.layoutElement(Math.max(0, w - 12), Math.max(0, h - 22));
 			layout.dispose();
-			layout = null;
 			*/
-			cell = null;
-			tbl = null;
 			return;
 		}else if(this._self.tagName != "BODY" && this._self.tagName != "TD"){
 			//window.alert(this._self.tagName + "," + w + "," + h);
@@ -357,7 +340,6 @@ _class("BorderLayout", AbstractLayout, function(){
 				}else{  //i == len - 1 考虑最后一个元素的marginBottom
 					nn += node._marginBottom;
 				}
-				node = null;
 			}
 		}else{  //this._direction == "horizontal"
 			//横向布局使用绝对定位，marginRight在其中并不起什么实际的作用，只是在计算两个结点之间margin时有用
@@ -385,13 +367,11 @@ _class("BorderLayout", AbstractLayout, function(){
 				}else{  //i == len - 1 考虑最后一个元素的marginRight
 					nn += node._marginRight;
 				}
-				node = null;
 			}
 		}
 		for(var i = 0, len = nodes.length; i < len; i++){
 			nodes[i].dispose();
 			nodes[i] = null;
 		}
-		nodes = null;
 	};
 });

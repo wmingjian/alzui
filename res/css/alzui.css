@@ -1,20 +1,20 @@
 @charset "utf-8";
 
-@import "ui-workspace.css";
-@import "ui-modalpanel.css";
-@import "ui-window.css";
-@import "ui-window-skin.css";
-@import "ui-dialog.css";
-@import "ui-toolwin.css";
-@import "ui-lineedit.css";
-@import "ui-listbox.css";
-@import "ui-table.css";
-@import "ui-popup.css";
-@import "ui-popmenu.css";
-@import "ui-menubar.css";
-@import "ui-toolbar.css";
-@import "ui-statusbar.css";
-@import "ui-treeview.css";
+@import url("ui-workspace.css");
+@import url("ui-modalpanel.css");
+@import url("ui-window.css");
+@import url("ui-window-skin.css");
+@import url("ui-dialog.css");
+@import url("ui-toolwin.css");
+@import url("ui-lineedit.css");
+@import url("ui-listbox.css");
+@import url("ui-table.css");
+@import url("ui-popup.css");
+@import url("ui-popmenu.css");
+@import url("ui-menubar.css");
+@import url("ui-toolbar.css");
+@import url("ui-statusbar.css");
+@import url("ui-treeview.css");
 
 /* 公共样式 */
 html,body{position:relative;overflow:hidden;width:100%;height:100%;margin:0px;border:none;padding:0px;/*background-color:background;*/}

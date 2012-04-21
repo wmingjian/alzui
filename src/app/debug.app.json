@@ -1,10 +1,10 @@
 {
-	id:"debug",
-	title:"框架提供的调试应用",
-	conf:[0,0,0,1],
-	libName:"debug",
-	className:"AppDebug",
-	css:"debug.css",
-	tpl:"debug.tpl",
-	lib:"core.lib,ui.lib,#debug.lib"
+	"id": "debug",
+	"title": "框架提供的调试应用",
+	"conf": [0,0,0,1],
+	"libName": "debug",
+	"className": "AppDebug",
+	"css": "debug.css",
+	"tpl": "debug.tpl",
+	"lib": "core.lib,ui.lib,#debug.lib"
 }

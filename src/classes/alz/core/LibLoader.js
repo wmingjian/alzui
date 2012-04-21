@@ -21,7 +21,7 @@ _class("LibLoader", "", function(){
 	this.dispose = function(){
 		if(this._disposed) return;
 		this._agent = null;
-		this._libs = [];
+		this._libs.length = 0;
 		this._appConf = null;
 		_super.dispose.apply(this);
 	};
@@ -146,7 +146,6 @@ _class("LibLoader", "", function(){
 				}
 			});
 			loader.load([this.getUrlByName(lib)], "", true);
-			loader = null;
 		}
 	};
 	this._onLoad = function(){
@@ -161,7 +160,6 @@ _class("LibLoader", "", function(){
 				var loader = new ScriptLoader();
 				loader.create(this, function(){
 					this._start();  //加载完毕，再开始加载剩余的库文件
-					loader = null;
 				});
 				loader.load([runtime.getConfigData("pathlib") + runtime.getConfData("product")], "", true);
 			}else{
@@ -171,7 +169,6 @@ _class("LibLoader", "", function(){
 			argv[2] = true;  //表示加载完毕
 			func.apply(this._agent, argv);
 		}
-		func = null;
 	};
 	this.getLibConf = function(lib){
 		if(lib.type == "tpl"){

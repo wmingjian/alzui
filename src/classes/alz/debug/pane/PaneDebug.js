@@ -149,8 +149,6 @@ _class("PaneDebug", Pane, function(){
 			if(plugin.create(obj)){  //插件创建成功的话
 				plugin.init();
 			}
-			plugin = null;
-			obj = null;
 		//});
 	};
 });

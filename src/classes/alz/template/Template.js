@@ -44,7 +44,6 @@ _class("Template", "", function(){
 		try{
 			var func = this._func;
 			func(resultOut, context, flags);
-			func = null;
 		}catch(ex){
 			if(flags.throwExceptions == true){
 				throw ex;

@@ -1,0 +1,13 @@
+{
+	"name": "docs.app",
+	"title": "alzui-mini框架文档中心",
+	"pathcss": "res/css/",
+	"pathimg": "res/images/",
+	"pathlib": "lib/",
+	"css": "c3.css,docs.css",
+	"lib": "docs.tpl,docs.lib",
+	"conf": {
+		"debug": true
+	},
+	"active": true
+}

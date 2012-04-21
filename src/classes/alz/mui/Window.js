@@ -146,7 +146,6 @@ _class("Window", BaseWindow, function(){
 		this.setElementRect(this._head, n,  n, w - 2 * n,     h0 - n - 1);
 		this.setElementRect(this._body, n, h0, w - 2 * n, h - h0 - n    );
 		this._title.style.width = (w - 2 * n - m["icon_width"] - m["sbtn_width"] * 3 - 2 * m["sep_num"]) + "px";
-		m = null;
 	};
 	//窗体最大化
 	this.do_win_max = function(act, sender){

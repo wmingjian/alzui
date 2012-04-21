@@ -101,7 +101,6 @@ _class("SysBtn", Component, function(){
 		if(runtime._host.env == "ie"){
 			body.releaseCapture();
 		}
-		body = null;
 		*/
 	};
 });

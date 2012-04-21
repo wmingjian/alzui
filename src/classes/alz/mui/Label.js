@@ -41,7 +41,6 @@ _class("Label", Component, function(){
 			}else{
 				this._ptr.applyCssStyle(this, _css, "over");
 			}
-			node = null;
 		};
 		this._self.onmouseout = function(){
 			if(_this._parent._tree.getActiveNode() == _this._parent) return;

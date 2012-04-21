@@ -19,7 +19,7 @@ _class("Container", Component, function(){
 			this._nodes[i].dispose();
 			this._nodes[i] = null;
 		}
-		this._nodes = [];
+		this._nodes.length = 0;
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){
@@ -105,6 +105,5 @@ _class("Container", Component, function(){
 				break;
 			}
 		}
-		nodes = null;
 	};
 });

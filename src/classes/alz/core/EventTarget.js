@@ -105,7 +105,6 @@ _class("EventTarget", "", function(){
 				this._listener[k] = listener[k];
 			}
 		}
-		//maps = null;
 	};
 	*/
 	this.fireEvent1 = function(ev){
@@ -142,7 +141,6 @@ _class("EventTarget", "", function(){
 				//this._self.removeEventListener(maps[i], null, false);
 			}
 		}
-		maps = null;
 		//this._listener = null;
 	};
 	*/

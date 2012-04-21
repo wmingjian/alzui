@@ -75,7 +75,6 @@ _class("Application", EventTarget, function(){
 					case 1: ret = o.agent[o.func](ev);break;
 					case 2: ret = o.func.apply(o.agent, [ev]);break;
 					}
-					o = null;
 					return ret;
 				}
 			};

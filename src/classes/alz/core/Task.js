@@ -38,7 +38,7 @@ _class("Task", "", function(){
 	};
 	this.dispose = function(){
 		this.ret = null;
-		this.args = [];
+		this.args.length = 0;
 		this.func = null;
 		this.agent = null;
 		this._parent = null;

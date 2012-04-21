@@ -56,7 +56,7 @@ _class("SelectionManager", "", function(){
 		if(this._disposed) return;
 		this.unbindEvent();
 		this._lastActiveItem = null;
-		this._activeItems = [];
+		this._activeItems.length = 0;
 		this._list = null;
 		_super.dispose.apply(this);
 	};
@@ -80,7 +80,6 @@ _class("SelectionManager", "", function(){
 		for(var i = 0, len = items.length; i < len; i++){
 			this.itemBindEvent(items[i]);
 		}
-		items = null;
 	};
 	this.unbindEvent = function(){
 		var items = this._list.getItems();
@@ -92,7 +91,6 @@ _class("SelectionManager", "", function(){
 				items[i]._evFlag = false;
 			}
 		}
-		items = null;
 	};
 	this.getActiveItems = function(){
 		return this._activeItems;
@@ -182,12 +180,8 @@ _class("SelectionManager", "", function(){
 						}
 					}
 				}
-				obj = null;
 			}
 			this.selectItems(list, list0);
-			items = null;
-			list = null;
-			list0 = null;
 		//}
 		if(this._list.onItemCancel && !item._active){
 			this._list.onItemCancel(item);
@@ -206,7 +200,6 @@ _class("SelectionManager", "", function(){
 		for(var i = 0, len = list0.length; i < len; i++){
 			this._list.activeItem(items[i], list0[i]);
 		}
-		items = null;
 	};
 	/**
 	 * 把全部项目设置为选中或非选中状态
@@ -228,8 +221,6 @@ _class("SelectionManager", "", function(){
 			this._activeItems = [];
 			this._lastActiveItem = null;
 		}
-		items = null;
-		items0 = null;
 		if(this._list.onSelectChange){
 			this._list.onSelectChange(this._lastActiveItem);
 		}
@@ -242,8 +233,7 @@ _class("SelectionManager", "", function(){
 		for(var i = 0, len = items.length; i < len; i++){
 			this._list.activeItem(items[i], false);
 		}
-		items = null;
-		this._activeItems = [];
+		this._activeItems.length = 0;
 	};
 	/**
 	 * 把某个项目置为非选中状态

@@ -1,5 +1,9 @@
 import alz.copyright;
-(function(){with(runtime.createContext("ui_action")){
+/**
+ * ���ACTION��
+ * @require core,ui
+ */
+runtime.regLib("ui_action", "", function(){with(arguments[0]){
 
 //import alz.mui.ThemeManager;
 //import alz.template.TemplateManager;
@@ -16,8 +20,4 @@ import alz.copyright;
 //import alz.mui.Pane;
 import alz.core.Application_action;
 
-runtime.regLib("ui_action", function(){  //加载之后的初始化工作
-
-});
-
-}})(this);
+}});

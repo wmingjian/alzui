@@ -47,7 +47,6 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 					"innerHTML"   : msg
 				});
 				this._body.appendChild(div);
-				div = null;
 			};
 		}
 	};
@@ -81,7 +80,6 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 			for(var i = 0, len = imgs.length; i < len; i++){
 				imgs[i].src = imgs[i].getAttribute("src0");
 			}
-			imgs = null;
 			*/
 		}
 		return obj;
@@ -174,9 +172,7 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 						this.initComponent(c, nodes[i], true);
 					}
 				}
-				nodes = null;
 			}
-			c = null;
 		}
 		return obj._ptr;
 	};
@@ -194,12 +190,8 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 				if(node.nodeType == 1 && node.getAttribute("aui")){  //NODE_ELEMENT
 					this.initComponent(c, node, true);
 				}
-				node = null;
 			}
-			nodes = null;
-			c = null;
 		}
-		arr = null;
 	};
 	/**
 	 * 显示一个模态对话框

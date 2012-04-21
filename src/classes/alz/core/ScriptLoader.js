@@ -27,7 +27,7 @@ _class("ScriptLoader", EventTarget, function(){
 			this._scripts[i][this._event] = null;
 			this._scripts[i] = null;
 		}
-		this._scripts = [];
+		this._scripts.length = 0;
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){

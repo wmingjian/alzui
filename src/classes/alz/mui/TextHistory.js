@@ -14,7 +14,7 @@ _class("TextHistory", "", function(){
 		for(var i = 0, len = this._historys.length; i < len; i++){
 			this._historys[i] = null;
 		}
-		this._historys = [];
+		this._historys.length = 0;
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){

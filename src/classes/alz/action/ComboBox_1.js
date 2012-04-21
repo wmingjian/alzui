@@ -15,7 +15,6 @@ _class("ComboBox", BitButton, function(){
 		_super.init.apply(this, arguments);
 		var rows = this._self.rows;
 		if(rows.length != 1) throw "[UI_ERROR]组件BitButton只能有一个TR";
-		rows = null;
 		var menuId = this._self.getAttribute("_popmenu");
 		if(!menuId) throw "[UI_ERROR]组件ComboBox缺少属性_popmenu，请检查相关的HTML代码";
 		this._popmenu = $(menuId);
@@ -103,8 +102,5 @@ _class("ComboBox", BitButton, function(){
 			"href": "#"
 		});
 		a.appendChild(this._createTextNode(text));
-		a = null;
-		li = null;
-		ul = null;
 	};
 });

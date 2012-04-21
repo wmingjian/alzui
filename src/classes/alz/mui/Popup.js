@@ -99,7 +99,6 @@ _class("Popup", Pane, function(){
 			for(var i = 0, len = frames.length; i < len; i++){
 				this._regOnFrame(frames[i], type, isRemove);
 			}
-			frames = null;
 		}catch(ex){
 		}
 	};

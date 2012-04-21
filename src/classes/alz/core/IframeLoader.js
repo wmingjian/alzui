@@ -47,7 +47,6 @@ _class("IframeLoader", "", function(){
 				}else{
 					json = null;  //runtime.parseJson(doc.body.innerHTML)
 				}
-				doc = null;
 			}catch(ex){
 				//_this._win.alert("通信失败！\n原因：" + runtime.forIn(ex).join("\n"));
 				json = null;

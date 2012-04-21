@@ -17,7 +17,7 @@ _class("ActionStack", "", function(){
 		for(var i = 0, len = this._stack.length; i < len; i++){
 			this._stack[i] = null;
 		}
-		this._stack = [];
+		this._stack.length = 0;
 		_super.dispose.apply(this);
 	};
 	/**
@@ -34,7 +34,6 @@ _class("ActionStack", "", function(){
 			this._oldAction = this._stack.length < 2 ? "" : this._stack[this._stack.length - 2];
 		}else{
 			runtime.log("动作栈已经被清空，您没有后路可退啦！");
-			action = null;
 		}
 		return action;
 	};

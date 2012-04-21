@@ -32,7 +32,7 @@ _class("AbstractModel", "", function(){
 		for(var i = 0, len = this._listeners.length; i < len; i++){
 			this._listeners[i] = null;
 		}
-		this._listeners = [];
+		this._listeners.length = 0;
 		for(var k in this._hashIndexs){
 			for(var i = 0, len = this._hashIndexs.length; i < len; i++){
 				this._hashIndexs[k][i] = null;
@@ -54,7 +54,6 @@ _class("AbstractModel", "", function(){
 			if(filter(item)){
 				arr.push(item);
 			}
-			item = null;
 		}
 		return arr;
 	};
@@ -109,7 +108,6 @@ _class("AbstractModel", "", function(){
 					listener.onDataChange.apply(listener, arguments);
 					break;
 				}
-				listener = null;
 			}catch(ex){
 			}
 		}
@@ -136,8 +134,7 @@ _class("AbstractModel", "", function(){
 		for(var i = 0, len = this._list.length; i < len; i++){
 			this._list[i] = null;
 		}
-		//this._list = this._list.splice(0, this._list.length);
-		this._list = [];
+		this._list.length = 0;
 		for(var k in this._hash){
 			delete this._hash[k];
 		}

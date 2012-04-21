@@ -39,10 +39,8 @@ _class("ToolBar", Component, function(){
 				var btn = new clazz();
 				btn.bind(node, this._app);  //[TO-DO]改用bind实现
 				this._buttons.push(btn);
-				btn = null;
 			}
 		}
-		nodes = null;
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
@@ -50,7 +48,7 @@ _class("ToolBar", Component, function(){
 			this._buttons[i].dispose();
 			this._buttons[i] = null;
 		}
-		this._buttons = [];
+		this._buttons.length = 0;
 		this._app = null;
 		_super.dispose.apply(this);
 	};

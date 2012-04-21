@@ -4,7 +4,7 @@ import alz.copyright;
  */
 runtime.regLib("core", "", function(){with(arguments[0]){
 
-//import alz.core.XPathQuery;
+import alz.core.XPathQuery;
 import alz.core.DOMUtil;
 import alz.core.BoxElement;
 import alz.layout.AbstractLayout;
@@ -19,6 +19,9 @@ import alz.core.ActionCollection;
 import alz.core.ProductManager;
 import alz.core.ToggleGroup;
 import alz.core.ToggleManager;
+import alz.core.Animate;
+import alz.core.AnimateData;
+import alz.core.AnimationEngine;
 import alz.core.WebRuntime_core;
 
 }});

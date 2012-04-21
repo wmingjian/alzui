@@ -228,7 +228,6 @@ _class("Workspace", Container, function(){
 		}else{  //fixed
 			ev.cancelBubble = true;
 		}
-		obj = null;
 	};
 	*/
 	this._mousemoveForFixed = function(dlg, ev){
@@ -258,7 +257,6 @@ _class("Workspace", Container, function(){
 			dlg.onMouseMove(ev);
 			this._mousemoveForFixed = null;
 		}
-		obj = null;
 	};
 	this._mousemoveForNormal = function(ev){
 		if(runtime._debug){  //如果调试状态的话，更新 MouseEvent 的信息

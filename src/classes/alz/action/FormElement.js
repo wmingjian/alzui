@@ -26,7 +26,7 @@ _class("FormElement", ActionElement, function(){
 			this._elements[i].dispose();
 			this._elements[i] = null;
 		}
-		this._elements = [];
+		this._elements.length = 0;
 		this._self.onsubmit = null;
 		_super.dispose.apply(this);
 	};
@@ -56,7 +56,6 @@ _class("FormElement", ActionElement, function(){
 		for(var i = 0, len = nodes.length; i < len; i++){
 			elements.push(nodes[i]);
 		}
-		nodes = null;
 		for(var i = 0, len = elements.length; i < len; i++){
 			var el = elements[i];
 			switch(el.tagName){
@@ -73,14 +72,11 @@ _class("FormElement", ActionElement, function(){
 						var component = new clazz();
 						component.bindElement(el, this.getApp());
 						this._elements.push(component);
-						component = null;
 					}
 					break;
 				}
 				break;
 			}
-			el = null;
 		}
-		elements = null;
 	};
 });
