@@ -104,7 +104,6 @@ _class("SilverButton", Component, function(_super){
 		cite.appendChild(this._createTextNode(this._btn.value));
 		this._ee["_cite"] =
 		this._cite = this._self.appendChild(cite);
-		cite = null;
 		this._self.style.backgroundRepeat = "no-repeat";
 		this._cite.style.backgroundRepeat = "no-repeat";
 		this.setState("normal");

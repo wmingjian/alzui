@@ -1,7 +1,6 @@
 import alz.copyright;
-(function(){with(runtime.createContext("demos.app", "core,ui")){
-
-function $(id){return window.document.getElementById(id);}
+//"core,ui"
+runtime.regLib("demos.app", "AppTestWin", function(){with(arguments[0]){
 
 //import alz.core.DomUtil2;
 //import alz.mui.Component2;
@@ -15,8 +14,4 @@ import alz.app.demo.pane.PaneForm;
 import alz.app.demo.pane.PaneUrlMan;
 import alz.app.demo.AppTestWin;
 
-runtime.regLib("demos.app", function(){
-	application = runtime.createApp("alz.app.demo.AppTestWin");
-});
-
-}})(this);
+}});

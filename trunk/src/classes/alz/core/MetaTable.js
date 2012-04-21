@@ -82,7 +82,6 @@ _class("MetaTable", EventTarget, function(){
 			if(filter(item)){
 				arr.push(item);
 			}
-			item = null;
 		}
 		return arr;
 	};
@@ -192,7 +191,6 @@ _class("MetaTable", EventTarget, function(){
 			var ev = new Event("ItemAdd");
 			ev.data = ret;
 			this.dispatchEvent(ev);
-			ev = null;
 			*/
 		}
 		return ret;
@@ -213,7 +211,6 @@ _class("MetaTable", EventTarget, function(){
 			var ev = new Event("ItemsAdd");
 			ev.data = arr;
 			this.dispatchEvent(ev);
-			ev = null;
 			*/
 		}
 	};

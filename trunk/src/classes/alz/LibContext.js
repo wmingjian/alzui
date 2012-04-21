@@ -134,8 +134,6 @@ function contextImp(/*_super*/){
 				obj._init.call(this.runtime);
 			}
 		}
-		//obj = null;
-		//p = null;
 	};
 	/*
 	this.isArray = function(a){

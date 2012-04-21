@@ -61,7 +61,7 @@ _class("CustomEvent", "", function(){
 			this.subscribers[i].dispose();
 			this.subscribers[i] = null;
 		}
-		this.subscribers = [];
+		this.subscribers.length = 0;
 		_super.dispose.apply(this);
 	};
 	this.toString = function(){

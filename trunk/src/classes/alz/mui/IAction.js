@@ -117,9 +117,7 @@ _interface("IAction", "", function(){
 						this._actionManager.add(plugin);
 					}
 				}
-				node = null;
 			}
-			nodes = null;
 		}
 		return customNodes;
 	};

@@ -71,7 +71,7 @@ _class("Console", Component, function(){
 		for(var i = 0, len = this._lines.length; i < len; i++){
 			this._lines[i] = null;
 		}
-		this._lines = [];
+		this._lines.length = 0;
 		this._app = null;
 		if(!runtime.ie){
 			window.document.removeEventListener("keydown", this.__onkeydown, false);
@@ -157,7 +157,6 @@ _class("Console", Component, function(){
 			//line.innerHTML = runtime.encodeHTML(text);
 			var span = this._createElement2(line, "span", type);
 			span.appendChild(this._createTextNode(text));
-			span = null;
 		}
 		if(refNode){
 			this._self.insertBefore(line, refNode);

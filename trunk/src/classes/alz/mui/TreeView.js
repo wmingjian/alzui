@@ -60,9 +60,7 @@ _class("TreeView", Component, function(){
 			node.setTree(this._tree || this);
 			node.create(this, nodes[i], i == 0, i == len - 1);
 			this._nodes.push(node);
-			node = null;
 		}
-		nodes = null;
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
@@ -73,7 +71,7 @@ _class("TreeView", Component, function(){
 			this._nodes[i].dispose();
 			this._nodes[i] = null;
 		}
-		this._nodes = [];
+		this._nodes.length = 0;
 		if(!this._tree){
 			this._self.ondblclick = null;
 			this._self.onclick = null;
@@ -206,7 +204,6 @@ _class("TreeView", Component, function(){
 				break;
 			}
 		}*/
-		control = null;
 		return ret;
 	};
 	this.handleEvent = function(ev, target){
@@ -252,8 +249,6 @@ _class("TreeView", Component, function(){
 		var pos = this.getPos(target, this._self);
 		rect.style.left = (pos.x + ev.offsetX + (target.tagName == "LABEL" ? -33 : 0) + 1) + "px";
 		rect.style.top  = (pos.y + ev.offsetY + (target.tagName == "LABEL" ? 1 : 0) + 1) + "px";
-		pos = null;
-		rect = null;
 	};
 	this.stopDrag = function(){
 		this.getDragRect().style.display = "none";

@@ -68,8 +68,6 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 			obj.className = "ui-loging";
 			obj.style.display = "none";
 			this._info = body.appendChild(obj);
-			obj = null;
-			body = null;
 		}
 		this._info.innerHTML = info;
 		if(this._info.style.display == "none"){

@@ -37,7 +37,7 @@ _class("AppManager", Plugin, function(){
 			this._list[i].dispose();
 			this._list[i] = null;
 		}
-		this._list = [];
+		this._list.length = 0;
 		for(var k in this._hash){
 			//this._hash[k].dispose();
 			delete this._hash[k];
@@ -122,7 +122,6 @@ _class("AppManager", Plugin, function(){
 			//if(parentApp){
 			//	app.setHistoryIndex(parentApp._history.getLength());
 			//}
-			appManager = null;
 		}
 		//注册APP
 		if(conf){
@@ -130,7 +129,6 @@ _class("AppManager", Plugin, function(){
 		}
 		this._list.push(app);
 		//app.init();
-		conf = null;
 		return app;
 	};
 	this.getClazzByName = function(name){
@@ -233,7 +231,6 @@ _class("AppManager", Plugin, function(){
 					if(lib.type == "lib"){
 						func.apply(agent, [this.getAppByClassName(conf.className)]);
 						libLoader.dispose();
-						libLoader = null;
 					}else{  //lib.type == "tpl"
 						//window.alert("load tpl callback");
 					}

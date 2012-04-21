@@ -195,7 +195,6 @@ _class("Dialog", BaseWindow, function(){
 			}
 			*/
 		}
-		workspace = null;
 	};
 	this.onMouseMove = function(ev){
 		var workspace = runtime._workspace;
@@ -221,7 +220,6 @@ _class("Dialog", BaseWindow, function(){
 		this._body.childNodes[1].value = str;
 		*/
 		this.moveTo(x, y);
-		workspace = null;
 	};
 	this.onMouseUp = function(ev){
 		//this.removeListener(this._head, "mousemove");

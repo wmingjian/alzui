@@ -47,11 +47,9 @@ _class("Select", ComboBox, function(){
 			if(i == pageNo){
 				option.selected = true;
 			}
-			option = null;
 		}
 		if(options.length == 0){
 			this._select.style.display = "none";
 		}
-		options = null;
 	};
 });

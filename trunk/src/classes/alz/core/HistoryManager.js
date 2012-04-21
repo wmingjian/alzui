@@ -17,7 +17,7 @@ _class("HistoryManager", Plugin, function(){
 		for(var i = 0, len = this._stack.length; i < len; i++){
 			this._stack[i] = null;
 		}
-		this._stack = [];
+		this._stack.length = 0;
 		_super.dispose.apply(this);
 	};
 	//[TODO]监控调试信息

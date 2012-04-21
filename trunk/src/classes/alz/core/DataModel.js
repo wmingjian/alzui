@@ -120,7 +120,6 @@ _class("DataModel", Plugin, function(){
 				}else{
 					runtime.error("[TODO]数据调用接口" + name + "尚未实现");
 				}
-				model = null;
 			}else{
 				runtime.error("[TODO]数据接口调用时没有找到对应的模型" + type);
 			}

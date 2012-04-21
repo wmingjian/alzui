@@ -58,7 +58,7 @@ _class("TemplateObject", "", function(){
 			this._elements[i].dispose();
 			this._elements[i] = null;
 		}
-		this._elements = [];
+		this._elements.length = 0;
 		this._root = null;
 		this._xmldoc = null;
 		_super.dispose.apply(this);
@@ -142,7 +142,6 @@ _class("TemplateObject", "", function(){
 				for(var i = 0, len = nodes.length; i < len; i++){
 					sb.push(this.node2html(nodes[i]));
 				}
-				nodes = null;
 				sb.push("</" + tagName + ">");
 			}else{
 				if(tagName in this._hashTag){

@@ -30,12 +30,12 @@ _class("DOMUtil", Plugin, function(){
 			this._nodes[i].dispose();
 			this._nodes[i] = null;
 		}
-		this._nodes = [];
+		this._nodes.length = 0;
 		for(var i = 0, len = this._components.length; i < len; i++){
 			this._components[i].dispose();
 			this._components[i] = null;
 		}
-		this._components = [];
+		this._components.length = 0;
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){
@@ -54,7 +54,6 @@ _class("DOMUtil", Plugin, function(){
 			for(var i = 0, len = imgs.length; i < len; i++){
 				imgs[i].src = imgs[i].getAttribute("src0");
 			}
-			imgs = null;
 			*/
 		}
 		return obj;
@@ -102,13 +101,11 @@ _class("DOMUtil", Plugin, function(){
 				pos.x += a;
 				pos.y += b;
 				//s += ",borderLeftWidth=" + a + ",borderTopWidth=" + b;
-				style = null;
 				//sb.push(s);
 				break;
 			}
 			//sb.push(s);
 			if(o.tagName == "BODY" || o.tagName == "HTML") break;
-			style = null;
 		}
 		//$("log_off").value += "\n" + sb.join("\n");
 		}catch(ex){
@@ -401,7 +398,6 @@ _class("DOMUtil", Plugin, function(){
 			}
 		//}
 		return obj._width;
-		//obj = null;
 	};
 	/**
 	 * @method getHeight
@@ -421,7 +417,6 @@ _class("DOMUtil", Plugin, function(){
 			}
 		//}
 		return obj._height;
-		//obj = null;
 	};
 	/**
 	 * @method setWidth
@@ -439,7 +434,6 @@ _class("DOMUtil", Plugin, function(){
 			var w = this.getInnerWidth(el, v);
 			this._setWidth(el, w);
 		//}
-		obj = null;
 	};
 	/**
 	 * @method setHeight
@@ -456,7 +450,6 @@ _class("DOMUtil", Plugin, function(){
 			var w = this.getInnerHeight(el, v);
 			this._setHeight(el, w);
 		}
-		obj = null;
 	};
 	/**
 	 * @method getInnerWidth
@@ -470,7 +463,6 @@ _class("DOMUtil", Plugin, function(){
 		if(!v) v = obj._width;
 		var innerWidth = Math.max(0, runtime._host.compatMode == "BackCompat" ? v : v - obj._borderLeftWidth - obj._borderRightWidth - obj._paddingLeft - obj._paddingRight);
 		//var innerWidth = Math.max(0, runtime.getBoxModel() == 0 ? v : v - this._borderLeftWidth - this._borderRightWidth - this._paddingLeft - this._paddingRight);
-		obj = null;
 		if(isNaN(innerWidth)) runtime.log("DomUtil::getInnerWidth isNaN(innerWidth)");
 		return innerWidth;
 	};
@@ -485,7 +477,6 @@ _class("DOMUtil", Plugin, function(){
 		var obj = this.getObj1(el);
 		if(!v) v = obj._height || el.offsetHeight;
 		var innerHeight = Math.max(0, runtime._host.compatMode == "BackCompat" ? v : v - obj._borderTopWidth - obj._borderBottomWidth - obj._paddingTop - obj._paddingBottom);
-		obj = null;
 		if(isNaN(innerHeight)) runtime.log("DomUtil::getInnerHeight isNaN(innerHeight)");
 		return innerHeight;
 	};
@@ -500,7 +491,6 @@ _class("DOMUtil", Plugin, function(){
 		var obj = this.getObj1(el);
 		if(!v) v = this.getWidth(el);
 		var outerWidth = Math.max(0, runtime._host.compatMode == "BackCompat" ? v : v + obj._marginLeft + obj._marginRight);
-		obj = null;
 		if(isNaN(outerWidth)) window.alert("DomUtil::getOuterWidth isNaN(outerWidth)");
 		return outerWidth;
 	};
@@ -515,7 +505,6 @@ _class("DOMUtil", Plugin, function(){
 		var obj = this.getObj1(el);
 		if(!v) v = this.getHeight(el);
 		var outerHeight = Math.max(0, runtime._host.compatMode == "BackCompat" ? v : v + obj._marginTop + obj._marginBottom);
-		obj = null;
 		if(isNaN(outerHeight)) window.alert("DomUtil::getOuterHeight isNaN(outerHeight)");
 		return outerHeight;
 	};
@@ -651,7 +640,6 @@ _class("DOMUtil", Plugin, function(){
 				break;
 			}
 		}
-		obj = null;
 	};
 	/**
 	 * @method selectNodes
@@ -874,7 +862,6 @@ _class("DOMUtil", Plugin, function(){
 							obj.style[name] = v[key];
 						}
 					}
-					obj = null;
 				}else{
 					var name = this.cssKeyToJsKey(k);
 					if(el.style[name] != v){
@@ -893,7 +880,6 @@ _class("DOMUtil", Plugin, function(){
 							obj.style[name] = v[key];
 						}
 					}
-					obj = null;
 				}else{
 					var name = this.cssKeyToJsKey(k);
 					if(el._self.style[name] != v){
@@ -902,7 +888,6 @@ _class("DOMUtil", Plugin, function(){
 				}
 			}
 		}
-		style = null;
 	};
 	this.applyCssStyle1 = function(el, xpath, className){
 		if(!this._css){
@@ -930,7 +915,6 @@ _class("DOMUtil", Plugin, function(){
 							obj.style[name] = v[key];
 						}
 					}
-					obj = null;
 				}else{
 					var name = this.cssKeyToJsKey(k);
 					if(el.style[name] != v){
@@ -957,11 +941,9 @@ _class("DOMUtil", Plugin, function(){
 							obj.style[name] = v[key];
 						}
 					}
-					obj = null;
 				}
 			}
 		}
-		style = null;
 	};
 	this.addClass = function(el, cls){
 		el.className = el.className ? el.className + " " + cls : cls;

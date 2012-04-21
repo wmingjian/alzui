@@ -49,7 +49,7 @@ _class("ListBox", Component, function(){
 			//this._list[i].dispose();
 			this._list[i] = null;
 		}
-		this._list = [];  //列表项目
+		this._list.length = 0;
 		for(var k in this._hash){
 			this._hash[k].dispose();
 			delete this._hash[k];
@@ -240,7 +240,6 @@ _class("ListBox", Component, function(){
 			}
 			list0.push(v);
 		}
-		items = null;
 		this._selectMgr.selectItems(list, list0);
 	};
 	/**
@@ -321,7 +320,6 @@ _class("ListBox", Component, function(){
 			}
 			delete this._hash[id];
 			item.dispose();
-			item = null;
 		}
 	};
 	this.deleteItem = function(data){
@@ -335,7 +333,7 @@ _class("ListBox", Component, function(){
 			}
 			this._list[i] = null;
 		}
-		this._list = [];
+		this._list.length = 0;
 		for(var k in this._hash){
 			//this._hash[k].dispose();
 			delete this._hash[k];

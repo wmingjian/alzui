@@ -114,7 +114,6 @@ _class("BaseWindow", Pane, function(){
 		if(runtime._host.env == "ie"){
 			body.releaseCapture();
 		}
-		body = null;
 		*/
 		//if(runtime.ie) this._head.releaseCapture();
 		//this.setCapture(false);
@@ -154,7 +153,6 @@ _class("BaseWindow", Pane, function(){
 				}
 			}
 			this._borders.push(o);
-			o = null;
 		}
 	};
 	this.hideBorder = function(){

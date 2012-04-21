@@ -142,7 +142,6 @@ function ClazzImp(){
 			*/
 			var arr = Array[__proto].slice.call(arguments, 2);
 			s[name].apply(obj, arr);
-			arr = null;
 		}else{
 			if(arguments.length == 2){
 				s[name].apply(obj);
@@ -265,7 +264,6 @@ function ClazzImp(){
 				}
 			}
 			exts.push(ext);
-			//ext = null;
 		}
 		for(var k in obj){
 			if(k in __methods) continue;  //忽略关键方法
@@ -340,7 +338,6 @@ function ClazzImp(){
 						}
 					}
 				}
-				//exts = null;
 			}
 			*/
 		//}

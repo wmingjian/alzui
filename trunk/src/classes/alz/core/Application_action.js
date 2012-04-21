@@ -53,9 +53,7 @@ _extension("Application", function(){  //注册 Application 扩展(action)
 						break;
 					}
 				}
-				node = null;
 			}
-			nodes = null;
 		}
 	};
 	this.doAction = function(act, sender){

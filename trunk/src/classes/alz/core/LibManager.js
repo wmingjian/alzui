@@ -20,12 +20,11 @@ _class("LibManager", ManagerBase, function(){
 			this._libs[arr[i]].dispose.apply(this);
 			delete this._libs[arr[i]];
 		}
-		arr = null;
 		*/
 		for(var i = 0, len = this._libs.length; i < len; i++){
 			this._libs[i] = null;
 		}
-		this._libs = [];
+		this._libs.length = 0;
 		for(var k in this._hash){
 			this._hash[k].dispose.apply(runtime);
 			delete this._hash[k];
@@ -58,7 +57,6 @@ _class("LibManager", ManagerBase, function(){
 		}
 		this._hash[name] = library;
 		this._libs.push(library);
-		library = null;
 	};
 	/**
 	 * 执行和初始化文件一起加载并且尚未初始化的库代码
@@ -70,7 +68,6 @@ _class("LibManager", ManagerBase, function(){
 				lib.init.apply(runtime);
 				lib._inited = true;
 			}
-			lib = null;
 		}
 	};
 });

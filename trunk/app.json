@@ -1,0 +1,16 @@
+{
+	"name": "alzui.app",
+	"title": "alzui-mini框架",
+	"pathcss": "res/css/",
+	"pathimg": "res/images/",
+	"pathlib": "lib/",
+	"css": "alzui.css",
+	"lib0": "core.lib,ui.lib,ui_action.lib",
+	"lib": "aui.tpl,aui.lib",
+	"conf": {
+		"debug": true,
+		"runmode": 0,
+		"action": "home"
+	},
+	"active": true
+}

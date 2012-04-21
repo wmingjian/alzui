@@ -169,14 +169,12 @@ _class("DataTable", ListBox, function(){
 				var item = items[i];
 				item._self.parentNode.appendChild(item._self);
 				item.setChecked(item._active, true);
-				item = null;
 			}
 		}else{
 			for(var i = items.length - 1; i >= 0; i--){
 				var item = items[i];
 				item._self.parentNode.appendChild(item._self);
 				item.setChecked(item._active, true);
-				item = null;
 			}
 		}
 	};
@@ -194,7 +192,6 @@ _class("DataTable", ListBox, function(){
 			}else{
 				row.deactivate();
 			}
-			row = null;
 		}
 	};
 	/**

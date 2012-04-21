@@ -67,7 +67,6 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 							arr.push("class=" + el.className);
 							arr.push("tagName=" + el.tagName);
 							window.alert(arr.join("\n"));
-							arr = null;
 							break;
 						}
 					}
@@ -311,7 +310,6 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 				for(var i = 0, len = nodes.length; i < len; i++){
 					this.checkEvents(nodes[i]);
 				}
-				nodes = null;
 			}
 			}catch(ex){
 				window.alert(ex);

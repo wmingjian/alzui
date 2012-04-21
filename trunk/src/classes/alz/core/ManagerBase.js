@@ -18,7 +18,7 @@ _class("ManagerBase", "", function(){
 		for(var i = 0, len = this._list.length; i < len; i++){
 			this._list[i] = null;
 		}
-		this._list = [];
+		this._list.length = 0;
 		for(var k in this._hash){
 			this._hash[k].dispose();
 			delete this._hash[k];

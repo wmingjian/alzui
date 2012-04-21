@@ -51,7 +51,6 @@ _class("BoxElement", "", function(){
 			if(sc){
 				obj.__properties__ = hash;
 			}
-			hash = null;
 		}
 	};
 	this.dispose = function(){
@@ -152,6 +151,5 @@ _class("BoxElement", "", function(){
 			self.clientHeight - this._paddingTop - this._paddingBottom
 		);
 		layout.dispose();
-		layout = null;
 	};
 });

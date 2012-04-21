@@ -20,7 +20,7 @@ _class("ActionManager", "", function(){
 			this._components[i].dispose();
 			this._components[i] = null;
 		}
-		this._components = [];
+		this._components.length = 0;
 		for(var k in this._nodes){
 			for(var i = 0, len = this._nodes[k].length; i < len; i++){
 				this._nodes[k][i] = null;  //再此无需调用 dispose 方法
@@ -56,7 +56,6 @@ _class("ActionManager", "", function(){
 		for(var i = 0, len = nodes.length; i < len; i++){
 			nodes[i].setDisabled(false);
 		}
-		nodes = null;
 	};*/
 	/**
 	 * 启用名字为name对的action(可能是一组)
@@ -99,7 +98,6 @@ _class("ActionManager", "", function(){
 				}
 			}
 		}
-		nodes = null;
 	};
 	/**
 	 * 分派一个action

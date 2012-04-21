@@ -103,7 +103,7 @@ _class("AjaxEngine", Plugin, function(){
 		for(var i = 0, len = this._queue.length; i < len; i++){
 			this._queue[i] = null;
 		}
-		this._queue = [];
+		this._queue.length = 0;
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){
@@ -171,7 +171,6 @@ _class("AjaxEngine", Plugin, function(){
 				im_history.appendChild(div);
 				*/
 				http.send(postData);  //FF下面参数null不能省略
-				http = null;
 				return this._onSyncCallback(type);
 			}
 		}catch(ex){
@@ -223,7 +222,6 @@ _class("AjaxEngine", Plugin, function(){
 			}else{
 				data = this._encodeData(http, charset);  //args
 			}
-			http = null;
 			return data;
 			//}
 		}
@@ -293,7 +291,6 @@ _class("AjaxEngine", Plugin, function(){
 			req.data = "";
 		}
 		this._queue.push(req);
-		req = null;
 		if(this._timer == 0){
 			this._startAjaxThread();
 		}
@@ -343,7 +340,6 @@ _class("AjaxEngine", Plugin, function(){
 					_this._onScriptCallback();
 				});
 				loader.load(req.url, req.data);
-				loader = null;
 			}else{
 				var http = this._openHttp(req.method, req.url, true);
 				http.onreadystatechange = function(){
@@ -356,7 +352,6 @@ _class("AjaxEngine", Plugin, function(){
 				http.send(req.data);
 			}
 		}
-		req = null;
 		return;
 	};
 	this._onTestCaseCallback = function(o){
@@ -446,7 +441,6 @@ _class("AjaxEngine", Plugin, function(){
 				//	}
 				//}
 			}
-			req = null;
 			this._queue[0] = null;
 			this._queue.shift();  //清除队列第一个元素
 		}else{
@@ -523,7 +517,6 @@ _class("AjaxEngine", Plugin, function(){
 			//	}
 			//}
 		}
-		req = null;
 		this._queue[0] = null;
 		this._queue.shift();  //清除队列第一个元素
 		this._checkAjaxThread();
@@ -633,9 +626,6 @@ _class("AjaxEngine", Plugin, function(){
 					}else{
 						agent[func](data, req[6]);
 					}
-					func = null;
-					agent = null;
-					req = null;
 					i++;
 					runtime.startTimer(0, this, cb);  //调用下一个
 				});

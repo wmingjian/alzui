@@ -17,7 +17,6 @@ _class("BitButton", ActionElement, function(){
 		var btn = $(arr[i]);
 		btn.onmousemove = function(){this.getElementsByTagName("tr")[0].className = "onHover";};
 		btn.onmouseout = function(){this.getElementsByTagName("tr")[0].className = "normal";};
-		btn = null;
 		*/
 		this._disabled = this._self.getAttribute("_disabled") == "true";
 		this.setAction(this._self.getAttribute("_action"));
@@ -33,7 +32,6 @@ _class("BitButton", ActionElement, function(){
 		if(rows.length != 1){
 			throw "[UI_ERROR]组件BitButton只能有一个TR";
 		}
-		rows = null;
 		this._self.onmouseover = function(){
 			if(_this._disabled) return;
 			_this._self.rows[0].className = "onHover";

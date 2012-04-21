@@ -35,7 +35,7 @@ _interface("IConfigurable", "", function(_property){
 					if(name in cxt && typeof cxt[name] === "function"){
 						item.clazz = cxt[name];
 					}else{
-						console.log("[IConf::__conf__]clazz not found");
+						console.log("[IConfigurable::__conf__]clazz not found");
 					}
 				}
 				hash[item.id] = item;

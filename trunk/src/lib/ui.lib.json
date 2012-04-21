@@ -1,23 +1,14 @@
 {
-	name:"ui",
-	title:"UI基础库",
-	libs:"core",
-	app:"",
-	/*
-	var _tmpl = {
-		"dialog": "<div html=\"true\" aui=\"{align:'top',height:18;}\" style=\"width:100%;height:18px;background-color:activecaption;border:0px;padding:0px;\">"
-			+ "<label style=\"position:absolute;height:14px;background-color:gray;left:4px;top:4px;font:bold 12px 宋体;line-height:100%;color:white;text-align:left;cursor:default;padding-top:2px;\">{$caption}</label>"
-			+ "<img style=\"position:absolute;width:16px;height:14px;top:4px;right:4px;vertical-align:middle;background-color:buttonface;\" src=\"{$pathAui}lib/src/AWindow_closeup.gif\" />"
-			+ "</div>"
-			+ "<div id=\"dlgBody\" aui=\"{align:'client'}\" style=\"position:absolute;top:21px;width:100%;height:300px;background-color:#666666;border:0px;padding:0px;\"></div>"
-	};
-	*/
-	tpl:[
+	"name": "ui",
+	"title": "UI基础库",
+	"libs": "core",
+	"app": "",
+	"tpl": [
 		"dialog.tpl"
 	],
-	classes:[
-		"alz.mui.ToggleGroup",
-		"alz.mui.ToggleManager",
+	"classes": [
+		"alz.mui.IBoxModel",
+		//"alz.mui.IDesignable",
 		"alz.mui.SelectionManager",
 		"alz.mui.Component",
 		"alz.action.ActionElement",
@@ -30,6 +21,7 @@
 		"alz.action.ComboBox",
 		"alz.action.Select",
 		"alz.action.FormElement",
+		"alz.mui.IAction",
 		"alz.mui.ListItem",
 		"alz.mui.ListBox",
 		"alz.mui.DataRow",
@@ -39,25 +31,40 @@
 		"alz.mui.LineEdit",
 		"alz.mui.Console",
 		"alz.mui.Iframe",
+		"alz.mui.CodeEditor",
+		"alz.mui.ToolButton",
 		"alz.mui.BitButton",
 		"alz.mui.ToggleButton",
 		"alz.mui.ToolBar",
+		"alz.mui.MenuItem",
+		"alz.mui.MenuButton",
+		"alz.mui.MenuBar",
 		"alz.mui.ModalPanel",
 		"alz.mui.Container",
 		"alz.mui.Panel",
 		"alz.mui.Pane",
+		"alz.mui.DeckPane",
 		"alz.mui.Workspace",
 		"alz.mui.DropDown",
 		"alz.mui.Popup",
 		"alz.mui.Menu",
+		"alz.mui.PopupMenu",
 		"alz.mui.TableView",
+		"alz.util.FileType",
+		"alz.mui.Label",
+		"alz.mui.TreeNode",
+		"alz.mui.TreeView",
+		"alz.mui.BaseWindow",
 		"alz.mui.Dialog",
+		//"alz.mui.Dialog1",
 		"alz.mui.TabPage",
 		"alz.mui.WindowSkinWINXP",
 		"alz.mui.WindowSkinWIN2K",
 		"alz.mui.SysBtn",
 		"alz.mui.Window",
 		"alz.mui.ToolWin",
+		"alz.mui.AppWorkspace",
+		"alz.mui.PaneBase",
 		"alz.core.WebRuntime_ui"
 	]
 }

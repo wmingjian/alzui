@@ -77,7 +77,6 @@ _class("LineEdit", Component, function(){
 		window.document.title = this._pos;
 		rng.collapse(false);  //移到后面
 		rng.select();
-		rng = null;
 	}
 	this._init = function(){
 		_super._init.call(this);
@@ -146,7 +145,7 @@ _class("LineEdit", Component, function(){
 			this._items[i].dispose();
 			this._items[i] = null;
 		}
-		this._items = [];
+		this._items.length = 0;
 		this._col = 0;
 		this.print(this._parent.getPrompt(), "sys");
 		this.setIomode("in");
@@ -158,7 +157,7 @@ _class("LineEdit", Component, function(){
 			this._items[i].dispose();
 			this._items[i] = null;
 		}
-		this._items = [];
+		this._items.length = 0;
 		this._app = null;
 		if(this._useInput){
 			this.removeListener(this._input, "click");
@@ -220,7 +219,7 @@ _class("LineEdit", Component, function(){
 					this._items[i].dispose();
 					this._items[i] = null;
 				}
-				this._items = [];
+				this._items.length = 0;
 			}
 			this._parent._self.removeChild(this._self);
 		}
@@ -231,7 +230,6 @@ _class("LineEdit", Component, function(){
 			this._lastLine.appendChild(obj);
 			this.resize();
 		}
-		obj = null;
 		*/
 	};
 	this.setWidth = function(v){
@@ -294,7 +292,6 @@ _class("LineEdit", Component, function(){
 			rng.collapse(true);
 			rng.moveStart('character', this._pos);
 			rng.select();
-			rng = null;
 			runtime.addThread(0, this, function(){
 				try{
 					this._input.focus();
@@ -318,9 +315,7 @@ _class("LineEdit", Component, function(){
 	this.getFrontText = function(){
 		var s = window.document.selection.createRange();
 		s.setEndPoint("StartToStart", this._input.createTextRange());
-		var text = s.text;
-		s = null;
-		return text;
+		return s.text;
 	};
 	this.addInputText = function(text, value){
 		//var rng = this._input.createTextRange();
@@ -330,7 +325,6 @@ _class("LineEdit", Component, function(){
 			rng.moveStart("character", -value.length);
 		}
 		rng.text = text;
-		rng = null;
 	};
 	this.getNumber = function(n){
 		return this._number.substr(n, 1);
@@ -385,7 +379,6 @@ _class("LineEdit", Component, function(){
 		/*
 		var span = this._createElement2(this._self, "span", type);
 		span.appendChild(this._createTextNode(str));
-		span = null;
 		*/
 	};
 	this.incCol = function(n){
