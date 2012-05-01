@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <div _align="client" _layout="BorderLayout">
-	<div style="height:40px;background-color:#E2E2E2;">alzui-mini框架演示程序</div>
-	<ul id="left1" class="mui-ListBox pane-left" _align="left"><!--
+	<div style="height:40px;background-color:#E2E2E2;">框架示例应用</div>
+	<ul id="left1" class="ui-listbox pane-left" _align="left"><!--
 		<li _id="home"><a href="index.html">介绍</a></li>
 	--></ul>
 	<div id="main1" class="pane-main" _align="client"></div>

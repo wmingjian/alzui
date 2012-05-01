@@ -3,7 +3,7 @@ _package("alz.app.demo.pane");
 _import("alz.mui.Pane");
 
 /**
- * 通用表单面板
+ * 閫氱敤琛ㄥ崟闈㈡澘
  */
 _class("PaneForm", Pane, function(){
 	this._init = function(){

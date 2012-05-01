@@ -4,7 +4,7 @@ _import("alz.mui.Pane");
 _import("alz.mui.Console");
 
 /**
- * ¿ØÖÆÌ¨Ãæ°å
+ * æ§åˆ¶å°é¢æ¿
  */
 _class("PaneConsole", Pane, function(){
 	this._init = function(){
@@ -39,11 +39,11 @@ _class("PaneConsole", Pane, function(){
 		this._console.resize(640, 100);
 		//this._console._self.setAttribute("_align", "bottom");
 		var _this = this;
-		//´òÓ¡Ö®Ç°»º´æµÄÈÕÖ¾ĞÅÏ¢
+		//æ‰“å°ä¹‹å‰ç¼“å­˜çš„æ—¥å¿—ä¿¡æ¯
 		for(var i = 0, len = runtime._log.length; i < len; i++){
 			this._console.print(runtime._log[i] + "\n", "log");
 		}
-		//ÖØ¶¨ÒåÏµÍ³¼¶Êä³öº¯Êı
+		//é‡å®šä¹‰ç³»ç»Ÿçº§è¾“å‡ºå‡½æ•°
 		runtime.log = function(msg){
 			_this._console.print(_this.getLogTime() + msg + "\n", "log");
 		};
@@ -53,7 +53,7 @@ _class("PaneConsole", Pane, function(){
 		runtime.error = function(msg){
 			_this._console.print(msg + "\n", "err");
 		};
-		//¿ØÖÆÌ¨¿ªÊ¼Êµ¼Ê¹¤×÷
+		//æ§åˆ¶å°å¼€å§‹å®é™…å·¥ä½œ
 		runtime.warning(this.getLogTime() + "Now start the actual work of the console.");
 		this._console.start(this, function(text){
 			this.interpret(text);

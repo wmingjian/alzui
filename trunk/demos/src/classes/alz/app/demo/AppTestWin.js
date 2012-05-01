@@ -9,28 +9,29 @@ _import("alz.app.demo.pane.PaneUrlMan");
 
 _class("AppTestWin", Application, function(){
 	var pane_conf = [
-		{"id": "home"   , "name":"½éÉÜ"      , "title": "Ä¬ÈÏÒ³"  , "clazz": "PaneHome"   },
-		{"id": "console", "name":"¿ØÖÆÌ¨"    , "title": "¿ØÖÆÌ¨"  , "clazz": "PaneConsole"},
-		{"id": "win"    , "name":"Window×é¼ş", "title": "´°ÌåÆ¤·ô", "clazz": "PaneWindow" },
-		{"id": "table"  , "name":"Table×é¼ş" , "title": "±í¸ñ×é¼ş", "clazz": "PaneTable"  },
-		{"id": "form"   , "name":"Í¨ÓÃ±íµ¥"  , "title": "Í¨ÓÃ±íµ¥", "clazz": "PaneForm"   },
-		{"id": "urlman" , "name":"ÍøÖ·¹ÜÀí"  , "title": "ÍøÖ·¹ÜÀí", "clazz": "PaneUrlMan" }
+		{"id": "home"   , "name":"ä»‹ç»"      , "title": "é»˜è®¤é¡µ"  , "clazz": "PaneHome"   },
+		{"id": "console", "name":"æ§åˆ¶å°"    , "title": "æ§åˆ¶å°"  , "clazz": "PaneConsole"},
+		{"id": "win"    , "name":"Windowç»„ä»¶", "title": "çª—ä½“çš®è‚¤", "clazz": "PaneWindow" },
+		{"id": "table"  , "name":"Tableç»„ä»¶" , "title": "è¡¨æ ¼ç»„ä»¶", "clazz": "PaneTable"  },
+		{"id": "form"   , "name":"é€šç”¨è¡¨å•"  , "title": "é€šç”¨è¡¨å•", "clazz": "PaneForm"   },
+		{"id": "urlman" , "name":"ç½‘å€ç®¡ç†"  , "title": "ç½‘å€ç®¡ç†", "clazz": "PaneUrlMan" }
 	];
 	var pane_hash = {};
 	this._init = function(){
 		_super._init.call(this);
-		this._template = {
-			getTpl: function(name){
-				return runtime.getTplData("demos.tpl")[name];
-			}
-		};
+		this._template = null;
 		this._panes = {};
 		this._activePane = null;
 	};
 	this.init = function(){
 		_super.init.apply(this, arguments);
+		this._template = {
+			getTplData: function(name){
+				return runtime.getTplData("demos.tpl")[name];
+			}
+		};
 		var obj = runtime.dom.createDomElement(this._template.getTplData("pane_main.xml"));
-		document.body.appendChild(obj);
+		this._workspace._self.appendChild(obj);
 		var sb = [];
 		for(var i = 0, len = pane_conf.length; i < len; i++){
 			var item = pane_conf[i];
@@ -61,7 +62,10 @@ _class("AppTestWin", Application, function(){
 	};
 	this.destroy = function(){
 	};
-	this.onResize = function(w, h){
+	this.onResize = function(ev){
+		var w = ev.w;
+		var h = ev.h;
+		console.log("onResize");
 		var mw = Math.max(0, w - $("left1").offsetWidth);
 		$("left1").style.height = h + "px";
 		$("main1").style.width = mw + "px";

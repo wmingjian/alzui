@@ -1,4 +1,6 @@
-import alz.copyright;
+/**
+ * 示例应用代码库
+ */
 //"core,ui"
 runtime.regLib("demos.app", "AppTestWin", function(){with(arguments[0]){
 

@@ -3,7 +3,7 @@ _package("alz.app.demo.pane");
 _import("alz.mui.Pane");
 
 /**
- * ÍøÖ·¹ÜÀíÃæ°å
+ * ç½‘å€ç®¡ç†é¢æ¿
  */
 _class("PaneUrlMan", Pane, function(){
 	this._init = function(){
