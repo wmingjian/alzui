@@ -4,7 +4,7 @@ _import("alz.mui.Pane");
 _import("alz.mui.TableView");
 
 /**
- * 表格组件面板
+ * 琛ㄦ牸缁勪欢闈㈡澘
  */
 _class("PaneTable", Pane, function(){
 	this._init = function(){

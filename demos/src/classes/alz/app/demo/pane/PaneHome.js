@@ -3,7 +3,7 @@ _package("alz.app.demo.pane");
 _import("alz.mui.Pane");
 
 /**
- * 默认面板
+ * 榛樿闈㈡澘
  */
 _class("PaneHome", Pane, function(){
 	this._init = function(){
@@ -11,9 +11,9 @@ _class("PaneHome", Pane, function(){
 		this._tpl = "pane_home.xml";
 	};
 	/*
-		<li><a href="index.html">介绍</a></li>
-		<li><a href="Window.html">Window组件</a></li>
-		<li><a href="Table.html">Table组件</a></li>
+		<li><a href="index.html">浠嬬粛</a></li>
+		<li><a href="Window.html">Window缁勪欢</a></li>
+		<li><a href="Table.html">Table缁勪欢</a></li>
 	*/
 	this.create = function(parent, app){
 		this.setParent2(parent);

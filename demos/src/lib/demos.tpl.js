@@ -1,5 +1,5 @@
-/*
- * alzui-mini ÑİÊ¾³ÌĞòÄ£°å¿â
+/**
+ * ç¤ºä¾‹åº”ç”¨æ¨¡æ¿åº“
  */
 runtime.regTpl("demos.tpl", {
 pane_main.xml,
