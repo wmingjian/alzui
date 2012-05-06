@@ -19,7 +19,7 @@ _class("SysBtn", Component, function(){
 		this._capture = false;
 		this.addListener(this._self, "click", this, "onClick1");
 		this.addListener(this._self, "mousedown", this, "onMouseDown1");
-		//this.addListener(this._self, "mouseup", this, "onMouseUp1");
+		this.addListener(this._self, "mouseup", this, "onMouseUp1");
 		//this.addListener(this._self, "mouseover", this, "onMouseOver1");
 		//this.addListener(this._self, "mouseout", this, "onMouseOut1");
 	}
@@ -35,21 +35,27 @@ _class("SysBtn", Component, function(){
 	this.destroy = function(){
 	};
 	this.onMouseDown1 = function(ev){
-		/*
-		//this._self.style.backgroundPosition = "0px -" + this._win._skin._model["sbtn_height"] + "px";
+		this._dom.addClass(this._self, "active");
 		this._capture = true;
-		this._self.setCapture();
 		this.setState("active");
-		ev.cancelBubble = true;
+		if(runtime.ie){
+			this._self.setCapture();
+			ev.cancelBubble = true;
+		}else{
+			ev.stopPropagation();
+		}
 		return false;
-		*/
 	};
 	this.onMouseUp1 = function(ev){
-		//this._self.style.backgroundPosition = "0px 0px";
-		this.setState("normal");
-		this._self.releaseCapture();
+		this._dom.removeClass(this._self, "active");
 		this._capture = false;
-		ev.cancelBubble = true;
+		this.setState("normal");
+		if(runtime.ie){
+			this._self.releaseCapture();
+			ev.cancelBubble = true;
+		}else{
+			ev.stopPropagation();
+		}
 		return false;
 	};
 	this.onMouseOver1 = function(ev){

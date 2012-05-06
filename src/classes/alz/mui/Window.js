@@ -33,9 +33,10 @@ _class("Window", BaseWindow, function(){
 		this._minbtn = null;
 		this._maxbtn = null;
 		this._skin = null;
-		this._resizable = true;
+		this._resizable = false;
 		this._width = 0;
 		this._height = 0;
+		this._lastRect = null;
 	};
 	this.build = function(el){
 		_super.build.apply(this, arguments);
@@ -60,6 +61,7 @@ _class("Window", BaseWindow, function(){
 	};
 	this.bind = function(obj){
 		this.setParent2(obj.parentNode);
+		this._params = {};
 		this.init(obj);
 	};
 	this.init = function(obj){
@@ -95,7 +97,10 @@ _class("Window", BaseWindow, function(){
 		}
 		this.createBorders();
 		this._skin.create(this);
+
 		this.resize(800, 600);
+		this.showBorder();
+		this.setResizable(true);
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
@@ -120,7 +125,13 @@ _class("Window", BaseWindow, function(){
 		if(v == this._resizable) return;
 		this._resizable = v;
 		this.tune(this._width, this._height);
-		this.hideBorder();
+		if(v){
+			this.showBorder();
+			this._skin.showBorder();
+		}else{
+			this.hideBorder();
+			this._skin.hideBorder();
+		}
 		this._skin.onResizableChange();
 	};
 	this.resize = function(w, h){
@@ -135,23 +146,37 @@ _class("Window", BaseWindow, function(){
 	};
 	this.tune = function(w, h){
 		var m = this._skin._model;
-		var n, h0;
-		if(this._resizable){
-			n = 4;
-			h0 = m["head_height"];
-		}else{
-			n = 3;
-			h0 = m["head_height"] - 1;
-		}
-		this.setElementRect(this._head, n,  n, w - 2 * n,     h0 - n - 1);
-		this.setElementRect(this._body, n, h0, w - 2 * n, h - h0 - n    );
+		var n = this._resizable ? 4 : (this._state == "normal" ? 3 : 0);  //this._borderTopWidth + this._paddingTop;
+		var h0 = m["head_height"];
+		this.setElementRect(this._head, n, n, w - 2 * n, (this._state == "normal" ? h0 - n - 1 : 18));
+		this.setElementRect(this._body, n, n, w - 2 * n, h - h0 - n    );
 		this._title.style.width = (w - 2 * n - m["icon_width"] - m["sbtn_width"] * 3 - 2 * m["sep_num"]) + "px";
 	};
 	//窗体最大化
 	this.do_win_max = function(act, sender){
 		console.log("[TODO]do_win_max");
-		var rect = this.getParent().getViewPort();
-		this.resize(rect.w, rect.h);
+		if(this._state == "normal"){
+			this._state = "max";
+			this._lastRect = {
+				"x": this._left,
+				"y": this._top,
+				"w": this._width,
+				"h": this._height
+			};
+			this.hideBorder();
+			this.moveTo(0, 0);
+			var rect = this.getParent().getViewPort();
+			this.resize(rect.w, rect.h);
+			this.setResizable(false);
+		}else{
+			this._state = "normal";
+			this.showBorder();
+			var rect = this._lastRect;
+			this.moveTo(rect.x, rect.y);
+			this.resize(rect.w, rect.h);
+			this._lastRect = null;
+			this.setResizable(true);
+		}
 	};
 	//窗体最小化
 	this.do_win_min = function(act, sender){

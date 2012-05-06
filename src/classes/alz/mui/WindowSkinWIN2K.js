@@ -149,4 +149,10 @@ _class("WindowSkinWIN2K", Component, function(){
 		//runtime.dom.applyCssStyle1(this, this._xpath, v);
 		runtime.dom.applyCssStyle(this, this._cssData, v);
 	};
+	this.showBorder = function(){
+		this._dom.removeClass(this._self, "none");
+	};
+	this.hideBorder = function(){
+		this._dom.addClass(this._self, "none");
+	};
 });
