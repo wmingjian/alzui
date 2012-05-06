@@ -9,6 +9,7 @@ _import("alz.core.TagLib");
 _import("alz.template.TemplateManager");
 //_import("alz.core.TemplateManager");
 _import("alz.core.HistoryManager");
+_import("alz.template.TplDocument");
 
 /**
  * [TODO]
@@ -82,6 +83,7 @@ _class("Application", EventTarget, function(){
 			Application._hotkey = true;
 		}
 		//this._template = runtime.getTemplate();  //模版引擎
+		this._tpldoc = new TplDocument(runtime.getWorkspace().getContainer(), this);
 	};
 	this.dispose = function(){
 		if(this._disposed) return;
@@ -190,6 +192,9 @@ _class("Application", EventTarget, function(){
 	};
 	this.getTplDoc = function(){
 		return this._tpldoc;
+	};
+	this.cc = function(id){
+		return this._tpldoc.$(id);
 	};
 	this.setContentPane = function(v){
 		this._contentPane = v;

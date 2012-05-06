@@ -20,11 +20,19 @@ _class("PaneHome", Pane, function(){
 		this.setApp(app);
 		var obj = this.createTplElement(parent, this._tpl);
 		this.init(obj);
+		this.initActionElements();
 		return obj;
 	};
 	this.dispose = function(){
 		_super.dispose.apply(this);
 	};
 	this.destroy = function(){
+	};
+	this.do_show_window = function(act, sender){
+		console.log("do_show_window");
+		var params = {
+		};
+		var win = this._app.createWindow("main", this._app, params);
+		win.moveTo(20, 20);
 	};
 });

@@ -6,6 +6,7 @@
 		<h5>控制台组件</h5>
 		<p>主要供开发调试时使用</p>
 		<h5>Window组件</h5>
+		<p><a href="#" _action="show_window">window</a></p>
 		<h5>Table组件</h5>
 	</div>
 </div>

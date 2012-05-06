@@ -18,6 +18,7 @@ _class("BaseWindow", Pane, function(){
 		this._closebtn = null;
 		this._body = null;
 		this._borders = null;   //{Array}
+		this._state = "normal";  //normal|max|min
 	};
 	this.create2 = function(conf, parent, app, params){
 		this.setConf(conf);
@@ -31,18 +32,21 @@ _class("BaseWindow", Pane, function(){
 	this.init = function(obj){
 		_super.init.apply(this, arguments);
 		var data = {
-			"caption": this._params.caption ||
-				this._tplel._attributes.caption ||
-				obj.getAttribute("_caption") ||
-				"标题栏"
+			"caption": this._params.caption
+				|| (this._tplel ? this._tplel._attributes.caption : "")
+				|| obj.getAttribute("_caption")
+				|| "标题栏"
 		};
 		this._body = this.find(".win-body");
 		this._head = this.find(".win-head");
 		var _this = this;
-		this._head.onselectstart = function(ev){return false;};
+		var falseFunc = function(){return false;};
+		this._head.ondragstart = falseFunc;
+		this._head.onselectstart = falseFunc;
 		this.addListener(this._head, "mousedown", this, "onMouseDown");
 		this._title = this.find(".win-head label");
-		this._title.onselectstart = function(){return false;};
+		this._title.ondragstart = falseFunc;
+		this._title.onselectstart = falseFunc;
 		this._title.innerHTML = data.caption;
 		this._closebtn = new SysBtn();
 		this._closebtn.init(this.find(".icon-close"), this);
@@ -56,12 +60,15 @@ _class("BaseWindow", Pane, function(){
 			for(var i = 0, len = this._borders.length; i < len; i++){
 				this._borders[i] = null;
 			}
+			this._borders = null;
 		}
 		this._closebtn.dispose();
 		this._closebtn = null;
 		this._title.onselectstart = null;
+		this._title.ondragstart = null;
 		this.removeListener(this._head, "mousedown");
 		this._head.onselectstart = null;
+		this._head.ondragstart = null;
 		this._head = null;
 		this._req = null;
 		this._params = null;
@@ -82,6 +89,7 @@ _class("BaseWindow", Pane, function(){
 		this._req = v;
 	};
 	this.onMouseDown = function(ev){
+		if(this._state != "normal") return;
 		this._self.style.zIndex = runtime.getNextZIndex();
 		//this._head.setCapture(true);
 		var pos = runtime.dom.getPos1(ev, 1, this._self);
@@ -103,7 +111,7 @@ _class("BaseWindow", Pane, function(){
 		//[TODO]是否需要考虑BODY元素的边框宽度？
 		var x = rect.x + Math.min(rect.w - 10, Math.max(10, ev.clientX)) - this._offsetX/* - 2*/;
 		var y = rect.y + Math.min(rect.h - 10, Math.max(10, ev.clientY)) - this._offsetY/* - 2*/;
-		runtime.dom.moveTo(this._self, x, y);
+		this.moveTo(x, y);
 	};
 	this.onMouseUp = function(ev){
 		this.setCapture(false);
@@ -155,9 +163,14 @@ _class("BaseWindow", Pane, function(){
 			this._borders.push(o);
 		}
 	};
+	this.showBorder = function(){
+		for(var i = 0, len = this._borders.length; i < len; i++){
+			this._borders[i].style.display = "";
+		}
+	};
 	this.hideBorder = function(){
 		for(var i = 0, len = this._borders.length; i < len; i++){
-			this._borders[i].style.display = v ? "" : "none";
+			this._borders[i].style.display = "none";
 		}
 	};
 	this.resizeBorder = function(w, h){

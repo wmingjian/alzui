@@ -8,5 +8,6 @@ pane_console.xml,
 pane_window.xml,
 pane_table.xml,
 pane_form.xml,
-pane_urlman.xml
+pane_urlman.xml,
+win_main.xml
 });

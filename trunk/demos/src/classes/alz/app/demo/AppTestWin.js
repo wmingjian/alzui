@@ -8,6 +8,19 @@ _import("alz.app.demo.pane.PaneForm");
 _import("alz.app.demo.pane.PaneUrlMan");
 
 _class("AppTestWin", Application, function(){
+	this.__conf__(__context__, {
+		//"plugin": [],
+		"model": [
+		],
+		//"taglib": [],
+		"popup": [
+		],
+		"dialog": [
+			{"id": "main"       , "clazz": "Window"       , "tpl": "win_main.xml"      }
+		],
+		"pane": [
+		]
+	});
 	var pane_conf = [
 		{"id": "home"   , "name":"介绍"      , "title": "默认页"  , "clazz": "PaneHome"   },
 		{"id": "console", "name":"控制台"    , "title": "控制台"  , "clazz": "PaneConsole"},
@@ -25,11 +38,14 @@ _class("AppTestWin", Application, function(){
 	};
 	this.init = function(){
 		_super.init.apply(this, arguments);
+		this.initConf("demos.tpl");
+		/*
 		this._template = {
 			getTplData: function(name){
 				return runtime.getTplData("demos.tpl")[name];
 			}
 		};
+		*/
 		var obj = runtime.dom.createDomElement(this._template.getTplData("pane_main.xml"));
 		this._workspace._self.appendChild(obj);
 		var sb = [];
