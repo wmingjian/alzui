@@ -64,10 +64,10 @@ function Profile(){
 				+ '</tr>');
 		}
 		sb.push('</table>');
-		var obj = document.getElementById("total");
-		obj.innerHTML = sb.join("");
+		var el = document.getElementById("total");
+		el.innerHTML = sb.join("");
 		var _this = this;
-		var cells = obj.getElementsByTagName("th");
+		var cells = el.getElementsByTagName("th");
 		for(var i = 0, len = cells.length; i < len; i++){
 			cells[i].onclick = function(){
 				_this.showLogData(_this._list, this.innerHTML);

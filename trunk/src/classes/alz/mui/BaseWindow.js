@@ -98,7 +98,7 @@ _class("BaseWindow", Pane, function(){
 		this.setCapture(true);
 		/*
 		var _this = this;
-		var body = window.document.body;
+		var body = document.body;
 		if(runtime._host.env == "ie"){
 			body.setCapture();
 		}
@@ -107,7 +107,7 @@ _class("BaseWindow", Pane, function(){
 		*/
 	};
 	this.onMouseMove = function(ev){
-		var rect = runtime.dom.getViewPort(window.document.body);
+		var rect = runtime.dom.getViewPort(document.body);
 		//[TODO]是否需要考虑BODY元素的边框宽度？
 		var x = rect.x + Math.min(rect.w - 10, Math.max(10, ev.clientX)) - this._offsetX/* - 2*/;
 		var y = rect.y + Math.min(rect.h - 10, Math.max(10, ev.clientY)) - this._offsetY/* - 2*/;
@@ -116,7 +116,7 @@ _class("BaseWindow", Pane, function(){
 	this.onMouseUp = function(ev){
 		this.setCapture(false);
 		/*
-		var body = window.document.body;
+		var body = document.body;
 		this.removeListener(body, "mousemove");
 		this.removeListener(body, "mouseup");
 		if(runtime._host.env == "ie"){

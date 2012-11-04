@@ -22,11 +22,11 @@ _class("Console", Component, function(){
 	this.create = function(parent, app){
 		this.setParent2(parent);
 		this._app = app;
-		var obj = this._createElement2(parent, "div", "ui-console");
-		this.init(obj);
-		return obj;
+		var el = this._createElement2(parent, "div", "ui-console");
+		this.init(el);
+		return el;
 	};
-	this.init = function(obj){
+	this.init = function(el){
 		_super.init.apply(this, arguments);
 		//<div class="ui-lineedit">&gt;<input class="input" type="text" value="" /></div>
 		//this.setFont("12px 宋体");
@@ -53,7 +53,7 @@ _class("Console", Component, function(){
 			this.__onkeydown = function(ev){
 				return _this._lineEdit.onKeyDown(ev || window.event, _this._lineEdit._self);
 			};
-			window.document.addEventListener("keydown", this.__onkeydown, false);
+			document.addEventListener("keydown", this.__onkeydown, false);
 		}else{
 			this.addListener(this._self, "keydown", this._lineEdit, "onKeyDown");
 		}
@@ -74,7 +74,7 @@ _class("Console", Component, function(){
 		this._lines.length = 0;
 		this._app = null;
 		if(!runtime.ie){
-			window.document.removeEventListener("keydown", this.__onkeydown, false);
+			document.removeEventListener("keydown", this.__onkeydown, false);
 		}else{
 			this.removeListener(this._self, "keydown");
 		}
@@ -88,8 +88,8 @@ _class("Console", Component, function(){
 	this.resize = function(w, h){
 		//this._lineEdit.setWidth(this._input.parentNode.offsetWidth) + "px";
 		//this.print(this._self.clientWidth, "dbg");
-		//var w = window.document.body.clientWidth - 14 - 100;
-		//this._self.style.width = (window.document.body.clientWidth - 14) + "px";
+		//var w = document.body.clientWidth - 14 - 100;
+		//this._self.style.width = (document.body.clientWidth - 14) + "px";
 		w = this._self.clientWidth - 14 - 8 - 20;
 		this._lineEdit.setWidth(w);
 	};

@@ -19,15 +19,15 @@ _class("Label", Component, function(){
 	this.create = function(parent, text){
 		this.setParent2(parent);
 		this._text = text;
-		var obj = this._createElement("label");
-		//var obj = this._createElement("a");
-		//obj.href = "#";
-		obj.appendChild(this._createTextNode(text));
-		this._parent._self.appendChild(obj);
-		this.init(obj);
-		return obj;
+		var el = this._createElement("label");
+		//var el = this._createElement("a");
+		//el.href = "#";
+		el.appendChild(this._createTextNode(text));
+		this._parent._self.appendChild(el);
+		this.init(el);
+		return el;
 	};
-	this.init = function(obj){
+	this.init = function(el){
 		_super.init.apply(this, arguments);
 		var _this = this;
 		//this._self.ondragstart = function(){return false;};

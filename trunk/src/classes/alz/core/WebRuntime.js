@@ -328,18 +328,19 @@ _class("WebRuntime", "", function(){
 			"mbsafari": /Version\/(\d+(?:\.\d+)+)\x20Mobile\/(\d|\D)+\x20Safari\/(\d+(?:\.\d+)+)/,
 			"mf"    : /Minefield\/(\d+(?:\.\d+)+)/  //Minefield/3.0b4pre
 		};
+		var ua = nav.userAgent;
 		var host = {"os":"unix","env":"unknown","ver":"0","compatMode":"","osver":""};
 		if(nav.platform == "Win32" || nav.platform == "Windows"){
 			//"Window NT 5.0" win2k
 			//"Window NT 5.1" winxp
 			host.os = "win";
-			if(/Windows NT 5\.1/.test(nav.userAgent)){
+			if(/Windows NT 5\.1/.test(ua)){
 				host.osver = "win2k";
-			}else if(/Windows NT 6\.1/.test(nav.userAgent)){
+			}else if(/Windows NT 6\.1/.test(ua)){
 				host.osver = "win7";
-			}else if(/Windows NT 5\.0/.test(nav.userAgent)){
+			}else if(/Windows NT 5\.0/.test(ua)){
 				host.osver = "win2k";
-			}else if(/Windows NT 6\.0/.test(nav.userAgent)){
+			}else if(/Windows NT 6\.0/.test(ua)){
 				host.osver = "vista";
 			}
 		}else if(nav.platform == "Mac68K" || nav.platform == "MacPPC" || nav.platform == "Macintosh"){
@@ -350,8 +351,8 @@ _class("WebRuntime", "", function(){
 			host.os = "iPhoneOS";  //[TODO]
 		}
 		for(var k in re){
-			var arr = re[k].exec(nav.userAgent);
-			if(arr){  //re[k].test(nav.userAgent)
+			var arr = re[k].exec(ua);
+			if(arr){  //re[k].test(ua)
 				host.env = k == "mf" ? "ff": k;
 				host.ver = arr[1];
 				host.compatMode = host.env == "ie" && this._doc.compatMode == "BackCompat" ? "BackCompat" : "CSS1Compat";
@@ -365,7 +366,7 @@ _class("WebRuntime", "", function(){
 			}
 		}
 		if(host.env == "unknown"){
-			runtime.log("[WebRuntime::getHostenv]未知的宿主环境，userAgent:" + nav.userAgent);
+			this.log("[WebRuntime::getHostenv]未知的宿主环境，userAgent:" + ua);
 		}
 		return host;
 	};
@@ -384,16 +385,17 @@ _class("WebRuntime", "", function(){
 		this.safari = this._hostenv == "safari" || this._hostenv == "mbsafari";
 		this.chrome = this._hostenv == "chrome";
 		this.moz = this.ns || this.ff;  //nav.product == "Gecko";
-		this.ie6 = nav.userAgent.indexOf("MSIE 6.0") != -1;
-		this.ie7 = nav.userAgent.indexOf("MSIE 7.0") != -1;
-		this.ie8 = nav.userAgent.indexOf("MSIE 8.0") != -1;
-		this.ie9 = nav.userAgent.indexOf("MSIE 9.0") != -1;
+		var ua = nav.userAgent;
+		this.ie6 = ua.indexOf("MSIE 6.0") != -1;
+		this.ie7 = ua.indexOf("MSIE 7.0") != -1;
+		this.ie8 = ua.indexOf("MSIE 8.0") != -1;
+		this.ie9 = ua.indexOf("MSIE 9.0") != -1;
 		this.ie678 = this.ie6 || this.ie7 || this.ie8;
-		this.ff1 = nav.userAgent.indexOf("Firefox/1.0") != -1;
-		this.ff2 = nav.userAgent.indexOf("Firefox/2.0") != -1;
-		this.ff3 = nav.userAgent.indexOf("Firefox/3.0") != -1;
-		this.max = nav.userAgent.indexOf("Maxthon") != -1;
-		this.tt = nav.userAgent.indexOf("TencentTraveler") != -1;
+		this.ff1 = ua.indexOf("Firefox/1.0") != -1;
+		this.ff2 = ua.indexOf("Firefox/2.0") != -1;
+		this.ff3 = ua.indexOf("Firefox/3.0") != -1;
+		this.max = ua.indexOf("Maxthon") != -1;
+		this.tt = ua.indexOf("TencentTraveler") != -1;
 		/*
 		if(this.ie && this.max && this.tt){
 			this._win.alert(
@@ -504,11 +506,11 @@ _class("WebRuntime", "", function(){
 				if(!this._host.xul){
 					this._doc.write('<script type="text/javascript" charset=\"utf-8\" src="' + url /*+ '?' + new Date().getTime()*/ + '"></sc'+'ript>');
 				}else{
-					var obj = this._doc.createElement("script");
-					obj.type = "text/javascript";
-					obj.charset = "utf-8";
-					obj.src = url;
-					this._doc.documentElement.appendChild(obj);
+					var el = this._doc.createElement("script");
+					el.type = "text/javascript";
+					el.charset = "utf-8";
+					el.src = url;
+					this._doc.documentElement.appendChild(el);
 				}
 			}
 		}
@@ -824,7 +826,7 @@ _class("WebRuntime", "", function(){
 			if(this._inited) return;
 			this.fireEvent({"type": "contentLoaded"});
 			//this.init();  //系统初始化
-			//window.alert(runtime.getBrowser().getTestMode());
+			//window.alert(this.getBrowser().getTestMode());
 			break;
 		case "unload":
 			//try{  //屏蔽页面onunload时可能产生的错误
@@ -998,8 +1000,8 @@ _class("WebRuntime", "", function(){
 	 * @param {Function} libImp 库实现函数
 	 */
 	this.regLib = function(name, appName, libImp){
-		//runtime.createContext("alc")
-		//runtime.createApp("alz.util.alc.AppAlc")
+		//this.createContext("alc")
+		//this.createApp("alz.util.alc.AppAlc")
 		var cxt = this.createContext(name);
 		libImp(cxt);
 		if(appName != ""){
@@ -1109,15 +1111,15 @@ _class("WebRuntime", "", function(){
 		return this._boxModel;
 	};
 	this._createTestDiv = function(){
-		var obj = this._doc.createElement("div");
-		obj.style.position = "absolute";
-		obj.style.left = "-2000px";
-		obj.style.top = "-2000px";
-		//obj.style.font = "8pt tahoma";
+		var el = this._doc.createElement("div");
+		el.style.position = "absolute";
+		el.style.left = "-2000px";
+		el.style.top = "-2000px";
+		//el.style.font = "8pt tahoma";
 		if(this._host.xul == true){
-			return this._doc.documentElement.appendChild(obj);
+			return this._doc.documentElement.appendChild(el);
 		}else{
-			return this._doc.body.appendChild(obj);
+			return this._doc.body.appendChild(el);
 		}
 	};
 	/**
@@ -1133,15 +1135,16 @@ _class("WebRuntime", "", function(){
 		if(!this._testDiv){
 			this._testDiv = this._createTestDiv();
 		}
-		this._testDiv.style.width = "100px";
-		this._testDiv.style.height = "100px";
-		this._testDiv.style.border = "1px solid #000000";
-		this._testDiv.style.padding = "1px";
+		var style = this._testDiv.style;
+		style.width = "100px";
+		style.height = "100px";
+		style.border = "1px solid #000000";
+		style.padding = "1px";
 		var nType = this._testDiv.offsetWidth == 104 ? 1 : 0;
-		this._testDiv.style.width = "";
-		this._testDiv.style.height = "";
-		this._testDiv.style.border = "";
-		this._testDiv.style.padding = "";
+		style.width = "";
+		style.height = "";
+		style.border = "";
+		style.padding = "";
 		//this._doc.body.removeChild(this._testDiv);
 		return nType;
 	};
@@ -1150,7 +1153,7 @@ _class("WebRuntime", "", function(){
 			this._testDiv = this._createTestDiv();
 		}
 		this._testDiv.style.font = font || "8pt tahoma";
-		this._testDiv.innerHTML = runtime.encodeHTML(text);
+		this._testDiv.innerHTML = this.encodeHTML(text);
 		return {
 			"w": this._testDiv.offsetWidth,
 			"h": this._testDiv.offsetHeight
@@ -1171,13 +1174,13 @@ _class("WebRuntime", "", function(){
 	this.getElement = function(id){
 		return this._doc.getElementById(id);
 		/*
-		var obj = this._doc.getElementById(id);
-		if(!obj) return null;
-		if(!obj._ptr){
+		var el = this._doc.getElementById(id);
+		if(!el) return null;
+		if(!el._ptr){
 			var c = new Component();
-			c.init(obj);
+			c.init(el);
 		}
-		return obj;
+		return el;
 		*/
 	};
 	this.getBody = function(){

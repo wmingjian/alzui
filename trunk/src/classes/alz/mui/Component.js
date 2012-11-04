@@ -13,9 +13,9 @@ _import("alz.mui.IDesignable");
 _class("Component", EventTarget, function(){
 	_implements(this, IBoxModel/*, IDesignable*/);
 	/*
-	 0 : obj[k] = v;
-	 1 : obj.setAttribute(k, v);
-	 2 : obj.style[k] = v;
+	 0 : el[k] = v;
+	 1 : el.setAttribute(k, v);
+	 2 : el.style[k] = v;
 	*/
 	var ATTR = function(arr){
 		var hash = {};
@@ -111,20 +111,20 @@ _class("Component", EventTarget, function(){
 	};
 	/**
 	 * @method bind
-	 * @param {Element} obj
+	 * @param {Element} el
 	 * @desc 调用该方法初始化的组件的所有属性从DOM元素中动态获取
 	 * 设计该方法的思想和 init 方法完全相反，init方法从脚本组件角度考虑问题，bind
 	 * 方法从 DOM 元素角度考虑问题。
 	 */
-	this.bind = function(obj){
-		this.setParent2(obj.parentNode);
-		var style = this._dom.getStyle(obj);
+	this.bind = function(el){
+		this.setParent2(el.parentNode);
+		var style = this._dom.getStyle(el);
 		//if(this._className == "DlgPageTool") window.alert("123");
 
 		//调用一遍实现的接口
 		var imps = this.__cls__._imps;
 		for(var i = 0, len = imps.length; i < len; i++){
-			imps[i].init.call(this, obj, style);  //执行接口的init方法
+			imps[i].init.call(this, el, style);  //执行接口的init方法
 		}
 
 		this._position = this.getPropertyValue(style, "position");
@@ -143,7 +143,7 @@ _class("Component", EventTarget, function(){
 				this._dockRect.h = this._height;
 			}
 		}
-		this.__init(obj, 1);
+		this.__init(el, 1);
 	};
 	/**
 	 * @method create
@@ -153,19 +153,19 @@ _class("Component", EventTarget, function(){
 	 */
 	this.create = function(parent){
 		this.setParent2(parent);
-		var obj = this._createElement(this._tagName || "div");
-		if(parent) this.setParent(parent, obj);
-		this.init(obj);
-		return obj;
+		var el = this._createElement(this._tagName || "div");
+		if(parent) this.setParent(parent, el);
+		this.init(el);
+		return el;
 	};
-	this.__init = function(obj, domBuildType){
+	this.__init = function(el, domBuildType){
 		if(this._parent && this._parent.add){  //容器类实例有该方法
 			this._parent.add(this);
 		}
 		this._domBuildType = domBuildType;
-		obj._ptr = this;
-		this._self = obj;
-		this._containerNode = obj;  //基础组件默认_self就是具体的容器节点
+		el._ptr = this;
+		this._self = el;
+		this._containerNode = el;  //基础组件默认_self就是具体的容器节点
 		//this._self._ptr = this;
 		//this._id = "__dlg__" + Math.round(10000 * Math.random());
 		//this._self.id = this._id;
@@ -175,12 +175,12 @@ _class("Component", EventTarget, function(){
 	};
 	/**
 	 * @method init
-	 * @param {Element} obj
+	 * @param {Element} el
 	 * @desc 以create方式初始化一个DOM元素
 	 */
-	this.init = function(obj){
+	this.init = function(el){
 		if(this._inited){
-			if(this._self !== obj){
+			if(this._self !== el){
 				console.log("[Component::init]error");
 			}else{
 				console.log("[Component::init]repeated");
@@ -188,7 +188,7 @@ _class("Component", EventTarget, function(){
 			return;
 		}
 		//_super.init.apply(this, arguments);
-		this.__init(obj, 0);
+		this.__init(el, 0);
 		//runtime.actionManager.add(this);
 		//this.setVisible(this._visible);
 		this._inited = true;
@@ -280,41 +280,41 @@ _class("Component", EventTarget, function(){
 		return this.getDoc().createElement(tag);
 	};
 	this._createElement2 = function(parent, tag, cls, style){
-		var obj = this._createElement(tag);
+		var el = this._createElement(tag);
 		if(cls){
-			obj.className = cls;
+			el.className = cls;
 		}
 		if(style){
 			for(var k in style){
 				//if(k.charAt(0) == "_") 1;
 				switch(ATTR[k]){
-				case 0: obj[k] = style[k];break;
-				case 1: obj.setAttribute(k, style[k]);break;
-				case 2: obj.style[k] = style[k];break;
+				case 0: el[k] = style[k];break;
+				case 1: el.setAttribute(k, style[k]);break;
+				case 2: el.style[k] = style[k];break;
 				}
 			}
 		}
 		if(parent){
-			(parent._self || parent).appendChild(obj);
+			(parent._self || parent).appendChild(el);
 		}
-		return obj;
+		return el;
 	};
-	this._renderElement = function(parent, obj){
+	this._renderElement = function(parent, el){
 		if(parent.getContainer){
 			parent = parent.getContainer();
 		}
 		if(this.__insert){
-			parent.insertBefore(obj, this.__insert);
+			parent.insertBefore(el, this.__insert);
 		}else{
-			parent.appendChild(obj);
+			parent.appendChild(el);
 		}
 	};
 	this.createDomElement = function(parent, html, exp){
-		var obj = runtime.createDomElement(html, exp);
+		var el = runtime.createDomElement(html, exp);
 		if(parent){
-			this._renderElement(parent, obj);
+			this._renderElement(parent, el);
 		}
-		return obj;
+		return el;
 	};
 	/**
 	 * @method parseNum
@@ -382,30 +382,30 @@ _class("Component", EventTarget, function(){
 	/**
 	 * @method setParent
 	 * @param {Element} v 父容器
-	 * @param {Element} obj 插入的元素
-	 * @desc 把 obj 插入 v 中，如果obj之前已被加入DOM树，先进行移除。
+	 * @param {Element} el 插入的元素
+	 * @desc 把 el 插入 v 中，如果 el 之前已被加入DOM树，先进行移除。
 	 */
-	this.setParent = function(v, obj){
-		if(!v) v = runtime._workspace;  //obj.parentNode
+	this.setParent = function(v, el){
+		if(!v) v = runtime._workspace;  //el.parentNode
 		//this._parent = v;
 		_super.setParent.apply(this, arguments);
-		if(obj){
+		if(el){
 			var parent = v._self ? v : (
 				v._ptr ? v._ptr : (
 					v === this.getDoc().body ? {"_containerNode": v} : null
 				)
 			);
 			if(!parent) throw "找不到父组件的 DOM 元素";
-			if(obj.parentNode){
-				obj.parentNode.removeChild(obj);
+			if(el.parentNode){
+				el.parentNode.removeChild(el);
 			}
-			parent._containerNode.appendChild(obj);
+			parent._containerNode.appendChild(el);
 		}
 	};
 	/**
 	 * @method getOwner
 	 * @return {Component}
-	 * @desc ???
+	 * @desc 获取组件所有者
 	 */
 	this.getOwner = function(){
 		return this._owner;
@@ -413,7 +413,7 @@ _class("Component", EventTarget, function(){
 	/**
 	 * @method setOwner
 	 * @return {Component} v
-	 * @desc ???
+	 * @desc 设置组件所有者
 	 */
 	this.setOwner = function(v){
 		this._owner = v;
@@ -535,7 +535,7 @@ _class("Component", EventTarget, function(){
 	/**
 	 * @method getCapture
 	 * @return {Boolean}
-	 * @desc  ??
+	 * @desc  获取组件是否已经捕获焦点属性
 	 */
 	this.getCapture = function(){
 		return this._capture;
@@ -632,15 +632,16 @@ _class("Component", EventTarget, function(){
 			? {"x": ev.offsetX, "y": ev.offsetY}
 			: {"x": 0, "y": 0};
 		var refElement = runtime._workspace._self;
-		var obj = ev.srcElement || ev.target;
-		while(obj && obj != refElement){
-			pos.x += obj.offsetLeft;
-			pos.y += obj.offsetTop;
-			obj = obj.offsetParent;
+		var el = ev.srcElement || ev.target;
+		while(el && el != refElement){
+			pos.x += el.offsetLeft;
+			pos.y += el.offsetTop;
+			el = el.offsetParent;
 		}
 		return pos;
 	};
 	/**
+	 * 显示模态组件(对话框)
 	 * @method showModal
 	 * @param {Boolean} v 是否显示遮罩
 	 * @desc   是否显示遮罩
@@ -668,19 +669,19 @@ _class("Component", EventTarget, function(){
 	};
 	/**
 	 * @method setElementRect
-	 * @param {Element} obj DOM元素
+	 * @param {Element} el DOM元素
 	 * @param {Number} x x坐标
 	 * @param {Number} y y坐标
 	 * @param {Number} w 宽度
 	 * @param {Number} h 高度
 	 * @param {String} bg 背景
-	 * @desc   设置 obj 的矩形信息
+	 * @desc   设置 el 的矩形信息
 	 */
-	this.setElementRect = function(obj, x, y, w, h, bg){
-		obj.style.left   = x + "px";
-		obj.style.top    = y + "px";
-		obj.style.width  = w + "px";
-		obj.style.height = h + "px";
+	this.setElementRect = function(el, x, y, w, h, bg){
+		el.style.left   = x + "px";
+		el.style.top    = y + "px";
+		el.style.width  = w + "px";
+		el.style.height = h + "px";
 	};
 	/**
 	 * @method setState
@@ -708,11 +709,11 @@ _class("Component", EventTarget, function(){
 		var style = css[(el.className == "error" ? "error-" : "") + className];
 		for(var k in style){
 			if(k.charAt(0) == "_"){
-				var obj = el.getElementsByTagName(k.substr(1))[0];
+				var el = el.getElementsByTagName(k.substr(1))[0];
 				for(var key in style[k]){
 					var name = this._cssKeyToJsKey(key);
-					if(obj.style[name] != style[k][key]){
-						obj.style[name] = style[k][key];
+					if(el.style[name] != style[k][key]){
+						el.style[name] = style[k][key];
 					}
 				}
 			}else{

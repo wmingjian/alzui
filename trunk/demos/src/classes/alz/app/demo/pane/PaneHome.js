@@ -18,10 +18,10 @@ _class("PaneHome", Pane, function(){
 	this.create = function(parent, app){
 		this.setParent2(parent);
 		this.setApp(app);
-		var obj = this.createTplElement(parent, this._tpl);
-		this.init(obj);
+		var el = this.createTplElement(parent, this._tpl);
+		this.init(el);
 		this.initActionElements();
-		return obj;
+		return el;
 	};
 	this.dispose = function(){
 		_super.dispose.apply(this);

@@ -26,11 +26,11 @@ _class("Popup", Pane, function(){
 		this.setApp(app);
 		this.setOwner(owner);
 		this.setParams(params);
-		var obj = this.createTplElement(parent, tpl);
-		this.init(obj);
-		return obj;
+		var el = this.createTplElement(parent, tpl);
+		this.init(el);
+		return el;
 	};
-	this.init = function(obj){
+	this.init = function(el){
 		_super.init.apply(this, arguments);
 		/*
 		this._self.onmousedown = function(ev){
@@ -110,20 +110,20 @@ _class("Popup", Pane, function(){
 	this.getPosition = function(sender){
 		var pos = {"x": 0, "y": 0};
 		var refElement = runtime._workspace._self;
-		var obj = sender;
-		while(obj && obj != refElement){
-			pos.x += obj.offsetLeft;
-			pos.y += obj.offsetTop;
-			obj = obj.offsetParent;
+		var el = sender;
+		while(el && el != refElement){
+			pos.x += el.offsetLeft;
+			pos.y += el.offsetTop;
+			el = el.offsetParent;
 		}
 		return pos;
 	};
-	this.getPos = function(obj, refObj){
+	this.getPos = function(el, refObj){
 		var pos = {"x": 0, "y": 0};
 		var dom = runtime.dom;
-		for(var o = obj; o && o != refObj; o = o.offsetParent){
+		for(var o = el; o && o != refObj; o = o.offsetParent){
 			var bl, bt, x, y;
-			if(o != obj){
+			if(o != el){
 				bl = dom.getStyleProperty(o, "borderLeftWidth");
 				bt = dom.getStyleProperty(o, "borderTopWidth");
 				x = isNaN(bl) ? 0 : bl;
@@ -133,8 +133,8 @@ _class("Popup", Pane, function(){
 				x += isNaN(bl) ? 0 : bl;
 				y += isNaN(bt) ? 0 : bt;
 			}
-			pos.x += o.offsetLeft + (o != obj ? x : 0);
-			pos.y += o.offsetTop + (o != obj ? y : 0);
+			pos.x += o.offsetLeft + (o != el ? x : 0);
+			pos.y += o.offsetTop + (o != el ? y : 0);
 		}
 		return pos;
 	};

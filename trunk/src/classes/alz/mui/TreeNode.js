@@ -38,15 +38,15 @@ _class("TreeNode", Component, function(){
 		this._leaf = !data.isDir;
 		this._bFirst = bFirst;
 		this._bLast = bLast;
-		var obj = this._createElement("li");
+		var el = this._createElement("li");
 		if(parent){
 			this._parentNode = parent._parent;
-			this._parent._self.appendChild(obj);
+			this._parent._self.appendChild(el);
 		}
-		this.init(obj);
-		return obj;
+		this.init(el);
+		return el;
 	};
-	this.init = function(obj){
+	this.init = function(el){
 		_super.init.apply(this, arguments);
 		var _this = this;
 		if(!("preIcon" in TreeNode.iconCache)){

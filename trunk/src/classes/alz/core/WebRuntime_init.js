@@ -64,10 +64,10 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 		//this._win.alert(info);
 		if(!this._info){
 			var body = this.getBody();
-			var obj = this._doc.createElement("div");
-			obj.className = "ui-loging";
-			obj.style.display = "none";
-			this._info = body.appendChild(obj);
+			var el = this._doc.createElement("div");
+			el.className = "ui-loging";
+			el.style.display = "none";
+			this._info = body.appendChild(el);
 		}
 		this._info.innerHTML = info;
 		if(this._info.style.display == "none"){

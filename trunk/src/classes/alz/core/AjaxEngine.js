@@ -165,10 +165,10 @@ _class("AjaxEngine", Plugin, function(){
 			}else{
 				var http = this._openHttp(method, url, async);
 				/*
-				var div = window.document.createElement("div");
-				div.style.backgroundColor = "#EEEEEE";
-				div.innerHTML = url + "&" + postData;
-				im_history.appendChild(div);
+				var el = document.createElement("div");
+				el.style.backgroundColor = "#EEEEEE";
+				el.innerHTML = url + "&" + postData;
+				im_history.appendChild(el);
 				*/
 				http.send(postData);  //FF下面参数null不能省略
 				return this._onSyncCallback(type);
@@ -554,10 +554,10 @@ _class("AjaxEngine", Plugin, function(){
 				};
 			}
 			/ *
-			var div = runtime.getDocument().createElement("div");
-			div.style.backgroundColor = "#EEEEEE";
-			div.innerHTML = url + "&" + postData;
-			im_history.appendChild(div);
+			var el = runtime.getDocument().createElement("div");
+			el.style.backgroundColor = "#EEEEEE";
+			el.innerHTML = url + "&" + postData;
+			im_history.appendChild(el);
 			* /
 			if(method == "POST"){
 				this._http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");

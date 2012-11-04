@@ -16,11 +16,11 @@ _class("PaneWindow", Pane, function(){
 	this.create = function(parent, app){
 		this.setParent2(parent);
 		this.setApp(app);
-		var obj = this.createTplElement(parent, this._tpl);
-		this.init(obj);
-		return obj;
+		var el = this.createTplElement(parent, this._tpl);
+		this.init(el);
+		return el;
 	};
-	this.init = function(obj){
+	this.init = function(el){
 		_super.init.apply(this, arguments);
 		this._win1 = new Window();
 		this._win1.bind($("win1"));

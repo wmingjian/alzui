@@ -17,16 +17,16 @@ _class("SilverButton", Component, function(){
 		this._cite = null;
 	};
 	this.create = function(btn){
-		var obj = this._createElement("span");
-		obj.className = "ui-silverbutton";
+		var el = this._createElement("span");
+		el.className = "ui-silverbutton";
 		if(btn){
-			btn.parentNode.replaceChild(obj, btn);
-			this._btn = obj.appendChild(btn);
+			btn.parentNode.replaceChild(el, btn);
+			this._btn = el.appendChild(btn);
 		}
-		this.init(obj);
-		return obj;
+		this.init(el);
+		return el;
 	};
-	this.init = function(obj){
+	this.init = function(el){
 		_super.init.apply(this, arguments);
 		var cite = this._createElement("cite");
 		cite.appendChild(this._createTextNode(this._btn.value));

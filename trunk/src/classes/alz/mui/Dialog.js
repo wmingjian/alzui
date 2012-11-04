@@ -23,7 +23,7 @@ _class("Dialog", BaseWindow, function(){
 		this.setParent2(parent);
 		//this.setOwnerApp(ownerApp);
 		this.setApp(app);
-		var obj = this.createTplElement(parent, tpl);  //"dialog2.xml"
+		var el = this.createTplElement(parent, tpl);  //"dialog2.xml"
 		/*
 		tpl = runtime.formatTpl(tpl, {
 			"caption": params.caption,
@@ -31,12 +31,12 @@ _class("Dialog", BaseWindow, function(){
 		});
 		*/
 		if(this._conf.bg){
-			obj.style.backgroundImage = "url(res/images/dlg/" + this._conf.bg + ")";
+			el.style.backgroundImage = "url(res/images/dlg/" + this._conf.bg + ")";
 		}
-		this.init(obj);
-		return obj;
+		this.init(el);
+		return el;
 	};
-	this.init = function(obj){
+	this.init = function(el){
 		_super.init.apply(this, arguments);
 		//this._skin = this._createElement("div");
 		//this._self.appendChild(this._skin);
@@ -172,7 +172,7 @@ _class("Dialog", BaseWindow, function(){
 		//this.addListener(this._head, "mouseup", this, "onMouseUp");
 		this.setCapture(true);
 		//var pos = this._dom.getPos(ev.srcElement, this._self);
-		//window.document.title = pos.x + "+" + ev.offsetX + "=" + (pos.x + ev.offsetX) + "#" + ev.clientX
+		//document.title = pos.x + "+" + ev.offsetX + "=" + (pos.x + ev.offsetX) + "#" + ev.clientX
 		//								+ "|" + pos.y + "+" + ev.offsetY + "=" + (pos.y + ev.offsetY) + "#" + ev.clientY;
 		this._offsetX = ev.offsetX;  //ns 浏览器的问题
 		this._offsetY = ev.offsetY;

@@ -12,11 +12,11 @@ _class("PaneBase", Pane, function(){
 	this.create = function(parent, app, tpl){
 		this.setParent2(parent);
 		this.setApp(app);
-		var obj = this.createTplElement(parent, tpl);
-		this.init(obj);
-		return obj;
+		var el = this.createTplElement(parent, tpl);
+		this.init(el);
+		return el;
 	};
-	this.init = function(obj){
+	this.init = function(el){
 		_super.init.apply(this, arguments);
 		//this.initComponents();  //初始化内部组件
 		this.initActionElements(/*this._self, this*/);  //初始化动作元素

@@ -22,12 +22,12 @@ _class("TableView", Component, function(){
 		sb.push('</tbody>');
 		sb.push('</table>');
 		var tpl = sb.join("");
-		var obj = runtime.dom.createDomElement(tpl, parent._self);
-		//parent.appendChild(obj);
-		this.init(obj);
-		return obj;
+		var el = runtime.dom.createDomElement(tpl, parent._self);
+		//parent.appendChild(el);
+		this.init(el);
+		return el;
 	};
-	this.init = function(obj){
+	this.init = function(el){
 		_super.init.apply(this, arguments);
 	};
 	this.dispose = function(){

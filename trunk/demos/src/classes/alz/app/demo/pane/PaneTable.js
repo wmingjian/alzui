@@ -31,11 +31,11 @@ _class("PaneTable", Pane, function(){
 		this.setParent2(parent);
 		this._data = data;
 		this.setApp(app);
-		var obj = this.createTplElement(parent, this._tpl);
-		this.init(obj);
-		return obj;
+		var el = this.createTplElement(parent, this._tpl);
+		this.init(el);
+		return el;
 	};
-	this.init = function(obj){
+	this.init = function(el){
 		_super.init.apply(this, arguments);
 		this._table = new TableView();
 		this._table.create(this, this._data);

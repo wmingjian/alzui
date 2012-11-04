@@ -55,16 +55,16 @@ _class("Window", BaseWindow, function(){
 		this.setParent2(parent);
 		this.setApp(app);
 		this.setParams(params || {});
-		var obj = this.createTplElement(parent, tpl);
-		this.init(obj);
-		return obj;
+		var el = this.createTplElement(parent, tpl);
+		this.init(el);
+		return el;
 	};
-	this.bind = function(obj){
-		this.setParent2(obj.parentNode);
+	this.bind = function(el){
+		this.setParent2(el.parentNode);
 		this._params = {};
-		this.init(obj);
+		this.init(el);
 	};
-	this.init = function(obj){
+	this.init = function(el){
 		_super.init.apply(this, arguments);
 		/*
 		body     .body
@@ -77,8 +77,8 @@ _class("Window", BaseWindow, function(){
 		*/
 		//_icon="{$pathimg}win-icon.gif" _caption="alzui调试器 - Windown 2000" _align="none"
 		var data = {
-			"icon"   : obj.getAttribute("_icon") || "",
-			"caption": this._params.caption || obj.getAttribute("_caption") || "标题栏"
+			"icon"   : el.getAttribute("_icon") || "",
+			"caption": this._params.caption || el.getAttribute("_caption") || "标题栏"
 		};
 		this._cssName = "." + this._self.className;
 		this._xpath = this._cssName;

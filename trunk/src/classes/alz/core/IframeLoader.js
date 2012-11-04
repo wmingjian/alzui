@@ -19,11 +19,11 @@ _class("IframeLoader", "", function(){
 		this._func = func;
 		var _this = this;
 		var firstLoad = true;
-		var obj = this._doc.createElement("iframe");
-		obj.id = name;
-		obj.name = name;
-		obj.style.display = "none";
-		obj[this._event] = function(){
+		var el = this._doc.createElement("iframe");
+		el.id = name;
+		el.name = name;
+		el.style.display = "none";
+		el[this._event] = function(){
 			if(runtime.ie && !(this.readyState == "loaded" || this.readyState == "complete")){
 				return;
 			}
@@ -58,9 +58,9 @@ _class("IframeLoader", "", function(){
 			}
 			//_this.dispose();
 		};
-		obj.src = "about:blank";
-		this._self = parent.appendChild(obj);
-		return obj;
+		el.src = "about:blank";
+		this._self = parent.appendChild(el);
+		return el;
 	};
 	this.reset = function(){
 	};
