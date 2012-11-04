@@ -70,3 +70,27 @@ function colorcode(code){
 window.onload = onload;
 
 })(this);
+
+var chm = {
+	title: "alzui框架参考手册",  //"新浪邮箱-RIA前端开发文档"
+	copyright: "copyright &copy; 2012-2013 alz. all right reserved",  //"Copyright &copy; 2009 Sina Inc. All Right Reserved"
+	head: function(){
+		var url = document.URL.replace(/\\/g, "/");
+		var start = url.lastIndexOf("/") + 1;
+		var title = url.substr(start, document.URL.length - start - 4);
+		//document.write('<h1 class="title">' + document.title + '</h1>');
+		//document.write('<hr size="2" noshade="noshade" />');
+		document.write('<div class="head">'
+			+ '<h1>' + this.title + '</h1>'
+			+ '<h2>' + document.title + '</h2>'
+			+ '</div>');
+	},
+	/* 公共页尾 */
+	foot: function(){
+		//document.write('<hr size="1" noshade="noshade" />');
+		document.write('<div class="foot">'
+			+ '<hr />'
+			+ '<p>' + this.copyright + '</p>'
+			+ '</div>');
+	}
+};

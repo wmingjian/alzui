@@ -5,7 +5,6 @@ form{margin:0px;}
 table{border-collapse:collapse;}
 ul{margin:0px;padding:0px;}
 li{list-style:none;}
-h1{margin:8px 0px;}
 
 /* 样式 */
 .wui-PaneApp{position:relative;overflow:hidden;width:100%;height:100%;text-shadow:none;font:12px "宋体";}
@@ -24,7 +23,8 @@ h1{margin:8px 0px;}
 
 .list{float:left;width:200px;}
 
-ul.class-list{overflow:auto;height:600px;border:1px solid gray;}
+/* ul */
+.class-list{overflow:auto;height:600px;border:1px solid gray;}
 .class-list li a:link,
 .class-list li a:visited{color:#808080;text-decoration:none;}
 .class-list li a:hover{text-decoration:underline;}
@@ -33,3 +33,22 @@ ul.class-list{overflow:auto;height:600px;border:1px solid gray;}
 
 .pane-app-add{position:relative;overflow:auto;width:100%;height:100%;}
 .pane-app-add .title{background-color:#D3EAEF;font-size:20px;padding:2px 0px;}
+
+/* docs1.css */
+html, body{padding:0px;margin:0px;background-color:white;font:12px "宋体";}
+p,a,div,h1,h2,li{font-size:12px;font-family:"宋体";}
+table{border-collapse:collapse;}
+img{border-width:0px;}
+a{color:#333333;}
+a:hover{color:#B8860B;}
+p{margin:4px 0px;text-indent:24px;line-height:160%;}
+
+.head{background-color:#0080C0;color:white;padding:4px;}
+.head h1{margin:0px;padding:1px;font:bold 14px "宋体";color:white;background-color:#0080c0;}
+.head h2{margin:0px;padding:1px;font-size:12px;}
+.foot{text-align:left;/*padding:10px;margin:auto;width:80%;text-align:center;*/}
+.foot hr{width:95%;/*width:90%;*/color:#cecece;height:1px;}
+.art_ctn{margin-left:16px;margin-right:16px;}
+.art_ctn h2{margin-top:20px;}
+.code{margin:10px;width:80%;border:1px solid #666666;padding:10px;margin:auto;line-height:140%;background-color:#efefef;}
+.code pre{margin:0px;padding:0px;}

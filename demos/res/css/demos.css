@@ -10,3 +10,9 @@ form textarea,
 form select{font:12px "宋体";}
 
 label{font:12px "宋体";}
+
+/*height:40px;background-color:#E2E2E2;*/
+.header{position:relative;overflow:hidden;height:32px;color:white;background-color:#38546C;}
+.header .caption{position:relative;display:inline-block;width:120px;margin:2px;text-align:center;font:bold 20px "微软雅黑","黑体","宋体";}
+.header a{text-decoration:none;color:white;margin-right:10px;}
+.header a:hover{text-decoration:underline;}
