@@ -3,12 +3,11 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>基于alzui框架的代码编码规范</title>
-<style>
-body{font:12px 宋体;}
-p{margin:4px 0px;}
-</style>
+<link type="text/css" rel="stylesheet" href="../res/css/docs.css" />
+<script type="text/javascript" src="../lib/chm_lib.js"></script>
 </head>
 <body>
+<script src="../lib/head.js"></script>
 <!--
 http://www.phpv.net/html/1591.html
 	JavaScript程序编码规范 中文版
@@ -25,70 +24,26 @@ http://www.nowamagic.net/javascript/js_JavascriptCodingSpecification.php
 http://www.itrenjia.org/2011/0308/1179.html
 	JavaScript编程语言的编码规范浅谈
 -->
-<p>JS文件格式统一为UNIX格式(\n)；
-<p>统一使用TAB缩进，TAB除了用于缩进之外不允许用于其他用途（这意味着每一行第一个非TAB字符之后不再出现TAB）；
-<p>每条语句后面的单行注释前面保留两个空格；
-<p>HTML中不出现一行JS代码，只允许出现在script标签内或者通过script标签引用外部JS文件；
-<p>除个别变量名($,$E等)，禁止使用$符号作为变量名的组成字符（包括$开头的变量名）；
-<p>变量的命名宏观上遵循类Java的命名规则：驼峰命名法（Camel-Case）；
-<p>局部变量不使用下划线开头，类的私有成员变量，全部以下划线开头；
-<p>包的组织结构和java保持一致；
-<p>永远不显示的使用undefined，因为这些地方都可以使用null取代之；
-<p>所有用new Object(),new Array()的地方使用{},[]替代；
-<p>&&,||,&,|等表达式不作为单独的语句出现，=,+=等赋值语句不出现在条件表达式中；
-<p>for循环中任何重复性的操作符运算都应该使用一个局部变量替代；
-<p>使用数组保存顺序，使用对象进行哈希映射（快速查找）；
-<p>使用for-i遍历数组，使用for-in遍历对象，不要颠倒使用；
-<p>不要把数组当成对象使用哈希映射功能；
-<p>for-i循环变量只使用i,j,k三个，for-in推荐循环变量k,key；
-<p>函数内循环不超过三层，如果达到三层，请考虑将部分功能拆分到另一函数中；
-<p>“{”（左大括号）应在复合语句起始行的结尾处；
-<p>“}”（右大括号）应与“{”（左大括号）的那一行的开头对齐；
-<p>参考python语法，加强通过缩进识别语句块的习惯；
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
-<p>
+<p>JS文件格式统一为UNIX格式(\n)；</p>
+<p>统一使用TAB缩进，TAB除了用于缩进之外不允许用于其他用途（这意味着每一行第一个非TAB字符之后不再出现TAB）；</p>
+<p>每条语句后面的单行注释前面保留两个空格；</p>
+<p>HTML中不出现一行JS代码，只允许出现在script标签内或者通过script标签引用外部JS文件；</p>
+<p>除个别变量名($,$E等)，禁止使用$符号作为变量名的组成字符（包括$开头的变量名）；</p>
+<p>变量的命名宏观上遵循类Java的命名规则：驼峰命名法（Camel-Case）；</p>
+<p>局部变量不使用下划线开头，类的私有成员变量，全部以下划线开头；</p>
+<p>包的组织结构和java保持一致；</p>
+<p>永远不显示的使用undefined，因为这些地方都可以使用null取代之；</p>
+<p>所有用new Object(),new Array()的地方使用{},[]替代；</p>
+<p>&&,||,&,|等表达式不作为单独的语句出现，=,+=等赋值语句不出现在条件表达式中；</p>
+<p>for循环中任何重复性的操作符运算都应该使用一个局部变量替代；</p>
+<p>使用数组保存顺序，使用对象进行哈希映射（快速查找）；</p>
+<p>使用for-i遍历数组，使用for-in遍历对象，不要颠倒使用；</p>
+<p>不要把数组当成对象使用哈希映射功能；</p>
+<p>for-i循环变量只使用i,j,k三个，for-in推荐循环变量k,key；</p>
+<p>函数内循环不超过三层，如果达到三层，请考虑将部分功能拆分到另一函数中；</p>
+<p>“{”（左大括号）应在复合语句起始行的结尾处；</p>
+<p>“}”（右大括号）应与“{”（左大括号）的那一行的开头对齐；</p>
+<p>参考python语法，加强通过缩进识别语句块的习惯；</p>
+<script src="../lib/foot.js"></script>
 </body>
 </html>

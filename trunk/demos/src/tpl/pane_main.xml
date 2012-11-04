@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <div _align="client" _layout="BorderLayout">
-	<div style="height:40px;background-color:#E2E2E2;">框架示例应用</div>
+	<div class="header">
+		<div class="caption">框架示例应用</div>
+	</div>
 	<ul id="left1" class="ui-listbox pane-left" _align="left"><!--
 		<li _id="home"><a href="index.html">介绍</a></li>
 	--></ul>
