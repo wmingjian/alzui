@@ -1,0 +1,85 @@
+2012-11-4
+
+1)统一部分DOM元素的局部变量名为el
+2)更新合并后的lib文件
+
+2012-4-22
+
+1)去除局部变量置空语句，优化数组清空操作
+2)添加几个应用配置文件app.json
+3)调整几个lib文件格式，统一包含的类列表
+
+version 0.0.9
+
+1)修正apply方法的实现，提高运行速度
+2)WebAppRuntime->WebRuntime
+3)>ActionElement::dispatchAction(sender, ev);
+4)+AjaxEngine::pauseAjaxThread(abort);
+5)>this.netInvokeQueue(queue, agent, callback);
+6)重构TemplateManager::parse支持对XML类型模板的编译
+7)+alz.core.Plugin,alz.core.PluginManager
+8)2009-12-10 +类alz.core.Ajax代替runtime.getAjax()接口
+9)2009-12-10 +alz.core.Application::getAppManager()
+10)2010-1-14 _template属性移动到Application类中
+
+version 0.0.8
+
+1)+alz.mui.TextHistory
+2)+alz.mui.TextItem
+3)+Console彩色文本特性
+4)fixed: FF下对keyCode:61(-),109(;)的支持
+
+version 0.0.7
+
+1)重构Context::_class方法，完善和优化类继承模型
+2)优化AObject::getClass,instanceOf等方法
+3)feature: Context::_abstract 实现抽象方法定义
+4)+add: Console::setPrompt,Console::setInterpret
+5)Console FF兼容性调整
+
+version 0.0.6
+
+1)页面doctype更新为xhtml1-strict
+2)feature: 新增alz.mui.Console,alz.mui.LineEdit类，实现控制台功能
+
+version 0.0.5
+
+2009-9-18
+1)fixed: _extension对关键方法的扩展逻辑错误
+2)fixed: 类继承链中，父类扩展中对应方法不能被成功调用的问题
+3)fixed: AppManager_mini::dispose没有调用每个app的dispose方法
+4)fixed: ListItem onselectstart导致的内存泄漏
+5)+Component::_containerNode,Component::getOwner
+6)+alz.ui.ButtonBase
+7)+alz.ui.Console
+8)+alz.core.IframeLoader
+9)+alz.tools.shell.Console，AppShell应用重构
+10)网络桌面调试模式下Console类的工作
+2009-9-19
+11)重新定义runtime.pathApp的含义为netapp的默认根目录
+12)去掉Component::_create，统一为Component::_createElement
+
+version 0.0.4
+
+1)with语句内初始化代码重构到regLib接口中，__init__库文件格式和其他库进一步统一
+2)xul运行环境的初步支持
+
+version 0.0.3
+
+1)基础代码重构，alz.core.Context类和普通的类基本无异
+2)添加alz.core.ScriptLoader类，用于js文件的加载
+3)完善alz.core.AppManager类，APP管理功能基本实现
+4)WebAppRuntime类接口createApp,regProduct,getProduct调整到core.lib中
+5)demos/Window.html的浏览器兼容性调整
+
+version 0.0.2
+
+1)操作系统检测
+2)改善lib文件动态加载机制
+3)LayoutElement组件及BorderLayout布局完善
+
+version 0.0.1
+
+1)类模拟机制
+2)类扩展机制
+3)lib文件格式

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<div class="wui-Page">
+	<div class="header">
+		<label class="caption">alzui-mini框架文档中心</label>
+		<a href="#" _action="app_list">我的应用</a>
+		<a href="#" _action="app_add">新建应用</a>
+		<a href="#" _action="app_pkg">打包下载</a>
+		<a href="#" _action="app_check">检查工具</a>
+	</div>
+	<div class="pane-main">
+		<div id="left1" class="left treeview"></div>
+		<div id="deck_pane" class="deck-pane">
+			<!--div class="list">
+				<ul id="list" class="class-list"></ul>
+			</div-->
+		</div>
+	</div>
+</div>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<div class="pane-app-add">
+	<form name="frm_app_add" method="POST" action="xxx.php" _action="app_add2">
+		<h1 class="title">打包下载</h1>
+		<div>这里放置各种设置信息</div>
+		<div><input type="submit" value="确定" /></div>
+	</form>
+</div>
