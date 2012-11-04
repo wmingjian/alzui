@@ -124,12 +124,6 @@ function initNative(){
 			}
 		},
 		"Array": {
-			/**
-			 * 移除数组中的第i个对象
-			 */
-			removeAt: function(i){
-				this.splice(i, 1);
-			},
 			// 如果不考虑IE5.5下版本浏览器，该方法可考虑丢弃
 			// IE 5.x fix from Igor Poteryaev.
 			pop: function(){
@@ -149,7 +143,7 @@ function initNative(){
 			},
 			// 返回(默认从第一个元素开始查找)指定元素的索引，如果不存在返回-1
 			indexOf: function(obj, idx){
-				var from = idx === undefined ? 0 : (idx < 0 ? Math.max(0, arr.length + idx) : idx);
+				var from = idx === undefined ? 0 : (idx < 0 ? Math.max(0, this.length + idx) : idx);
 				for(var i = from, l = this.length; i < l; i++){
 					if(i in this && this[i] === obj){
 						return i;
@@ -169,6 +163,12 @@ function initNative(){
 					}
 				}
 				return -1;
+			},
+			/**
+			 * 移除数组中的第i个对象
+			 */
+			removeAt: function(i){
+				this.splice(i, 1);
 			},
 			// 检查数组元素是否都符合某个条件，只要有一个不符合返回false，否则返回true
 			every: function(fn, thisObj){

@@ -45,11 +45,11 @@ _class("Workspace", Container, function(){
 	};
 	this.create = function(parent){
 		this.setParent2(parent);
-		var obj = this._createElement2(parent, "div", "ui-workspace wui-PaneApp");
-		this.init(obj);
-		return obj;
+		var el = this._createElement2(parent, "div", "ui-workspace wui-PaneApp");
+		this.init(el);
+		return el;
 	};
-	this.__init = function(obj, domBuildType){
+	this.__init = function(el, domBuildType){
 		_super.__init.apply(this, arguments);
 		this.onMouseMove = this._mousemoveForNormal;
 		//this.onMouseMove = this._mousemoveForFixed;
@@ -81,7 +81,7 @@ _class("Workspace", Container, function(){
 		this.onMouseDown = this._mousemoveForFixed;
 		*/
 	};
-	this.init = function(obj){
+	this.init = function(el){
 		_super.init.apply(this, arguments);
 		//在这里绑定工作区所有可能用到的事件
 		//……
@@ -203,8 +203,8 @@ _class("Workspace", Container, function(){
 	 */
 	/*
 	this._mousemoveForFixed = function(ev){
-		var obj = runtime._testDiv;
-		var pos = this._dom.getPos(obj, this._self);
+		var el = runtime._testDiv;
+		var pos = this._dom.getPos(el, this._self);
 		if(this._fixed == null){
 			//window.alert((pos.x + ev.offsetX) + "," + (pos.y + ev.offsetY) + "|" + ev.clientX + "," + ev.clientY);
 			this._offsetX = ev.offsetX;
@@ -215,8 +215,8 @@ _class("Workspace", Container, function(){
 			var rect = this.getViewPort();
 			var x = rect.x + Math.min(rect.w - this._paddingLeft, Math.max(0, ev.clientX - this._borderLeftWidth)) - this._fixedX - this._offsetX - this._paddingLeft;
 			var y = rect.y + Math.min(rect.h - this._paddingTop, Math.max(0, ev.clientY - this._borderTopWidth)) - this._fixedY - this._offsetY - this._paddingTop;
-			obj.style.left = (-2000 + x) + "px";
-			obj.style.top = (-2000 + y) + "px";
+			el.style.left = (-2000 + x) + "px";
+			el.style.top = (-2000 + y) + "px";
 			this._mousemoveForFixed(ev);
 		}else if(this._fixed == "fixing"){
 			//this._fixedOff = {"x": ev.clientX, "y": ev.clientY};
@@ -231,8 +231,8 @@ _class("Workspace", Container, function(){
 	};
 	*/
 	this._mousemoveForFixed = function(dlg, ev){
-		var obj = ev.srcElement;
-		var pos = dlg._dom.getPos(obj, this._self);
+		var el = ev.srcElement;
+		var pos = dlg._dom.getPos(el, this._self);
 		if(this._fixed == null){
 			//window.alert((pos.x + ev.offsetX) + "," + (pos.y + ev.offsetY) + "|" + ev.clientX + "," + ev.clientY);
 			this._fixedOff = {
@@ -252,7 +252,7 @@ _class("Workspace", Container, function(){
 			}
 			this._fixedX = pos.x - this._fixedOff.pos_x;  //pos.x + ev.offsetX - (this._fixedOff.pos_x + this._fixedOff.ev_offsetX)
 			this._fixedY = pos.y - this._fixedOff.pos_y;  //pos.y + ev.offsetY - (this._fixedOff.pos_y + this._fixedOff.ev_offsetY)
-			//window.document.title = this._fixedX + "," + this._fixedY + "|" + dlg._borderLeftWidth + "," + dlg._borderTopWidth;
+			//document.title = this._fixedX + "," + this._fixedY + "|" + dlg._borderLeftWidth + "," + dlg._borderTopWidth;
 			this._fixed = "fixed";
 			dlg.onMouseMove(ev);
 			this._mousemoveForFixed = null;

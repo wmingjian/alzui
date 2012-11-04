@@ -5,7 +5,7 @@ _class("BoxElement", "", function(){
 	this._init = function(el, parent){
 		_super._init.call(this);
 		this._win = window;
-		this._doc = window.document;
+		this._doc = document;
 		this._parent = parent || null;
 		this._self = null;
 		this._nodes = [];
@@ -29,35 +29,35 @@ _class("BoxElement", "", function(){
 	};
 	this.create = function(parent, data){
 		if(data["__type__"] == "string"){
-			var obj = this._createTextNode(data["__contain__"][0][""]);
+			var el = this._createTextNode(data["__contain__"][0][""]);
 			if(parent){
 				this._parent = parent;
-				parent._self.appendChild(obj);
+				parent._self.appendChild(el);
 				//parent._nodes.push(this);
-				//this._self = obj;
+				//this._self = el;
 				//parent.appendNode(this);
 			}else{
 				parent = this._doc.body;
-				parent.appendChild(obj);
+				parent.appendChild(el);
 			}
-			return obj;
+			return el;
 		}
-		var obj = this._createElement("div");
-		obj.style.position = "absolute";
-		obj.style.overflow = "hidden";
-		//obj.style.width = "100%";
-		//obj.style.height = "100%";
+		var el = this._createElement("div");
+		el.style.position = "absolute";
+		el.style.overflow = "hidden";
+		//el.style.width = "100%";
+		//el.style.height = "100%";
 		if(parent){
 			this._parent = parent;
-			parent._self.appendChild(obj);
+			parent._self.appendChild(el);
 			//parent._nodes.push(this);
-			//this._self = obj;
+			//this._self = el;
 			//parent.appendNode(this);
 		}else{
 			parent = this._doc.body;
-			parent.appendChild(obj);
+			parent.appendChild(el);
 		}
-		this.init(obj);
+		this.init(el);
 		for(var k in data){
 			if(k == "__contain__"){
 				for(var i = 0, len = data[k].length; i < len; i++){
@@ -69,12 +69,12 @@ _class("BoxElement", "", function(){
 				this.setattr(k, data[k]);
 			}
 		}
-		return obj;
+		return el;
 	};
-	this.init = function(obj){
-		obj.__ptr__ = this;
-		this._self = obj;
-		this.__style = obj.style;
+	this.init = function(el){
+		el.__ptr__ = this;
+		this._self = el;
+		this.__style = el.style;
 		//初始化应用到的属性，从DOM对象中解析出实际的值，只读方式使用
 		var properties = [
 			"width","height",

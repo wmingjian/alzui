@@ -14,14 +14,14 @@ _class("ToggleButton", BitButton, function(){
 	this.create = function(parent, data){
 		this.setParent2(parent);
 		this.setData(data);
-		var obj = this._createElement2(parent, "li", "ui-toolbutton");
-		this.init(obj);
-		return obj;
+		var el = this._createElement2(parent, "li", "ui-toolbutton");
+		this.init(el);
+		return el;
 	};
-	this.bind = function(obj, app){
-		this.init(obj);
+	this.bind = function(el, app){
+		this.init(el);
 	};
-	this.init = function(obj){
+	this.init = function(el){
 		_super.init.apply(this, arguments);
 		var data = {
 			"groupid": this._self.getAttribute("_groupid"),

@@ -86,11 +86,11 @@ _class("WindowSkinWINXP", Component, function(){
 				this._parent[k]._cssData = this._cssHash[k];
 			}
 		}
-		var obj = this._createElement2(parent ? parent._self : null, "div", "ui-skin");
-		this.init(obj);
-		return obj;
+		var el = this._createElement2(parent ? parent._self : null, "div", "ui-skin");
+		this.init(el);
+		return el;
 	};
-	this.init = function(obj){
+	this.init = function(el){
 		_super.init.apply(this, arguments);
 		this._xpath = ".ui-window-winxp";
 		//this._skins = [];

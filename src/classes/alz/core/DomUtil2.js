@@ -21,21 +21,21 @@ _class("DomUtil2", "", function(){
 	};
 	this.createDomElement = function(html, parent){
 		if(!this._domTemp){
-			this._domTemp = window.document.createElement("div");
+			this._domTemp = document.createElement("div");
 		}
 		this._domTemp.innerHTML = html;
-		var obj = this._domTemp.removeChild(this._domTemp.childNodes[0]);
+		var el = this._domTemp.removeChild(this._domTemp.childNodes[0]);
 		if(parent){
-			parent.appendChild(obj);
+			parent.appendChild(el);
 			/*
 			//滞后加载图片
-			var imgs = obj.getElementsByTagName("img");
+			var imgs = el.getElementsByTagName("img");
 			for(var i = 0, len = imgs.length; i < len; i++){
 				imgs[i].src = imgs[i].getAttribute("src0");
 			}
 			*/
 		}
-		return obj;
+		return el;
 	};
 	/**
 	 * 统一 IE 和 Moz 系列浏览器的差异
@@ -54,7 +54,7 @@ _class("DomUtil2", "", function(){
 		}
 	};
 	this.getStyle = function(el){
-		var style, view = window.document.defaultView;
+		var style, view = document.defaultView;
 		if(view && view.getComputedStyle){
 			style = view.getComputedStyle(el, null);
 		}else if(el.currentStyle){

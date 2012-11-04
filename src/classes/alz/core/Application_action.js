@@ -16,7 +16,7 @@ _extension("Application", function(){  //注册 Application 扩展(action)
 	};
 	//实现动作接口: {initActionElements:null,doAction:null}
 	this.initActionElements = function(element, owner){
-		element = element || (this._contentPane ? this._contentPane._self : window.document);
+		element = element || (this._contentPane ? this._contentPane._self : document);
 		owner = owner || this;
 		function onAction(ev){
 			ev = ev || window.event;

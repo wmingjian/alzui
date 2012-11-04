@@ -34,20 +34,20 @@ _class("ScriptLoader", EventTarget, function(){
 	};
 	this.createScript = function(parent, url){
 		var _this = this;
-		var obj = runtime.getDocument().createElement("script");
-		obj.type = "text/javascript";
-		obj.charset = "utf-8";
-		obj[this._event] = function(){
+		var el = runtime.getDocument().createElement("script");
+		el.type = "text/javascript";
+		el.charset = "utf-8";
+		el[this._event] = function(){
 			//脚本如果缓存状态为 complete，否则为 loaded
 			if(runtime.ie && !(this.readyState == "loaded" || this.readyState == "complete")){
 				return;
 			}
 			_this.fireEvent({type: "load"});
 		};
-		obj.src = url;
-		this._scripts.push(obj);
-		parent.appendChild(obj);
-		return obj;
+		el.src = url;
+		this._scripts.push(el);
+		parent.appendChild(el);
+		return el;
 	};
 	/**
 	 * 一次加载一个或多个脚本

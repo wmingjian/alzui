@@ -46,8 +46,8 @@ _class("AppTestWin", Application, function(){
 			}
 		};
 		*/
-		var obj = runtime.dom.createDomElement(this._template.getTplData("pane_main.xml"));
-		this._workspace._self.appendChild(obj);
+		var el = runtime.dom.createDomElement(this._template.getTplData("pane_main.xml"));
+		this._workspace._self.appendChild(el);
 		var sb = [];
 		for(var i = 0, len = pane_conf.length; i < len; i++){
 			var item = pane_conf[i];

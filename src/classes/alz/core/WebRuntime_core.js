@@ -57,7 +57,7 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 		}
 		*/
 		if(this._debug){
-			window.document.onmousedown = function(ev){
+			document.onmousedown = function(ev){
 				ev = ev || window.event;
 				if(ev.ctrlKey){
 					var target = ev.target || ev.srcElement;
@@ -81,7 +81,7 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 		this._productManager.dispose();
 		this._productManager = null;
 		if(this._debug){
-			window.document.onmousedown = null;
+			document.onmousedown = null;
 		}
 		for(var i = 0, len = properties.length; i < len; i++){
 			var k = properties[i];

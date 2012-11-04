@@ -42,21 +42,21 @@ _class("DOMUtil", Plugin, function(){
 	};
 	this.createDomElement = function(html, parent){
 		if(!this._domTemp){
-			this._domTemp = window.document.createElement("div");
+			this._domTemp = document.createElement("div");
 		}
 		this._domTemp.innerHTML = html;
-		var obj = this._domTemp.removeChild(this._domTemp.childNodes[0]);
+		var el = this._domTemp.removeChild(this._domTemp.childNodes[0]);
 		if(parent){
-			parent.appendChild(obj);
+			parent.appendChild(el);
 			/*
 			//滞后加载图片
-			var imgs = obj.getElementsByTagName("img");
+			var imgs = el.getElementsByTagName("img");
 			for(var i = 0, len = imgs.length; i < len; i++){
 				imgs[i].src = imgs[i].getAttribute("src0");
 			}
 			*/
 		}
-		return obj;
+		return el;
 	};
 	/**
 	 * @method getPos
@@ -158,11 +158,11 @@ _class("DOMUtil", Plugin, function(){
 			runtime.ie ? {"x": ev.offsetX, "y": ev.offsetY} : {"x": ev.layerX, "y": ev.layerY}
 		) : {"x": 0, "y": 0};
 		refElement = refElement || runtime.getDocument().body;
-		var obj = ev.srcElement || ev.target;
-		while(obj && obj != refElement){
-			pos.x += obj.offsetLeft;
-			pos.y += obj.offsetTop;
-			obj = obj.offsetParent;
+		var el = ev.srcElement || ev.target;
+		while(el && el != refElement){
+			pos.x += el.offsetLeft;
+			pos.y += el.offsetTop;
+			el = el.offsetParent;
 		}
 		return pos;
 	};
@@ -363,7 +363,7 @@ _class("DOMUtil", Plugin, function(){
 		return obj;
 	};
 	this._create = function(tag){
-		return window.document.createElement(tag);
+		return document.createElement(tag);
 	};
 	this._setWidth = function(el, v){
 		//if(runtime._host.compatMode != "BackCompat"){

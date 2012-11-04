@@ -13,11 +13,11 @@ _class("ToolButton", Component, function(){
 	this.create = function(parent, data){
 		this.setParent2(parent);
 		this.setData(data);
-		var obj = this._createElement2(parent, "li", "ui-toolbutton");
-		this.init(obj);
-		return obj;
+		var el = this._createElement2(parent, "li", "ui-toolbutton");
+		this.init(el);
+		return el;
 	};
-	this.init = function(obj){
+	this.init = function(el){
 		_super.init.apply(this, arguments);
 		this._self.title = this._data.title;
 		this._self.setAttribute("_action", this._data.action);

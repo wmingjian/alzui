@@ -60,7 +60,7 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 			this._domTemp = this._doc.createElement("div");
 		}
 		this._domTemp.innerHTML = html;
-		var obj = this._domTemp.removeChild(this._domTemp.childNodes[0]);
+		var el = this._domTemp.removeChild(this._domTemp.childNodes[0]);
 		if(typeof parent == "string" || typeof parent == "undefined"){
 			//return jQuery.find(exp, div)[0];
 			/*
@@ -73,16 +73,16 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 			return null;
 			*/
 		}else if(parent){  //HTMLElement
-			parent.appendChild(obj);
+			parent.appendChild(el);
 			/*
 			//滞后加载图片
-			var imgs = obj.getElementsByTagName("img");
+			var imgs = el.getElementsByTagName("img");
 			for(var i = 0, len = imgs.length; i < len; i++){
 				imgs[i].src = imgs[i].getAttribute("src0");
 			}
 			*/
 		}
-		return obj;
+		return el;
 	};
 	this.getWorkspace = function(){
 		return this._workspace;
@@ -133,17 +133,17 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 	 * -@param {Boolean} initChild 是否初始化子DOM元素
 	 */
 	this.initComponent = function(parent, id){
-		var obj = typeof id == "string" ? this.getElement(id) : id;
-		if(!obj) throw "未找到指定id的DOM元素";
-		if(!obj._ptr){
+		var el = typeof id == "string" ? this.getElement(id) : id;
+		if(!el) throw "未找到指定id的DOM元素";
+		if(!el._ptr){
 			var className, aui;
-			var sAui = obj.getAttribute("aui");
+			var sAui = el.getAttribute("aui");
 			if(sAui != "-"){
 				aui = eval("(" + sAui + ")");
 				if(aui.tag){
 					className = aui.tag;
 				}else{
-					className = obj.getAttribute("tag");
+					className = el.getAttribute("tag");
 					if(!className){
 						className = "Component";
 						//throw "找到的DOM元素没有tag属性，不能绑定脚本组件";
@@ -160,13 +160,13 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 			if(aui){
 				c.setJsonData(aui);
 			}
-			c.setParent(parent, obj);
-			c.bind(obj);
+			c.setParent(parent, el);
+			c.bind(el);
 			//var color = this.getRandomColor();
 			//c._self.style.backgroundColor = color;
 			this._components.push(c);
-			if(obj.getAttribute("html") != "true"){  //如果初始化子组件的话
-				var nodes = obj.childNodes;
+			if(el.getAttribute("html") != "true"){  //如果初始化子组件的话
+				var nodes = el.childNodes;
 				for(var i = 0, len = nodes.length; i < len; i++){
 					if(nodes[i].nodeType == 1 && nodes[i].getAttribute("aui")){  //NODE_ELEMENT
 						this.initComponent(c, nodes[i], true);
@@ -174,7 +174,7 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 				}
 			}
 		}
-		return obj._ptr;
+		return el._ptr;
 	};
 	/**
 	 * @param {String} id DOM元素的ID列表，逗号分隔
@@ -205,11 +205,11 @@ _extension("WebRuntime", function(){  //注册 WebRuntime 扩展
 				var owner = this.getComponentById(ownerId);
 				this._workspace.getModalPanel().setOwner(owner);
 			}
-			var obj = this.getComponentById(id);  //可能的组件是 Popup,Dialog
-			obj.moveToCenter();
-			obj.showModal(true);
+			var el = this.getComponentById(id);  //可能的组件是 Popup,Dialog
+			el.moveToCenter();
+			el.showModal(true);
 		}/*else{
-			obj.showModal(false);
+			el.showModal(false);
 		}*/
 	};
 	this.getModalPanel = function(){

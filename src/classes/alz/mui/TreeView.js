@@ -28,22 +28,22 @@ _class("TreeView", Component, function(){
 	this.create = function(parent, data, w, h){
 		this.setParent2(parent);
 		if(data) this._data = data;
-		var obj = this._createElement2(null, "ul", !this._tree ? "ui-treeview" : "", {  //只有最外层的 TreeView 才有该样式
+		var el = this._createElement2(null, "ul", !this._tree ? "ui-treeview" : "", {  //只有最外层的 TreeView 才有该样式
 			"display": "none"
 		});
-		if(w) obj.style.width = typeof w == "string" ? w : w + "px";
-		if(h) obj.style.height = typeof h == "string" ? h : h + "px";
+		if(w) el.style.width = typeof w == "string" ? w : w + "px";
+		if(h) el.style.height = typeof h == "string" ? h : h + "px";
 		if(parent){
 			if(this._parent._self){
-				this._parent._self.appendChild(obj);
+				this._parent._self.appendChild(el);
 			}else{
-				this._parent.appendChild(obj);
+				this._parent.appendChild(el);
 			}
 		}
-		this.init(obj);
-		return obj;
+		this.init(el);
+		return el;
 	};
-	this.init = function(obj){
+	this.init = function(el){
 		_super.init.apply(this, arguments);
 		if(!this._tree){
 			this._self.onselectstart = function(){return false;};
@@ -219,11 +219,11 @@ _class("TreeView", Component, function(){
 		this._draging = true;
 		this._activeDragNode = treeNode;
 		var _this = this;
-		window.document.onmousemove = function(ev){
+		document.onmousemove = function(ev){
 			if(_this._draging){
 			}
 		};
-		window.document.onmouseup = function(ev){
+		document.onmouseup = function(ev){
 			ev = ev || window.event;
 			var target = ev.target || ev.srcElement;
 			if(target.tagName != "LI") target = target.parentNode;
@@ -232,8 +232,8 @@ _class("TreeView", Component, function(){
 			}
 			runtime.log("end drag");
 			_this._draging = false;
-			window.document.onmousemove = null;
-			window.document.onmouseup = null;
+			document.onmousemove = null;
+			document.onmouseup = null;
 		};
 	};
 	this.startDrag = function(ev, target, node){
@@ -265,12 +265,12 @@ _class("TreeView", Component, function(){
 		}
 		return rect;
 	};
-	this.getPos = function(obj, refObj){
+	this.getPos = function(el, refObj){
 		var pos = {"x": 0, "y": 0};
 		var dom = runtime.dom;
-		for(var o = obj; o && o != refObj; o = o.offsetParent){
+		for(var o = el; o && o != refObj; o = o.offsetParent){
 			var bl, bt, x, y;
-			if(o != obj){
+			if(o != el){
 				bl = dom.getStyleProperty(o, "borderLeftWidth");
 				bt = dom.getStyleProperty(o, "borderTopWidth");
 				x = isNaN(bl) ? 0 : bl;
@@ -280,8 +280,8 @@ _class("TreeView", Component, function(){
 				x += isNaN(bl) ? 0 : bl;
 				y += isNaN(bt) ? 0 : bt;
 			}
-			pos.x += o.offsetLeft + (o != obj ? x : 0);
-			pos.y += o.offsetTop + (o != obj ? y : 0);
+			pos.x += o.offsetLeft + (o != el ? x : 0);
+			pos.y += o.offsetTop + (o != el ? y : 0);
 		}
 		return pos;
 	};

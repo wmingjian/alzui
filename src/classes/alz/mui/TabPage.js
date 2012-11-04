@@ -13,7 +13,7 @@ _class("TabPage", Component, function(){
 		this._head = null;
 		this._body = null;
 	};
-	this.init = function(obj){
+	this.init = function(el){
 		_super.init.apply(this, arguments);
 		this._head = this._createElement2(this._self, "div", "ui-tabpage-head");
 		this._body = this._createElement2(this._self, "div", "ui-tabpage-body");
@@ -50,14 +50,14 @@ _class("TabPage", Component, function(){
 		}
 	};
 	this.add = function(text){
-		var obj = window.document.createElement("label");
-		obj._parent = this;
-		obj.tagIndex = this._tabs.length + 1;
-		obj.innerHTML = text + "[0]";
-		obj.onclick = function(){this._parent.activate(this);};
-		this._head.appendChild(obj);
-		this._tabs.push(obj);
-		this.activate(obj);
+		var el = document.createElement("label");
+		el._parent = this;
+		el.tagIndex = this._tabs.length + 1;
+		el.innerHTML = text + "[0]";
+		el.onclick = function(){this._parent.activate(this);};
+		this._head.appendChild(el);
+		this._tabs.push(el);
+		this.activate(el);
 	};
 	this.activate = function(tab){
 		if(this._activeTab != null){

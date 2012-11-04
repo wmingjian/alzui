@@ -30,13 +30,13 @@ _class("TemplateElement", "", function(){
 		this._attributes = tpldoc.getAttrs(xmlNode);
 		tplobj.regTplEl(this);  //注册模板元素
 		clazz = clazz || tagConf.getClass(xmlNode.getAttribute("clazz"));
-		var obj = tpldoc.createElementByXmlNode(this, tplobj.getRoot(), this._confStack, {
+		var el = tpldoc.createElementByXmlNode(this, tplobj.getRoot(), this._confStack, {
 			"xmlnode": xmlNode,
 			"clazz": clazz,
 			"tplel": clazz ? this : null
 		});
-		tpldoc._node.appendChild(obj);
-		this.init(obj);
+		tpldoc._node.appendChild(el);
+		this.init(el);
 		this.update(this._attributes);  //应用attributes
 		if(clazz){
 			//console.log("build <" + tagName + "> " + clazz.__cls__._fullName);
@@ -45,11 +45,11 @@ _class("TemplateElement", "", function(){
 			c.build(this);
 			this._component = c;
 		}
-		return obj;
+		return el;
 	};
-	this.init = function(obj){
-		obj._ptr = this;
-		this._self = obj;
+	this.init = function(el){
+		el._ptr = this;
+		this._self = el;
 	};
 	this.dispose = function(){
 		this._hash = null;

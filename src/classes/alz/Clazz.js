@@ -20,12 +20,12 @@ function Clazz(cxt, pkgName, className, superClass, superProto, classImp){
 	this._imps       = [];  //类实现的接口
 	this.init(this._clazz, this._proto);
 }
-function ClazzImp(){
+(function(){
 	//0=逆序,1=正序
 	var __methods = {  //str2hash("_init,destroy,dispose,init,__conf__")
 		"_init"   : 1,  //构造函数
 		"destroy" : 0,  //析构函数(销毁)
-		"dispose"  : 0,  //组件UI废弃函数
+		"dispose" : 0,  //组件UI废弃函数
 		"init"    : 1,  //初始化函数
 	//"__conf__": 1,  //配置数据注册方法
 		"bind"    : 1,  //组件创建方法
@@ -342,5 +342,4 @@ function ClazzImp(){
 			*/
 		//}
 	};
-}
-ClazzImp.call(Clazz.prototype);
+}).call(Clazz.prototype);

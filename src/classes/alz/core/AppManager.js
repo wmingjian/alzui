@@ -164,11 +164,11 @@ _class("AppManager", Plugin, function(){
 		var styles = conf.css.split(",");
 		var head = document.getElementsByTagName("head")[0];
 		for(var i = 0, len = styles.length; i < len; i++){
-			var obj = document.createElement("link");
-			obj.type = "text/css";
-			obj.rel = "stylesheet";
-			obj.href = conf.pathcss + styles[i];
-			head.appendChild(obj);
+			var el = document.createElement("link");
+			el.type = "text/css";
+			el.rel = "stylesheet";
+			el.href = conf.pathcss + styles[i];
+			head.appendChild(el);
 		}
 		var libs = [];
 		if(conf.tpl){

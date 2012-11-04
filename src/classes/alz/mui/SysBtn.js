@@ -82,7 +82,7 @@ _class("SysBtn", Component, function(){
 		this.setCapture(true);
 		/*
 		var _this = this;
-		var body = window.document.body;
+		var body = document.body;
 		if(runtime._host.env == "ie"){
 			body.setCapture();
 		}
@@ -101,7 +101,7 @@ _class("SysBtn", Component, function(){
 		this.setState("normal");
 		this.setCapture(false);
 		/*
-		var body = window.document.body;
+		var body = document.body;
 		this.removeListener(body, "mousemove");
 		this.removeListener(body, "mouseup");
 		if(runtime._host.env == "ie"){

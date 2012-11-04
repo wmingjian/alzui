@@ -15,13 +15,13 @@ _class("TextItem", Component, function(){
 		this.setParent2(parent);
 		this._type = type;
 		this._text = text;
-		var obj = window.document.createElement("span");
-		obj.className = this._type;
-		parent._self.appendChild(obj);
-		this.init(obj);
-		return obj;
+		var el = document.createElement("span");
+		el.className = this._type;
+		parent._self.appendChild(el);
+		this.init(el);
+		return el;
 	};
-	this.init = function(obj){
+	this.init = function(el){
 		_super.init.apply(this, arguments);
 		this.update();
 	};

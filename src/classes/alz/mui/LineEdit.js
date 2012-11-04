@@ -69,12 +69,12 @@ _class("LineEdit", Component, function(){
 	};
 	*/
 	function getCursorIndex(){
-		var selection = window.document.selection;
+		var selection = document.selection;
 		var rng = selection.createRange();
 		this._self.select();
 		rng.setEndPoint("StartToStart", selection.createRange());
 		this._pos = rng.text.length;
-		window.document.title = this._pos;
+		document.title = this._pos;
 		rng.collapse(false);  //移到后面
 		rng.select();
 	}
@@ -97,11 +97,11 @@ _class("LineEdit", Component, function(){
 	this.create = function(parent, app){
 		this.setParent2(parent);
 		if(app) this._app = app;
-		var obj = this._createElement2(parent ? parent._self : null, "div", "ui-lineedit");
-		this.init(obj);
-		return obj;
+		var el = this._createElement2(parent ? parent._self : null, "div", "ui-lineedit");
+		this.init(el);
+		return el;
 	};
-	this.init = function(obj){
+	this.init = function(el){
 		_super.init.apply(this, arguments);
 		var _this = this;
 		if(this._useInput){
@@ -313,14 +313,14 @@ _class("LineEdit", Component, function(){
 		}
 	};
 	this.getFrontText = function(){
-		var s = window.document.selection.createRange();
+		var s = document.selection.createRange();
 		s.setEndPoint("StartToStart", this._input.createTextRange());
 		return s.text;
 	};
 	this.addInputText = function(text, value){
 		//var rng = this._input.createTextRange();
 		//rng.moveEnd("character");
-		var rng = window.document.selection.createRange();
+		var rng = document.selection.createRange();
 		if(value && value.length > 0){
 			rng.moveStart("character", -value.length);
 		}
