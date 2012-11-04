@@ -7,7 +7,7 @@
 <script type="text/javascript" src="../../lib/chm_lib.js"></script>
 </head>
 <body>
-<div class="wui-Document">
+<script src="../../lib/head.js"></script>
 <h1>AjaxEngine 类</h1>
 <p>提供对异步请求的支持，实现了对 XMLHttpRequest 的简单封装，内部使用单一的 XMLHttpRequest 对象通过请求队列机制实现对多个请求的异步工作模式。</p>
 
@@ -82,6 +82,6 @@ var agent = {
 ajax.netInvoke("POST", "test3.php", "act=add&name=abc", "json", agent, function(data){
 	//this.xxxx  // ---- 这个里的 this 就是 agent 对象
 });</pre>
-</div>
+<script src="../../lib/foot.js"></script>
 </body>
 </html>
